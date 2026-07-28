@@ -2,7 +2,6 @@ import { ArrowRight, BadgeCheck, ClipboardCheck, CreditCard, Database, MessageCi
 import Link from "next/link";
 import { BrandWatermark } from "@/components/BrandWatermark";
 import { ButtonLink } from "@/components/ButtonLink";
-import { FAQAccordion } from "@/components/FAQAccordion";
 import { HomeBaseBuilderTeaser } from "@/components/HomeBaseBuilderTeaser";
 import { LeadDeliveryPreview } from "@/components/LeadDeliveryPreview";
 import { OpportunityShowcase } from "@/components/OpportunityShowcase";
@@ -11,7 +10,7 @@ import { SampleConversionSection } from "@/components/SampleConversionSection";
 import { assetPath } from "@/lib/asset-path";
 import { buildQuickRequestHref, segmentCards } from "@/lib/segments";
 import { createWhatsAppLink, defaultWhatsAppMessage } from "@/lib/whatsapp";
-import { homeFaq, isExternalHref, products } from "@/lib/site";
+import { isExternalHref, products } from "@/lib/site";
 
 const impactCards = [
   "Público definido antes da busca",
@@ -78,6 +77,46 @@ export default function HomePage() {
 
       <HomeBaseBuilderTeaser />
 
+      <section className="section section--light">
+        <div className="container-wide split-section">
+          <LeadDeliveryPreview />
+          <div>
+            <p className="eyebrow">DEMONSTRAÇÃO DA ENTREGA</p>
+            <h2 className="h2">Veja como sua base chega para a equipe comercial.</h2>
+            <p className="lead">
+              A entrega prioriza campos úteis para abordagem: empresa, segmento, cidade, CNAE, porte, abertura, site,
+              e status comercial ilustrativo.
+            </p>
+            <div className="impact-stack">
+              {impactCards.map((item) => (
+                <span key={item}>
+                  <BadgeCheck size={18} />
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="container-wide">
+          <div className="section-kicker">
+            <p className="eyebrow">Bases comerciais</p>
+            <h2 className="h2">Escolha o gatilho comercial da sua próxima venda.</h2>
+            <p className="lead">
+              Bases prontas para começar agora ou recortes personalizados quando seu público exige filtros mais
+              específicos.
+            </p>
+          </div>
+          <div className="product-signal-grid">
+            {mainProducts.map((product) => (
+              <ProductSignalCard key={product.slug} product={product} />
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="section conversion-system-section">
         <div className="container-wide conversion-system-grid">
           <div className="conversion-system-copy">
@@ -129,46 +168,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section section--light">
-        <div className="container-wide split-section">
-          <LeadDeliveryPreview />
-          <div>
-            <p className="eyebrow">DEMONSTRAÇÃO DA ENTREGA</p>
-            <h2 className="h2">Veja como sua base chega para a equipe comercial.</h2>
-            <p className="lead">
-              A entrega prioriza campos úteis para abordagem: empresa, segmento, cidade, CNAE, porte, abertura, site,
-              e status comercial ilustrativo.
-            </p>
-            <div className="impact-stack">
-              {impactCards.map((item) => (
-                <span key={item}>
-                  <BadgeCheck size={18} />
-                  {item}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container-wide">
-          <div className="section-kicker">
-            <p className="eyebrow">Bases comerciais</p>
-            <h2 className="h2">Escolha o gatilho comercial da sua próxima venda.</h2>
-            <p className="lead">
-              Bases prontas para começar agora ou recortes personalizados quando seu público exige filtros mais
-              específicos.
-            </p>
-          </div>
-          <div className="product-signal-grid">
-            {mainProducts.map((product) => (
-              <ProductSignalCard key={product.slug} product={product} />
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="section dark-band segment-band">
         <BrandWatermark tone="light" />
         <div className="container-wide">
@@ -196,19 +195,6 @@ export default function HomePage() {
       </section>
 
       <SampleConversionSection />
-
-      <section className="section section--light">
-        <div className="container-wide faq-short">
-          <div>
-            <p className="eyebrow">FAQ</p>
-            <h2 className="h2">Antes de começar, você talvez queira saber.</h2>
-            <ButtonLink href="/faq" variant="secondary">
-              Ver todas as dúvidas
-            </ButtonLink>
-          </div>
-          <FAQAccordion items={homeFaq.slice(0, 5)} />
-        </div>
-      </section>
 
       <section className="section final-cta">
         <BrandWatermark tone="light" />

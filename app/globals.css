@@ -1686,6 +1686,10 @@ textarea {
   overflow: hidden;
 }
 
+.builder-teaser-section .split-section {
+  grid-template-columns: minmax(0, 1.18fr) minmax(360px, 0.82fr);
+}
+
 .builder-mini-form {
   display: grid;
   gap: 18px;
@@ -1708,6 +1712,33 @@ textarea {
   display: flex;
   flex-wrap: wrap;
   gap: 9px;
+}
+
+.quick-period-options {
+  display: grid;
+  grid-template-columns: repeat(5, max-content);
+  gap: 10px;
+  align-items: center;
+  justify-content: start;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.quick-period-options::-webkit-scrollbar {
+  display: none;
+}
+
+.quick-period-options .choice-chip {
+  white-space: nowrap;
+}
+
+@media (max-width: 680px) {
+  .quick-period-options {
+    display: flex;
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
 }
 
 .choice-chip {
@@ -2364,6 +2395,10 @@ textarea {
   .sample-grid,
   .faq-short,
   .sample-form {
+    grid-template-columns: 1fr;
+  }
+
+  .builder-teaser-section .split-section {
     grid-template-columns: 1fr;
   }
 

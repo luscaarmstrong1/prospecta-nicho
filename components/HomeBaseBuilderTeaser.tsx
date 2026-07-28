@@ -70,7 +70,7 @@ export function HomeBaseBuilderTeaser() {
             </label>
             <div className="teaser-choice-group">
               <span>Empresas abertas há quanto tempo?</span>
-              <div className="chip-grid" role="listbox" aria-label="Período de abertura">
+              <div className="chip-grid quick-period-options" role="listbox" aria-label="Período de abertura">
                 {periods.map((option) => (
                   <button
                     className="choice-chip"
