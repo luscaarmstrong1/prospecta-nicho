@@ -4,8 +4,8 @@ import { requireAdmin, integrationStatus } from "@/lib/server/admin-auth";
 export const dynamic = "force-static";
 export const dynamicParams = false;
 
-export async function generateStaticParams() {
-  return [];
+export function generateStaticParams() {
+  return [{ id: "demo" }];
 }
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {

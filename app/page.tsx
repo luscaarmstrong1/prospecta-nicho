@@ -103,10 +103,10 @@ export default function HomePage() {
           </div>
           <div className="conversion-system-visual" aria-label="Fluxo comercial ilustrativo da ProspectaNicho">
             <picture>
-              <source media="(max-width: 680px)" srcSet={assetPath("/assets/images/opportunity-showcase-mobile.webp")} />
+              <source media="(max-width: 680px)" srcSet={assetPath("/assets/images/sections/operacao-guiada-mobile.webp")} />
               <img
-                src={assetPath("/assets/images/opportunity-showcase.webp")}
-                alt="Equipe comercial analisando sinais e critérios de uma base B2B segmentada"
+                src={assetPath("/assets/images/sections/operacao-guiada.webp")}
+                alt="Imagem ilustrativa da operação guiada da ProspectaNicho do nicho ao atendimento"
               />
             </picture>
             <div className="conversion-system-overlay">

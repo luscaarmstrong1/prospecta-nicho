@@ -3,6 +3,8 @@
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { assetPath } from "@/lib/asset-path";
+import { getSegmentAsset } from "@/lib/segment-assets";
 import { getSegmentById, segmentCards } from "@/lib/segments";
 
 const audiences = segmentCards.slice(0, 8);
@@ -21,6 +23,7 @@ export function HomeBaseBuilderTeaser() {
   const [city, setCity] = useState("");
   const [period, setPeriod] = useState("últimos 90 dias");
   const selectedSegment = getSegmentById(segment);
+  const selectedAsset = getSegmentAsset(selectedSegment.id);
 
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -88,14 +91,16 @@ export function HomeBaseBuilderTeaser() {
           </form>
         </div>
         <div className="teaser-radar-panel">
-          <span className="badge">Pedido rápido</span>
-          <h3 className="h3">{selectedSegment.label} {city ? `em ${city}` : "com região a definir"}</h3>
-          <div className="teaser-map" aria-hidden="true">
-            <span className="radar-pulse" />
-            <span className="radar-dot dot-a" />
-            <span className="radar-dot dot-b" />
-            <span className="radar-line line-a" />
+          <div className="teaser-radar-head">
+            <span className="badge">Pedido rápido</span>
+            <h3 className="h3">{selectedSegment.label} {city ? `em ${city}` : "com região a definir"}</h3>
           </div>
+          {selectedAsset ? (
+            <picture className="teaser-segment-media">
+              <source media="(max-width: 680px)" srcSet={assetPath(selectedAsset.mobileImage)} />
+              <img src={assetPath(selectedAsset.image)} alt={selectedAsset.alt} />
+            </picture>
+          ) : null}
           <div className="signal-chips">
             <span>{selectedSegment.label}</span>
             <span>{city || "Cidade ou região"}</span>

@@ -4,6 +4,8 @@ import { ArrowRight, MessageCircle, Send, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
+import { assetPath } from "@/lib/asset-path";
+import { getSegmentAsset } from "@/lib/segment-assets";
 import { buildQuickRequestHref, getSegmentById, segmentCards } from "@/lib/segments";
 import { isStaticExport } from "@/lib/static-export";
 import { createWhatsAppLink } from "@/lib/whatsapp";
@@ -71,6 +73,7 @@ export function QuickPlanilhaRequestForm() {
   });
 
   const selectedSegment = getSegmentById(form.segment);
+  const selectedAsset = getSegmentAsset(selectedSegment.id);
   const refineHref = `/montar-minha-base?segment=${encodeURIComponent(selectedSegment.id)}&audience=${encodeURIComponent(selectedSegment.label)}`;
 
   function updateField(field: keyof FormState, value: string | boolean) {
@@ -160,9 +163,17 @@ export function QuickPlanilhaRequestForm() {
             </div>
           </div>
           <aside className="quick-proof-panel">
-            <ShieldCheck size={28} />
-            <strong>Exemplo ilustrativo</strong>
-            <p>Os campos da planilha são confirmados conforme origem, disponibilidade e recorte solicitado.</p>
+            {selectedAsset ? (
+              <picture className="quick-segment-media">
+                <source media="(max-width: 680px)" srcSet={assetPath(selectedAsset.mobileImage)} />
+                <img src={assetPath(selectedAsset.image)} alt={selectedAsset.alt} />
+              </picture>
+            ) : null}
+            <div className="quick-proof-panel__body">
+              <ShieldCheck size={28} />
+              <strong>Exemplo ilustrativo</strong>
+              <p>Os campos da planilha são confirmados conforme origem, disponibilidade e recorte solicitado.</p>
+            </div>
           </aside>
         </div>
       </section>
@@ -184,6 +195,12 @@ export function QuickPlanilhaRequestForm() {
             <span><ShieldCheck size={17} /> Pedido salvo antes do WhatsApp</span>
             <span><ShieldCheck size={17} /> Dados usados só para atendimento</span>
           </div>
+          {selectedAsset ? (
+            <picture className="quick-segment-hero">
+              <source media="(max-width: 680px)" srcSet={assetPath(selectedAsset.mobileImage)} />
+              <img src={assetPath(selectedAsset.image)} alt={selectedAsset.alt} />
+            </picture>
+          ) : null}
         </div>
 
         <form className="quick-request-form" onSubmit={submit}>

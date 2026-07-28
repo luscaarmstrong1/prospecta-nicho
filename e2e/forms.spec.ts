@@ -23,3 +23,8 @@ test("formulário rápido oferece refinamento completo", async ({ page }) => {
     /\/montar-minha-base\?segment=contabilidades/,
   );
 });
+
+test("solicitação rápida exibe imagem do segmento selecionado", async ({ page }) => {
+  await page.goto("/solicitar-planilha?segment=energia-solar&source=e2e");
+  await expect(page.locator(".quick-segment-hero img")).toHaveAttribute("src", /energia-solar\.webp/);
+});

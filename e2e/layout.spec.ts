@@ -14,3 +14,12 @@ test("cards de segmento apontam para solicitação rápida", async ({ page }) =>
   );
   expect(hrefs.every((href) => href.startsWith("/solicitar-planilha?segment="))).toBe(true);
 });
+
+test("imagem da solicitação rápida muda conforme segmento escolhido", async ({ page }) => {
+  await page.goto("/");
+  const image = page.locator(".teaser-segment-media img");
+  await expect(image).toHaveAttribute("src", /agencias\.webp/);
+
+  await page.getByRole("button", { name: "Contabilidades" }).click();
+  await expect(image).toHaveAttribute("src", /contabilidades\.webp/);
+});

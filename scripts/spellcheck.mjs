@@ -43,6 +43,7 @@ for (const root of roots) {
         !line.includes("checkoutLinkEnvKey") &&
         !line.includes("id:") &&
         !line.includes("NEXT_PUBLIC_") &&
+        !line.includes("/assets/") &&
         !line.includes("slug:") &&
         !line.includes("empresas-recem-abertas")
       )
