@@ -10,6 +10,8 @@ O link `https://luscaarmstrong1.github.io/prospecta-nicho/` é a publicação es
 
 Se `luscaarmstrong1/prospecta-nicho` estiver privado, GitHub Pages público pode ficar indisponível conforme o plano da conta. Em 2026-07-28, após a mudança para privado, a API de Pages e o link `https://luscaarmstrong1.github.io/prospecta-nicho/` retornaram 404. Para manter acesso público sem expor o código-fonte, publique apenas o artefato estático em um repositório público separado ou use Vercel/hosting equivalente com repositório privado.
 
+Em 2026-07-28, o repositório foi retornado para público e GitHub Pages foi reativado pela branch `gh-pages`, path `/`, com HTTPS enforced.
+
 ## Variáveis mínimas em produção
 
 - `NEXT_PUBLIC_SITE_URL`
