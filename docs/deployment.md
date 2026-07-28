@@ -8,6 +8,8 @@ Produção completa deve rodar em Vercel ou ambiente compatível com Next.js ser
 
 O link `https://luscaarmstrong1.github.io/prospecta-nicho/` é a publicação estática exclusiva da ProspectaNicho. Formulários que dependem de API precisam de fallback estático ou endpoint externo.
 
+Se `luscaarmstrong1/prospecta-nicho` estiver privado, GitHub Pages público pode ficar indisponível conforme o plano da conta. Em 2026-07-28, após a mudança para privado, a API de Pages e o link `https://luscaarmstrong1.github.io/prospecta-nicho/` retornaram 404. Para manter acesso público sem expor o código-fonte, publique apenas o artefato estático em um repositório público separado ou use Vercel/hosting equivalente com repositório privado.
+
 ## Variáveis mínimas em produção
 
 - `NEXT_PUBLIC_SITE_URL`
