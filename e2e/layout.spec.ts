@@ -68,3 +68,44 @@ test("chips de período da solicitação rápida ficam alinhados no desktop", as
 
   expect(Math.max(...tops) - Math.min(...tops)).toBeLessThanOrEqual(1);
 });
+
+test("whatsapp flutuante permanece fixo e visível durante scroll", async ({ page }) => {
+  await page.goto("/");
+  const whatsapp = page.locator(".whatsapp-floating");
+  await expect(whatsapp).toBeVisible();
+  await expect(whatsapp).toHaveAttribute("href", /^https:\/\/wa\.me\//);
+
+  const samples = [];
+  for (const scrollY of [0, 800, 1800]) {
+    await page.evaluate((value) => window.scrollTo(0, value), scrollY);
+    await page.waitForTimeout(120);
+    samples.push(
+      await whatsapp.evaluate((element) => {
+        const style = window.getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+        return {
+          display: style.display,
+          visibility: style.visibility,
+          opacity: style.opacity,
+          position: style.position,
+          zIndex: Number(style.zIndex),
+          top: Math.round(rect.top),
+          width: Math.round(rect.width),
+          height: Math.round(rect.height),
+        };
+      }),
+    );
+  }
+
+  for (const sample of samples) {
+    expect(sample.display).not.toBe("none");
+    expect(sample.visibility).toBe("visible");
+    expect(sample.opacity).toBe("1");
+    expect(sample.position).toBe("fixed");
+    expect(sample.zIndex).toBeGreaterThanOrEqual(80);
+    expect(sample.width).toBeGreaterThanOrEqual(54);
+    expect(sample.height).toBeGreaterThanOrEqual(54);
+  }
+
+  expect(new Set(samples.map((sample) => sample.top)).size).toBe(1);
+});

@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
 
-const isGitHubPages = process.env.GITHUB_PAGES === "true";
+const isStaticPreviewExport =
+  process.env.GITHUB_PAGES === "true" || process.env.NEXT_PUBLIC_STATIC_EXPORT === "true";
 const repositoryName = process.env.GITHUB_REPOSITORY?.split("/")[1] || "prospecta-nicho";
-const githubPagesBasePath = process.env.NEXT_PUBLIC_BASE_PATH || `/${repositoryName}`;
+const staticPreviewBasePath = process.env.NEXT_PUBLIC_BASE_PATH || `/${repositoryName}`;
 const scriptSrc =
   process.env.NODE_ENV === "development"
     ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com"
@@ -36,14 +37,14 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   async headers() {
-    if (isGitHubPages) return [];
+    if (isStaticPreviewExport) return [];
     return [{ source: "/:path*", headers: securityHeaders }];
   },
-  ...(isGitHubPages
+  ...(isStaticPreviewExport
     ? {
         output: "export" as const,
-        basePath: githubPagesBasePath,
-        assetPrefix: githubPagesBasePath,
+        basePath: staticPreviewBasePath,
+        assetPrefix: staticPreviewBasePath,
         images: { unoptimized: true },
         trailingSlash: true,
       }

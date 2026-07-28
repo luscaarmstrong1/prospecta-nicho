@@ -24,7 +24,8 @@ Apoia organização de nichos, leads e dados comerciais para captação e análi
 - Framer Motion
 - Lucide React
 - Playwright
-- GitHub Pages
+- GitHub Actions
+- Preview estático opcional
 
 ## Recursos principais
 
@@ -36,7 +37,9 @@ Apoia organização de nichos, leads e dados comerciais para captação e análi
 
 ## Acesso público
 
-GitHub Pages: https://luscaarmstrong1.github.io/prospecta-nicho/
+Produção canônica: configurar `NEXT_PUBLIC_SITE_URL=https://prospectanicho.com.br` em Vercel ou infraestrutura equivalente com suporte a rotas server-side do Next.js.
+
+Preview estático temporário: GitHub Pages pode ser usado apenas quando o export estático estiver explicitamente habilitado, sem tratar `github.io` como canonical de produção.
 
 ## Como executar localmente
 

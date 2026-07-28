@@ -13,32 +13,32 @@ import { createWhatsAppLink, defaultWhatsAppMessage } from "@/lib/whatsapp";
 import { isExternalHref, products } from "@/lib/site";
 
 const impactCards = [
-  "Público definido antes da busca",
-  "Estrutura pronta para rotina comercial",
-  "Campos confirmados conforme disponibilidade",
-  "Suporte humano para validar o recorte",
+  "Critérios definidos antes da busca",
+  "Campos úteis para abordagem",
+  "Planilha pronta para rotina comercial",
+  "Suporte para ajustar o recorte",
 ];
 
 const commercialFlow = [
   {
     icon: Database,
     title: "Recorte antes do volume",
-    text: "Você define nicho, região, período de abertura e perfil desejado antes de receber qualquer lista genérica.",
+    text: "Nicho, região, período e perfil entram antes da geração da base.",
   },
   {
     icon: ClipboardCheck,
     title: "Validação assistida",
-    text: "A equipe revisa critérios, campos disponíveis e formato da entrega para reduzir retrabalho na prospecção.",
+    text: "Critérios e campos são revisados para reduzir retrabalho comercial.",
   },
   {
     icon: Workflow,
     title: "Pedido organizado",
-    text: "A solicitação fica estruturada com protocolo, resumo do recorte e caminho claro para refinamento ou WhatsApp.",
+    text: "A solicitação vira um resumo claro para refinamento e atendimento.",
   },
   {
     icon: CreditCard,
     title: "Compra com contexto",
-    text: "Quando houver checkout configurado, a compra acontece depois da escolha do produto ou da validação do escopo.",
+    text: "A compra acontece depois da escolha da base ou validação do escopo.",
   },
 ];
 
@@ -77,15 +77,15 @@ export default function HomePage() {
 
       <HomeBaseBuilderTeaser />
 
-      <section className="section section--light">
+      <section className="section section--light delivery-section">
         <div className="container-wide split-section">
           <LeadDeliveryPreview />
           <div>
             <p className="eyebrow">DEMONSTRAÇÃO DA ENTREGA</p>
             <h2 className="h2">Veja como sua base chega para a equipe comercial.</h2>
             <p className="lead">
-              A entrega prioriza campos úteis para abordagem: empresa, segmento, cidade, CNAE, porte, abertura, site,
-              e status comercial ilustrativo.
+              Uma prévia simples do formato: empresa, segmento, cidade, CNAE, porte, abertura, site e status comercial
+              ilustrativo.
             </p>
             <div className="impact-stack">
               {impactCards.map((item) => (
@@ -99,13 +99,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section commercial-bases-section">
         <div className="container-wide">
           <div className="section-kicker">
             <p className="eyebrow">Bases comerciais</p>
             <h2 className="h2">Escolha o gatilho comercial da sua próxima venda.</h2>
             <p className="lead">
-              Bases prontas para começar agora ou recortes personalizados quando seu público exige filtros mais
+              Comece com uma base pronta ou solicite um recorte personalizado quando o público pedir filtros mais
               específicos.
             </p>
           </div>
@@ -123,12 +123,11 @@ export default function HomePage() {
             <p className="eyebrow">OPERAÇÃO GUIADA</p>
             <h2 className="h2">Do nicho ao atendimento, cada etapa deixa a prospecção mais clara.</h2>
             <p className="lead">
-              A ProspectaNicho não entrega apenas uma lista: ela organiza o pedido para sua equipe entender o público,
-              validar critérios e avançar com menos ruído comercial.
+              O pedido fica mais claro antes da entrega: público, critérios, formato e próximo passo comercial.
             </p>
             <div className="conversion-system-proof">
               <ShieldCheck size={20} />
-              <span>Solicitação sem cobrança antecipada na base personalizada. Pagamento só entra quando o escopo comercial faz sentido.</span>
+              <span>Na base personalizada, a validação de escopo vem antes da cobrança.</span>
             </div>
             <div className="btn-row">
               <ButtonLink href={buildQuickRequestHref("agencias", "guided-flow")} variant="teal">

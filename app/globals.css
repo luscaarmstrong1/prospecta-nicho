@@ -8,10 +8,14 @@
   --teal-bright: #38ddd5;
   --canvas: #f5f8fb;
   --content-max: var(--content-default);
+  --content-default: 1360px;
   --content-wide: 1600px;
   --content-reading: 760px;
-  --gutter: clamp(var(--gutter-mobile), 5vw, var(--gutter-wide));
-  --section-y: clamp(72px, 8vw, 112px);
+  --gutter: clamp(20px, 5vw, 96px);
+  --section-y-large: clamp(84px, 8vw, 128px);
+  --section-y: clamp(64px, 6vw, 104px);
+  --section-y-compact: clamp(48px, 5vw, 76px);
+  --section-gap: clamp(32px, 4vw, 56px);
   --grid-gap: clamp(18px, 2vw, 34px);
   --deep: #061e3a;
   --navy: #0b2e59;
@@ -575,18 +579,33 @@ textarea {
   color: rgba(255, 255, 255, 0.78);
 }
 
-.whatsapp {
+.whatsapp-floating {
   position: fixed;
-  right: max(18px, env(safe-area-inset-right));
-  bottom: max(18px, env(safe-area-inset-bottom));
-  z-index: 45;
-  width: 54px;
-  height: 54px;
-  min-height: 54px;
+  right: max(22px, calc(env(safe-area-inset-right) + 18px));
+  bottom: max(22px, calc(env(safe-area-inset-bottom) + 18px));
+  z-index: 80;
+  display: inline-grid;
+  width: 58px;
+  height: 58px;
+  min-height: 58px;
+  place-items: center;
   padding: 0;
+  border: 0;
   border-radius: 999px;
-  background: #25d366;
-  box-shadow: 0 16px 36px rgba(37, 211, 102, 0.28);
+  color: var(--white);
+  background: var(--whatsapp, #25d366);
+  box-shadow: 0 18px 42px rgba(37, 211, 102, 0.34);
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  pointer-events: auto;
+  isolation: isolate;
+  transition: box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.whatsapp-floating:hover {
+  transform: none;
+  box-shadow: 0 22px 48px rgba(37, 211, 102, 0.42);
 }
 
 .final-cta,
@@ -611,7 +630,7 @@ textarea {
   backdrop-filter: blur(12px);
 }
 
-.whatsapp::before {
+.whatsapp-floating::before {
   content: attr(data-tooltip);
   position: absolute;
   right: 66px;
@@ -629,7 +648,7 @@ textarea {
   transition: opacity 180ms ease;
 }
 
-.whatsapp:hover::before {
+.whatsapp-floating:hover::before {
   opacity: 1;
 }
 
@@ -672,11 +691,11 @@ textarea {
 }
 
 .hero--premium {
-  min-height: 680px;
+  min-height: 640px;
   display: flex;
   align-items: center;
   overflow: hidden;
-  padding: 104px 0 86px;
+  padding: var(--section-y-large) 0 var(--section-y);
   color: var(--white);
   background:
     radial-gradient(circle at 78% 20%, rgba(15, 163, 166, 0.2), transparent 26%),
@@ -731,6 +750,8 @@ textarea {
 .conversion-system-section {
   position: relative;
   overflow: hidden;
+  padding-top: var(--section-y-compact);
+  padding-bottom: var(--section-y);
   background:
     radial-gradient(circle at 86% 16%, rgba(15, 163, 166, 0.16), transparent 24%),
     linear-gradient(180deg, #ffffff 0%, #eef7fa 100%);
@@ -739,7 +760,7 @@ textarea {
 .conversion-system-grid {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1fr);
-  gap: clamp(28px, 4vw, 64px);
+  gap: var(--section-gap);
   align-items: center;
 }
 
@@ -861,6 +882,17 @@ textarea {
   margin: 0;
   color: var(--muted);
   font-size: 0.94rem;
+}
+
+.delivery-section {
+  padding-top: var(--section-y-compact);
+}
+
+.commercial-bases-section {
+  padding-top: var(--section-y);
+  padding-bottom: var(--section-y-compact);
+  background:
+    linear-gradient(180deg, var(--soft) 0%, #f8fcfd 100%);
 }
 
 .opportunity-radar {
@@ -1175,6 +1207,11 @@ textarea {
   bottom: auto;
 }
 
+.segment-band {
+  padding-top: var(--section-y);
+  padding-bottom: var(--section-y);
+}
+
 .segment-labels {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1372,7 +1409,7 @@ textarea {
 .faq-short {
   display: grid;
   grid-template-columns: 1.04fr 0.96fr;
-  gap: 48px;
+  gap: var(--section-gap);
   align-items: center;
 }
 
@@ -1439,7 +1476,7 @@ textarea {
 
 .section-kicker {
   max-width: 760px;
-  margin-bottom: 30px;
+  margin-bottom: var(--section-gap);
 }
 
 .section-kicker.center {
@@ -1557,6 +1594,8 @@ textarea {
 .sample-section {
   position: relative;
   overflow: hidden;
+  padding-top: var(--section-y-compact);
+  padding-bottom: var(--section-y);
   background:
     radial-gradient(circle at 18% 20%, rgba(15, 163, 166, 0.16), transparent 26%),
     var(--teal-soft);
@@ -1684,6 +1723,10 @@ textarea {
 .builder-teaser-section {
   position: relative;
   overflow: hidden;
+  padding-top: var(--section-y-compact);
+  padding-bottom: var(--section-y);
+  background:
+    linear-gradient(180deg, var(--white) 0%, #f8fcfd 100%);
 }
 
 .builder-teaser-section .split-section {
@@ -2513,13 +2556,16 @@ textarea {
     gap: 4px;
   }
 
-  .whatsapp::before {
+  .whatsapp-floating::before {
     display: none;
   }
 
-  .whatsapp {
-    right: max(14px, env(safe-area-inset-right));
-    bottom: max(14px, env(safe-area-inset-bottom));
+  .whatsapp-floating {
+    right: max(16px, calc(env(safe-area-inset-right) + 12px));
+    bottom: max(16px, calc(env(safe-area-inset-bottom) + 12px));
+    width: 54px;
+    height: 54px;
+    min-height: 54px;
   }
 
   .cookie {

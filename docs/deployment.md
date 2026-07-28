@@ -4,13 +4,21 @@
 
 Produção completa deve rodar em Vercel ou ambiente compatível com Next.js server routes. GitHub Pages serve apenas HTML/CSS/JS estático e não executa APIs.
 
-## GitHub Pages
+## Preview estático / GitHub Pages
 
-O link `https://luscaarmstrong1.github.io/prospecta-nicho/` é a publicação estática exclusiva da ProspectaNicho. Formulários que dependem de API precisam de fallback estático ou endpoint externo.
+GitHub Pages deve ser tratado como preview/export estático temporário da ProspectaNicho. Formulários que dependem de API precisam de fallback estático ou endpoint externo nesse ambiente.
 
-Se `luscaarmstrong1/prospecta-nicho` estiver privado, GitHub Pages público pode ficar indisponível conforme o plano da conta. Em 2026-07-28, após a mudança para privado, a API de Pages e o link `https://luscaarmstrong1.github.io/prospecta-nicho/` retornaram 404. Para manter acesso público sem expor o código-fonte, publique apenas o artefato estático em um repositório público separado ou use Vercel/hosting equivalente com repositório privado.
+Se o repositório fonte estiver privado, GitHub Pages público pode ficar indisponível conforme o plano da conta. Em 2026-07-28, após a mudança para privado, a API de Pages e a URL antiga de Pages retornaram 404. Para manter acesso público sem expor o código-fonte, publique apenas o artefato estático em um repositório público separado ou use Vercel/hosting equivalente com repositório privado.
 
-Em 2026-07-28, o repositório foi retornado para público e GitHub Pages foi reativado pela branch `gh-pages`, path `/`, com HTTPS enforced.
+Em 2026-07-28, o repositório foi retornado para público e GitHub Pages foi reativado pela branch `gh-pages`, path `/`, com HTTPS enforced. Isso não torna `github.io` a URL canônica de produção.
+
+Para gerar preview estático com basePath, habilite explicitamente:
+
+- `GITHUB_PAGES=true` ou `NEXT_PUBLIC_STATIC_EXPORT=true`
+- `NEXT_PUBLIC_BASE_PATH=/prospecta-nicho`
+- `NEXT_PUBLIC_ALLOW_GITHUB_PAGES=true`
+
+Sem essas variáveis, `NEXT_PUBLIC_BASE_PATH` não deve alterar assets ou metadata de produção.
 
 ## Variáveis mínimas em produção
 

@@ -52,10 +52,28 @@ test("formulários comerciais têm honeypot, rate limit e Turnstile preparado", 
 test("configuração Next mantém GitHub Pages apenas de forma condicional", () => {
   const source = readFileSync("next.config.ts", "utf8");
   assert.match(source, /GITHUB_PAGES/);
+  assert.match(source, /NEXT_PUBLIC_STATIC_EXPORT/);
+  assert.match(source, /isStaticPreviewExport/);
   assert.match(source, /output: "export"/);
   assert.match(source, /assetPrefix/);
   assert.match(source, /basePath/);
   assert.match(source, /\?\s*{/);
+});
+
+test("basePath de assets só vale para preview ou export estático", () => {
+  const source = readFileSync("lib/asset-path.ts", "utf8");
+  assert.match(source, /allowStaticBasePath/);
+  assert.match(source, /NEXT_PUBLIC_STATIC_EXPORT/);
+  assert.match(source, /NEXT_PUBLIC_ALLOW_GITHUB_PAGES/);
+  assert.match(source, /GITHUB_PAGES/);
+});
+
+test("URL canônica bloqueia GitHub Pages fora de preview estático", () => {
+  const source = readFileSync("lib/site-url.ts", "utf8");
+  assert.match(source, /productionUrl = "https:\/\/prospectanicho\.com\.br"/);
+  assert.match(source, /github\\.io/);
+  assert.match(source, /allowStaticPreviewUrl/);
+  assert.match(source, /NEXT_PUBLIC_STATIC_EXPORT/);
 });
 
 test("segmentos públicos levam para solicitação rápida", () => {
