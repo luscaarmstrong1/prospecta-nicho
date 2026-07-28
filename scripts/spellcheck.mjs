@@ -45,6 +45,7 @@ for (const root of roots) {
         !line.includes("NEXT_PUBLIC_") &&
         !line.includes("/assets/") &&
         !line.includes("slug:") &&
+        !line.includes("comunicacao-visual") &&
         !line.includes("empresas-recem-abertas")
       )
       .join("\n");
