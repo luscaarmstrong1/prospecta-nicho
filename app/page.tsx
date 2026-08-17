@@ -2,11 +2,10 @@ import { ArrowRight, BadgeCheck, MessageCircle, ShieldCheck } from "lucide-react
 import Link from "next/link";
 import { BrandWatermark } from "@/components/BrandWatermark";
 import { ButtonLink } from "@/components/ButtonLink";
-import { HomeBaseBuilderTeaser } from "@/components/HomeBaseBuilderTeaser";
 import { LeadDeliveryPreview } from "@/components/LeadDeliveryPreview";
-import { OpportunityShowcase } from "@/components/OpportunityShowcase";
 import { ProductSignalCard } from "@/components/ProductSignalCard";
 import { SampleConversionSection } from "@/components/SampleConversionSection";
+import { CuratedShowcaseHero } from "@/features/home/CuratedShowcaseHero";
 import { assetPath } from "@/lib/asset-path";
 import { buildQuickRequestHref, segmentCards } from "@/lib/segments";
 import { createWhatsAppLink, defaultWhatsAppMessage } from "@/lib/whatsapp";
@@ -25,34 +24,7 @@ export default function HomePage() {
 
   return (
     <>
-      <section className="hero hero--premium">
-        <BrandWatermark tone="light" />
-        <div className="container-wide hero-grid">
-          <div className="hero-copy">
-            <p className="eyebrow eyebrow--dark">INTELIGÊNCIA COMERCIAL PARA QUEM PRECISA CRESCER</p>
-            <h1 className="h1">Encontre empresas com o perfil certo para sua próxima venda.</h1>
-            <p className="lead">
-              Defina nicho, cidade, porte, CNAE e momento de abertura. A ProspectaNicho organiza seu recorte comercial
-              para você prospectar com mais contexto.
-            </p>
-            <div className="btn-row">
-              <ButtonLink href="/montar-minha-base" variant="teal">
-                Montar minha base
-                <ArrowRight size={18} />
-              </ButtonLink>
-              <ButtonLink href="/produtos/amostra-gratuita" variant="secondary">
-                Receber 10 empresas de amostra
-              </ButtonLink>
-            </div>
-            <p className="hero-microcopy">
-              Sem assinatura obrigatória. Sem lista genérica. Recortes construídos para sua operação.
-            </p>
-          </div>
-          <OpportunityShowcase />
-        </div>
-      </section>
-
-      <HomeBaseBuilderTeaser />
+      <CuratedShowcaseHero />
 
       <section className="section section--light delivery-section">
         <div className="container-wide delivery-grid">
