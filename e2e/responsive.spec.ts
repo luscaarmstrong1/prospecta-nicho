@@ -1,19 +1,26 @@
 import { expect, test } from "@playwright/test";
 
 const viewports = [
-  { width: 360, height: 760 },
+  { width: 360, height: 800 },
   { width: 390, height: 844 },
+  { width: 430, height: 932 },
   { width: 768, height: 1024 },
-  { width: 1366, height: 900 },
-  { width: 1600, height: 1000 },
+  { width: 820, height: 1180 },
+  { width: 1024, height: 768 },
+  { width: 1280, height: 800 },
+  { width: 1440, height: 900 },
+  { width: 1920, height: 1080 },
 ];
 
 test("home preserva responsividade visual nos principais tamanhos", async ({ page }) => {
+  test.setTimeout(60_000);
+
   for (const viewport of viewports) {
     await page.setViewportSize(viewport);
     await page.goto("/");
 
-    await expect(page.locator(".hero")).toBeVisible();
+    await expect(page.locator(".curated-hero")).toBeVisible();
+    await expect(page.locator(".showcase-card").first()).toBeVisible();
     await expect(page.locator(".delivery-preview")).toBeVisible();
     await expect(page.locator('[data-test-id="whatsapp-floating-button"]')).toBeVisible();
 
@@ -22,27 +29,29 @@ test("home preserva responsividade visual nos principais tamanhos", async ({ pag
   }
 });
 
-test("chips de período ficam em linha no desktop e rolam horizontalmente no mobile", async ({ page }, testInfo) => {
+test("showcase adapta colunas e filtros sem quebrar largura", async ({ page }, testInfo) => {
   await page.goto("/");
-  const chips = page.locator(".quick-period-options .choice-chip");
-  await expect(chips).toHaveCount(5);
+  const cards = page.locator(".showcase-card");
+  await expect(cards).toHaveCount(6);
+  await expect(page.locator(".showcase-filter")).toHaveCount(8);
 
-  const metrics = await page.locator(".quick-period-options").evaluate((element) => {
+  const metrics = await page.locator(".showcase-grid").evaluate((element) => {
     const style = window.getComputedStyle(element);
-    const tops = Array.from(element.querySelectorAll(".choice-chip")).map((chip) =>
-      Math.round(chip.getBoundingClientRect().top),
-    );
     return {
-      flexWrap: style.flexWrap,
-      overflowX: style.overflowX,
-      rows: new Set(tops).size,
+      columns: style.gridTemplateColumns.split(" ").filter(Boolean).length,
     };
   });
 
   if (testInfo.project.name === "desktop") {
-    expect(metrics.rows).toBe(1);
+    expect(metrics.columns).toBe(12);
   } else {
-    expect(metrics.flexWrap).toBe("nowrap");
-    expect(["auto", "scroll"]).toContain(metrics.overflowX);
+    expect(metrics.columns).toBeGreaterThanOrEqual(1);
+    expect(metrics.columns).toBeLessThanOrEqual(2);
   }
+
+  const filterOverflow = await page.locator(".showcase-filters").evaluate((element) => {
+    const style = window.getComputedStyle(element);
+    return style.overflowX;
+  });
+  expect(["auto", "scroll"]).toContain(filterOverflow);
 });

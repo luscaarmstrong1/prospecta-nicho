@@ -8,7 +8,7 @@ test("whatsapp flutuante usa número padrão e não desaparece com scroll ou nav
   await expect(whatsapp).toHaveAttribute("href", /^https:\/\/wa\.me\/5535998905896\?text=/);
   await expect(whatsapp).not.toHaveAttribute("href", /https:\/\/wa\.me\/\?text=/);
 
-  await page.waitForTimeout(1200);
+  await page.waitForTimeout(3000);
   await expect(whatsapp).toBeVisible();
 
   const samples = [];
