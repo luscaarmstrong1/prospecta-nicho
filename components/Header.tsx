@@ -12,7 +12,6 @@ const navItems = [
   ["Solicitação rápida", "/solicitar-planilha"],
   ["Como funciona", "/como-funciona"],
   ["Para quem é", "/para-quem-e"],
-  ["Amostra", "/produtos/amostra-gratuita"],
 ];
 
 export function Header() {
