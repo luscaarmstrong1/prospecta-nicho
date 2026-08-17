@@ -2453,7 +2453,6 @@ textarea {
   white-space: nowrap;
 }
 
-.delivery-toolbar,
 .delivery-row {
   display: grid;
   grid-template-columns: 1.25fr 1fr 0.9fr 0.9fr 0.58fr 0.72fr 0.86fr;
@@ -2461,28 +2460,30 @@ textarea {
   min-width: 860px;
 }
 
-.delivery-toolbar {
+.delivery-badges {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   min-width: 0;
-  padding: 10px;
-  color: var(--white);
-  background: linear-gradient(135deg, var(--deep), var(--navy-soft));
+  padding: 10px 10px 2px;
+  color: var(--deep);
 }
 
-.delivery-toolbar > *,
 .delivery-row > * {
   border-right: 1px solid rgba(220, 230, 237, 0.75);
   padding: 13px 14px;
   font-size: 0.82rem;
 }
 
-.delivery-toolbar > * {
-  border: 1px solid rgba(255, 255, 255, 0.18);
+.delivery-badges > * {
+  border: 1px solid rgba(15, 163, 166, 0.18);
   border-radius: 999px;
+  background: rgba(15, 163, 166, 0.08);
   padding: 7px 10px;
+  font-size: 0.78rem;
+  font-weight: 900;
+  white-space: nowrap;
 }
 
 .delivery-body {
@@ -2776,7 +2777,6 @@ textarea {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .delivery-toolbar,
   .delivery-row {
     grid-template-columns: 1.25fr 1fr 0.9fr 0.9fr 0.58fr 0.72fr 0.86fr;
     min-width: 860px;

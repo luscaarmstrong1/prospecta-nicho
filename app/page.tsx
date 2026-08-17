@@ -12,10 +12,9 @@ import { createWhatsAppLink, defaultWhatsAppMessage } from "@/lib/whatsapp";
 import { isExternalHref, products } from "@/lib/site";
 
 const impactCards = [
-  "Critérios definidos antes da busca",
-  "Campos úteis para abordagem",
-  "Planilha pronta para rotina comercial",
-  "Suporte para ajustar o recorte",
+  "Campos essenciais para abordagem",
+  "Critérios claros de recorte",
+  "Formato pronto para rotina comercial",
 ];
 
 export default function HomePage() {
@@ -32,8 +31,8 @@ export default function HomePage() {
             <p className="eyebrow">DEMONSTRAÇÃO DA ENTREGA</p>
             <h2 className="h2">Veja como sua base chega para a equipe comercial.</h2>
             <p className="lead">
-              Uma prévia simples do formato: empresa, segmento, cidade, CNAE, porte, abertura e status comercial
-              ilustrativo, com dados fictícios e mascarados.
+              A entrega organiza os campos essenciais para iniciar uma abordagem comercial com mais clareza: empresa,
+              segmento, cidade, CNAE, porte, abertura e status de referência.
             </p>
             <div className="impact-stack">
               {impactCards.map((item) => (
@@ -48,8 +47,8 @@ export default function HomePage() {
                 Solicitar tabela grátis de teste
                 <ArrowRight size={18} />
               </ButtonLink>
-              <ButtonLink href="/como-funciona" variant="secondary">
-                Entender a entrega
+              <ButtonLink href="/montar-minha-base" variant="secondary">
+                Montar minha base
               </ButtonLink>
             </div>
           </div>
@@ -81,11 +80,12 @@ export default function HomePage() {
             <p className="eyebrow">OPERAÇÃO GUIADA</p>
             <h2 className="h2">Do nicho ao atendimento, cada etapa deixa a prospecção mais clara.</h2>
             <p className="lead">
-              O pedido fica mais claro antes da entrega: público, critérios, formato e próximo passo comercial.
+              A ProspectaNicho organiza o pedido para sua equipe entender o público, validar critérios e avançar com
+              menos ruído comercial.
             </p>
             <div className="conversion-system-proof">
               <ShieldCheck size={20} />
-              <span>Na base personalizada, a validação de escopo vem antes da cobrança.</span>
+              <span>Na base personalizada, a validação acontece antes da cobrança final.</span>
             </div>
             <div className="btn-row">
               <ButtonLink href={buildQuickRequestHref("agencias", "guided-flow")} variant="teal">
@@ -118,12 +118,15 @@ export default function HomePage() {
         <div className="container-wide">
           <div className="section-kicker">
             <p className="eyebrow eyebrow--dark">Para quem é</p>
-            <h2 className="h2">Uma base melhor começa com um público melhor definido.</h2>
+            <h2 className="h2">Bases pensadas para quem vende para empresas.</h2>
+            <p className="lead">
+              Escolha o tipo de operação e solicite uma planilha com critérios mais alinhados ao seu mercado.
+            </p>
           </div>
           <div className="segment-labels">
             {segmentCards.map((segment) => (
               <Link
-                href={buildQuickRequestHref(segment.id)}
+                href={buildQuickRequestHref(segment.id, "para-quem-e")}
                 key={segment.id}
                 aria-label={`${segment.label}: ${segment.description}`}
               >

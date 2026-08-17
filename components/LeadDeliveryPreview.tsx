@@ -11,15 +11,14 @@ export function LeadDeliveryPreview() {
   return (
     <div className="delivery-preview" aria-label="Prévia profissional de entrega de base B2B">
       <div className="delivery-preview__header">
-        <strong>Prévia da planilha</strong>
+        <strong>Prévia da entrega</strong>
         <span>Dados fictícios e mascarados</span>
       </div>
       <div className="delivery-body">
-        <div className="delivery-toolbar">
-          <span>Ativas</span>
+        <div className="delivery-badges" aria-label="Filtros demonstrativos">
+          <span>Empresas ativas</span>
           <span>ME e EPP</span>
           <span>Últimos 90 dias</span>
-          <span>Exemplo ilustrativo</span>
         </div>
         <div className="delivery-row" aria-hidden="true">
           {columns.map((column) => <strong key={column}>{column}</strong>)}
@@ -43,7 +42,7 @@ export function LeadDeliveryPreview() {
         ))}
       </div>
       <p className="delivery-note">
-        Exemplo ilustrativo. Campos entregues variam conforme produto, disponibilidade, origem e escopo contratado.
+        Exemplo ilustrativo. Campos e disponibilidade variam conforme produto, origem e escopo contratado.
       </p>
     </div>
   );
