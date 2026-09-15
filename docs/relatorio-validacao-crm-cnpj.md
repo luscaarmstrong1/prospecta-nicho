@@ -1,10 +1,10 @@
-# Relatorio de Validacao CRM CNPJ
+# Relatorio de Validação CRM CNPJ
 
 Data: 2026-09-15
 
 ## Escopo validado
 
-- Formularios publicos registram pedido real no CRM.
+- Formularios públicos registram pedido real no CRM.
 - CRM usa `custom_requests` como fonte canonica.
 - Filtros, campos e timeline usam `request_filters`, `request_fields` e `request_status_events`.
 - Admin e APIs administrativas exigem sessao httpOnly ou bearer token.

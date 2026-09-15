@@ -2,7 +2,7 @@
 
 O CRM da ProspectaNicho centraliza pedidos reais de planilhas CNPJ vindos da solicitacao rapida, da amostra gratuita, do construtor de base e das rotas administrativas.
 
-O produto principal e o gerador de planilhas com dados publicos de CNPJ. Enriquecimento comercial permanece bloqueado como add-on pago e nao faz parte do export padrao.
+O produto principal e o gerador de planilhas com dados públicos de CNPJ. Enriquecimento comercial permanece bloqueado como add-on pago e nao faz parte do export padrao.
 
 ## Fluxo operacional
 
@@ -50,13 +50,13 @@ As tabelas antigas `crm_requests`, `cnpj_jobs` e `crm_exports` podem existir em 
 - `/admin/segment-mapping`: mapeamento segmento-CNAE.
 - `/admin/concessionarias`: mapeamento concessionaria-cidades.
 - `/admin/suppression-list`: controle operacional de supressao.
-- `/pedido/[id]`: acompanhamento publico por protocolo.
+- `/pedido/[id]`: acompanhamento público por protocolo.
 
 ## Seguranca
 
 As rotas `/admin/*` sao protegidas por `middleware.ts`. O login usa `/api/admin/session`, grava cookie httpOnly e nunca expoe `SUPABASE_SERVICE_ROLE_KEY` no client.
 
-APIs administrativas tambem aceitam `Authorization: Bearer ADMIN_API_TOKEN` para automacoes controladas. O publico nao deve listar pedidos, baixar exports privados nem acionar processamento.
+APIs administrativas tambem aceitam `Authorization: Bearer ADMIN_API_TOKEN` para automacoes controladas. O público nao deve listar pedidos, baixar exports privados nem acionar processamento.
 
 ## Ambiente
 
@@ -79,7 +79,7 @@ No deploy estatico em `https://luscaarmstrong1.github.io/prospecta-nicho/`, o fr
 
 Rotas importantes nesse modo:
 
-- `/pedido/?codigo=PN-...`: acompanhamento publico por protocolo, sem dados internos nem arquivo privado.
+- `/pedido/?codigo=PN-...`: acompanhamento público por protocolo, sem dados internos nem arquivo privado.
 - `/health/`: verificacao publica do estado das integracoes sem expor segredos.
 - `/admin/*`: interface estatica; as acoes reais exigem `ADMIN_API_TOKEN` validado pelas Edge Functions.
 

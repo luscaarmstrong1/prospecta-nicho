@@ -9,7 +9,7 @@ Use este checklist antes da primeira entrega comercial gerada pela plataforma Pr
 3. Configurar `EXPORT_SIGNING_SECRET` forte e exclusivo para links temporarios.
 4. Configurar `SUPABASE_URL` somente no ambiente server-side.
 5. Configurar `SUPABASE_SERVICE_ROLE_KEY` somente no ambiente server-side.
-6. Configurar `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` quando o front precisar de recursos publicos do Supabase.
+6. Configurar `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` quando o front precisar de recursos públicos do Supabase.
 7. Confirmar que `.env` nao esta versionado.
 8. Rodar `npm run check:env` e corrigir qualquer variavel critica ausente antes de producao.
 9. Ativar `CHECK_ENV_STRICT=1` ou usar `NODE_ENV=production` em deploy real.
@@ -41,7 +41,7 @@ Use este checklist antes da primeira entrega comercial gerada pela plataforma Pr
 
 ## 5. Pedido real no CRM
 
-26. Enviar um pedido pelo formulario publico.
+26. Enviar um pedido pelo formulario público.
 27. Confirmar que o pedido aparece em `/admin/requests`.
 28. Conferir se contato, segmento, cidade/UF, periodo, quantidade e observacoes foram salvos corretamente.
 29. Confirmar que filtros normalizados foram gravados em `request_filters`.
@@ -75,7 +75,7 @@ Use este checklist antes da primeira entrega comercial gerada pela plataforma Pr
 51. Marcar o pedido como entregue somente depois da conferencia.
 52. Confirmar que `/pedido/[public_code]` mostra status seguro e nao mostra URL direta do arquivo.
 
-## 8. Validacao final
+## 8. Validação final
 
 53. Rodar `npm run typecheck`.
 54. Rodar `npm run lint`.
