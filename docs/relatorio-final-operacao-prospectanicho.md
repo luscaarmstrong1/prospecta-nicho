@@ -4,14 +4,14 @@ Data: 2026-09-15
 
 ## Escopo aplicado
 
-Esta etapa reforcou a operacao real do CRM CNPJ sem recriar o projeto e sem depender de servicos pagos.
+Esta etapa reforçou a operação real do CRM CNPJ sem recriar o projeto e sem depender de servicos pagos.
 
 Alteracoes feitas:
 
-- CLI `python -m workers.rfb_cnpj data ...` para descoberta, setup, status, validacao, update e limpeza de snapshots.
+- CLI `python -m workers.rfb_cnpj data ...` para descoberta, setup, status, validação, update e limpeza de snapshots.
 - Scripts `.bat` de setup/status/update/worker para uso local no Windows.
 - Caminhos locais padrao fora do repositorio: `%USERPROFILE%\ProspectaNicho\RFB` e `%USERPROFILE%\ProspectaNicho\Exports`.
-- Validacao dos ZIPs obrigatorios antes de marcar snapshot como pronto.
+- Validação dos ZIPs obrigatorios antes de marcar snapshot como pronto.
 - Exclusao explicita dos arquivos de socios no fluxo padrao.
 - `.env.worker.example` com placeholders sem segredos.
 - Autenticacao administrativa preparada para Supabase Auth por email/senha, com fallback tecnico por `ADMIN_API_TOKEN`.
@@ -23,7 +23,7 @@ O worker usa a fonte oficial historica:
 
 `https://dadosabertos.rfb.gov.br/CNPJ/dados_abertos_cnpj`
 
-Durante a validacao desta etapa, a origem remota nao expos um snapshot valido para descoberta automatica e o comando retornou:
+Durante a validação desta etapa, a origem remota nao expos um snapshot valido para descoberta automatica e o comando retornou:
 
 `REMOTE_UNAVAILABLE`
 
@@ -53,7 +53,7 @@ Ignorados no padrao:
 - Configurar secrets reais fora do repositorio: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_API_TOKEN` se desejar fallback e bucket privado de exports.
 - Executar `setup-dados-receita.bat` quando a fonte remota da Receita estiver disponivel.
 
-## Validacao executada
+## Validação executada
 
 - `python -m pytest workers/rfb_cnpj/tests/test_data_cli.py`: passou.
 - `python -m workers.rfb_cnpj data status`: executou e retornou `WAITING_DATA`, pois os ZIPs reais ainda nao existem localmente.

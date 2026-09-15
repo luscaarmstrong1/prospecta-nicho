@@ -46,7 +46,7 @@ export async function requireAdmin(request: Request) {
   if (expected && (token === expected || cookieToken === expected)) return null;
   if ((token && await validateSupabaseAdminToken(token)) || (cookieToken && await validateSupabaseAdminToken(cookieToken))) return null;
   if (!expected && !(process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL)) {
-    return NextResponse.json({ ok: false, message: "Autenticacao administrativa nao configurada." }, { status: 503 });
+    return NextResponse.json({ ok: false, message: "Autenticação administrativa nao configurada." }, { status: 503 });
   }
 
   return NextResponse.json({ ok: false, message: "Nao autorizado." }, { status: 401 });

@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({ email, password }),
     }) as { access_token?: string; expires_in?: number; user?: { id?: string } } | null;
     const role = session?.user?.id ? await verifyAdminRole(session.user.id) : "";
-    if (!session?.access_token || !role) return NextResponse.json({ ok: false, message: "Email ou senha administrativa invalidos." }, { status: 401 });
+    if (!session?.access_token || !role) return NextResponse.json({ ok: false, message: "Email ou senha administrativa inválidos." }, { status: 401 });
     const response = NextResponse.json({ ok: true, session: { accessToken: session.access_token, expiresAt: new Date(Date.now() + (session.expires_in || 28_800) * 1000).toISOString(), role } });
     response.cookies.set(adminCookieName, session.access_token, {
       httpOnly: true,
