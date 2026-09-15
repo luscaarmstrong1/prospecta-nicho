@@ -13,7 +13,7 @@ async function event(supabase: ReturnType<typeof serviceClient>, requestId: stri
 }
 
 export async function adminListRequests(request: Request) {
-  const denied = await requireAdmin(request);
+  const denied = await requireAdmin(request, "request:read");
   if (denied) return denied;
   const supabase = serviceClient();
   const { data, error } = await supabase.from("custom_requests").select("*").order("created_at", { ascending: false }).limit(100);
@@ -22,7 +22,7 @@ export async function adminListRequests(request: Request) {
 }
 
 export async function adminRequestDetail(request: Request) {
-  const denied = await requireAdmin(request);
+  const denied = await requireAdmin(request, "request:read");
   if (denied) return denied;
   const requestId = idFrom(request);
   const supabase = serviceClient();
@@ -40,7 +40,7 @@ export async function adminRequestDetail(request: Request) {
 }
 
 export async function adminUpdateRequest(request: Request, forcedStatus?: string) {
-  const denied = await requireAdmin(request);
+  const denied = await requireAdmin(request, "request:update");
   if (denied) return denied;
   const requestId = idFrom(request);
   const body = await request.json().catch(() => ({})) as Record<string, unknown>;
@@ -60,11 +60,20 @@ export async function adminUpdateRequest(request: Request, forcedStatus?: string
 }
 
 export async function adminCreateJob(request: Request) {
-  const denied = await requireAdmin(request);
+  const denied = await requireAdmin(request, "job:create");
   if (denied) return denied;
   const requestId = idFrom(request);
   if (!requestId) return errorJson(request, "MISSING_REQUEST_ID", "Pedido nao informado.", 400);
   const supabase = serviceClient();
+  const { data: existingJob } = await supabase
+    .from("rfb_processing_jobs")
+    .select("*")
+    .eq("request_id", requestId)
+    .in("status", ["queued", "running"])
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (existingJob) return json(request, { ok: true, job: existingJob, idempotent: true });
   const { data: filters } = await supabase.from("request_filters").select("*").eq("request_id", requestId).maybeSingle();
   const { data, error } = await supabase.from("rfb_processing_jobs").insert({
     request_id: requestId,
@@ -81,7 +90,7 @@ export async function adminCreateJob(request: Request) {
 }
 
 export async function adminCompleteJob(request: Request) {
-  const denied = await requireAdmin(request);
+  const denied = await requireAdmin(request, "job:update");
   if (denied) return denied;
   const jobId = idFrom(request);
   const body = await request.json().catch(() => ({})) as Record<string, unknown>;
@@ -90,14 +99,23 @@ export async function adminCompleteJob(request: Request) {
   const supabase = serviceClient();
   const { data: job } = await supabase.from("rfb_processing_jobs").select("*").eq("id", jobId).maybeSingle();
   if (!job) return errorJson(request, "JOB_NOT_FOUND", "Job nao encontrado.", 404);
-  const { data, error } = await supabase.from("exports").insert({
+  const format = text(body.format || body.fileFormat || body.file_format, 20) || "xlsx";
+  const { data: existingExport } = await supabase
+    .from("exports")
+    .select("*")
+    .eq("job_id", jobId)
+    .eq("file_format", format)
+    .maybeSingle();
+  const { data, error } = existingExport
+    ? { data: existingExport, error: null }
+    : await supabase.from("exports").insert({
     request_id: job.request_id,
     job_id: jobId,
     status: "ready",
-    file_url: fileUrl.startsWith("http") ? fileUrl : null,
+    signed_url: fileUrl.startsWith("http") ? fileUrl : null,
     storage_path: fileUrl.startsWith("http") ? null : fileUrl,
     row_count: numberValue(body.rowCount, 0),
-    format: text(body.format, 20) || "xlsx",
+    file_format: format,
   }).select("*").single();
   if (error) return errorJson(request, "EXPORT_CREATE_FAILED", error.message, 500);
   await supabase.from("rfb_processing_jobs").update({ status: "completed", progress: 100, completed_at: new Date().toISOString() }).eq("id", jobId);
@@ -107,7 +125,7 @@ export async function adminCompleteJob(request: Request) {
 }
 
 export async function adminSignExport(request: Request) {
-  const denied = await requireAdmin(request);
+  const denied = await requireAdmin(request, "export:sign");
   if (denied) return denied;
   const exportId = idFrom(request);
   const body = await request.json().catch(() => ({})) as Record<string, unknown>;
@@ -115,10 +133,10 @@ export async function adminSignExport(request: Request) {
   const supabase = serviceClient();
   const { data: item } = await supabase.from("exports").select("*").eq("id", exportId).maybeSingle();
   if (!item) return errorJson(request, "EXPORT_NOT_FOUND", "Export nao encontrado.", 404);
-  let signedUrl = text(item.file_url, 2000);
+  let signedUrl = text(item.signed_url, 2000);
   const storagePath = text(item.storage_path, 2000);
   if (storagePath) {
-    const bucket = Deno.env.get("EXPORTS_BUCKET") || Deno.env.get("SUPABASE_EXPORTS_BUCKET") || "exports";
+    const bucket = Deno.env.get("EXPORTS_BUCKET") || Deno.env.get("SUPABASE_EXPORTS_BUCKET") || "prospectanicho-exports";
     const { data, error } = await supabase.storage.from(bucket).createSignedUrl(storagePath, expiresIn);
     if (error) return errorJson(request, "EXPORT_SIGN_FAILED", error.message, 500);
     signedUrl = data.signedUrl;
@@ -129,7 +147,7 @@ export async function adminSignExport(request: Request) {
 }
 
 export async function adminRunEnrichment(request: Request) {
-  const denied = await requireAdmin(request);
+  const denied = await requireAdmin(request, "enrichment:run");
   if (denied) return denied;
   const requestId = idFrom(request);
   const supabase = serviceClient();

@@ -24,6 +24,8 @@ export default defineConfig({
         env: {
           ...process.env,
           ADMIN_API_TOKEN: process.env.ADMIN_API_TOKEN || "playwright-admin-token",
+          ENABLE_ADMIN_TOKEN_LOGIN: "true",
+          NEXT_PUBLIC_ENABLE_ADMIN_TOKEN_LOGIN: "true",
         },
         url: baseURL,
         reuseExistingServer: !process.env.CI,

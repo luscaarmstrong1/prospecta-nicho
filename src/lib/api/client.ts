@@ -12,6 +12,11 @@ export function getAdminSessionToken() {
   return window.sessionStorage.getItem(adminSessionStorageKey) || "";
 }
 
+export function clearAdminSessionToken() {
+  if (typeof window === "undefined") return;
+  window.sessionStorage.removeItem(adminSessionStorageKey);
+}
+
 function jsonResponse(body: Record<string, unknown>, status: number) {
   return new Response(JSON.stringify(body), {
     status,
@@ -48,5 +53,7 @@ export async function apiFetch(path: string, init: RequestInit = {}) {
     headers.set("x-admin-session", adminToken);
   }
 
-  return fetch(`${functionsBaseUrl}/${edgeRoute.functionName}${sourceUrl.search}`, { ...init, headers });
+  const response = await fetch(`${functionsBaseUrl}/${edgeRoute.functionName}${sourceUrl.search}`, { ...init, headers });
+  if (response.status === 401 && sourceUrl.pathname.startsWith("/api/admin/")) clearAdminSessionToken();
+  return response;
 }

@@ -126,6 +126,8 @@ def skipped_file_names() -> tuple[str, ...]:
 
 
 def _snapshot_url(snapshot: str, base_url: str = OFFICIAL_BASE_URL) -> str:
+    if snapshot == "root":
+        return f"{base_url.rstrip('/')}/"
     return f"{base_url.rstrip('/')}/{snapshot}/"
 
 
@@ -157,9 +159,9 @@ def _make_client():
     try:
         import httpx  # type: ignore
 
-        return httpx.Client(timeout=httpx.Timeout(2.5, connect=1.0))
+        return httpx.Client(timeout=httpx.Timeout(12.0, connect=5.0))
     except Exception:
-        return UrlLibClient(timeout=2.5)
+        return UrlLibClient(timeout=12.0)
 
 
 def _head_ok(client, url: str) -> tuple[bool, int | None]:
@@ -190,7 +192,7 @@ def discover_latest_snapshot(client=None, base_url: str = OFFICIAL_BASE_URL) -> 
 
         from_listing = bool(candidates)
         if not candidates:
-            candidates = _month_candidates()
+            candidates = ["root", *_month_candidates()]
 
         def valid_candidate(candidate: str) -> tuple[str, int | None] | None:
             local_client = client if from_listing else _make_client()
@@ -227,11 +229,12 @@ def discover_latest_snapshot(client=None, base_url: str = OFFICIAL_BASE_URL) -> 
         if resolved:
             candidate, empresas_size = resolved
             url = _snapshot_url(candidate, base_url)
+            snapshot_name = candidate if candidate != "root" else datetime.now(UTC).strftime("%Y-%m")
             files = [
                 RemoteFile(file_name, f"{url}{file_name}", empresas_size if file_name == "Empresas0.zip" else None)
                 for file_name in REQUIRED_RFB_FILES
             ]
-            return RemoteSnapshot(candidate, url, tuple(files))
+            return RemoteSnapshot(snapshot_name, url, tuple(files))
         raise RuntimeError("Nenhum snapshot oficial valido da Receita Federal foi localizado.")
     finally:
         if owns_client:

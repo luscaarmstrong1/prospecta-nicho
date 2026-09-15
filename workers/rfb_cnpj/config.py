@@ -28,6 +28,9 @@ class WorkerConfig:
     data_dir: str = _default_data_dir()
     output_dir: str = _default_output_dir()
     storage_bucket: str | None = getenv("R2_BUCKET") or getenv("SUPABASE_STORAGE_BUCKET")
+    supabase_url: str | None = getenv("SUPABASE_URL")
+    supabase_service_role_key: str | None = getenv("SUPABASE_SERVICE_ROLE_KEY")
+    worker_id: str = getenv("RFB_WORKER_ID") or "prospectanicho-local-worker"
 
 
 def load_config() -> WorkerConfig:

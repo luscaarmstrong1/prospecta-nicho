@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
+import { type AdminPermission, normalizeAdminRole, roleHasPermission } from "@/lib/admin-permissions";
 
 const adminCookieName = "prospecta_admin_session";
-const allowedRoles = new Set(["admin", "editor", "operador", "operator", "leitura", "read"]);
 
 function readCookieToken(request: Request) {
   const cookie = request.headers.get("cookie") || "";
@@ -18,35 +18,54 @@ async function readJson(url: string, init: RequestInit) {
   return response.json().catch(() => null);
 }
 
-async function validateSupabaseAdminToken(token: string) {
+async function validateSupabaseAdminToken(token: string, permission: AdminPermission) {
   const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !serviceKey) return false;
+  if (!supabaseUrl || !serviceKey) return { ok: false, status: 503 as const };
+
   const baseUrl = supabaseUrl.replace(/\/+$/, "");
-  const userPayload = await readJson(`${baseUrl}/auth/v1/user`, {
+  const userPayload = (await readJson(`${baseUrl}/auth/v1/user`, {
     headers: { apikey: serviceKey, authorization: `Bearer ${token}` },
-  }) as { id?: string } | null;
-  if (!userPayload?.id) return false;
+  })) as { id?: string } | null;
+  if (!userPayload?.id) return { ok: false, status: 401 as const };
 
   const headers = { apikey: serviceKey, authorization: `Bearer ${serviceKey}` };
-  const adminProfiles = await readJson(`${baseUrl}/rest/v1/admin_profiles?id=eq.${encodeURIComponent(userPayload.id)}&select=role&limit=1`, { headers }) as Array<{ role?: string }> | null;
+  const adminProfiles = (await readJson(
+    `${baseUrl}/rest/v1/admin_profiles?id=eq.${encodeURIComponent(userPayload.id)}&select=role&limit=1`,
+    { headers },
+  )) as Array<{ role?: string }> | null;
   const profiles = adminProfiles?.[0]
     ? null
-    : await readJson(`${baseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(userPayload.id)}&select=role&limit=1`, { headers }) as Array<{ role?: string }> | null;
-  const role = String(adminProfiles?.[0]?.role || profiles?.[0]?.role || "").toLowerCase();
-  return allowedRoles.has(role);
+    : ((await readJson(`${baseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(userPayload.id)}&select=role&limit=1`, {
+        headers,
+      })) as Array<{ role?: string }> | null);
+
+  const role = normalizeAdminRole(adminProfiles?.[0]?.role || profiles?.[0]?.role);
+  if (!role) return { ok: false, status: 403 as const };
+  if (!roleHasPermission(role, permission)) return { ok: false, status: 403 as const };
+  return { ok: true, status: 200 as const, role };
 }
 
-export async function requireAdmin(request: Request) {
+export async function requireAdmin(request: Request, permission: AdminPermission = "admin:read") {
   if (process.env.NEXT_PUBLIC_STATIC_EXPORT === "true") return null;
+
   const expected = process.env.ADMIN_API_TOKEN;
   const header = request.headers.get("authorization") || "";
   const token = header.startsWith("Bearer ") ? header.slice(7) : "";
   const cookieToken = readCookieToken(request);
+
   if (expected && (token === expected || cookieToken === expected)) return null;
-  if ((token && await validateSupabaseAdminToken(token)) || (cookieToken && await validateSupabaseAdminToken(cookieToken))) return null;
+
+  const tokenResult = token ? await validateSupabaseAdminToken(token, permission) : null;
+  if (tokenResult?.ok) return null;
+  const cookieResult = cookieToken ? await validateSupabaseAdminToken(cookieToken, permission) : null;
+  if (cookieResult?.ok) return null;
+
   if (!expected && !(process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL)) {
-    return NextResponse.json({ ok: false, message: "Autenticação administrativa nao configurada." }, { status: 503 });
+    return NextResponse.json({ ok: false, message: "Autenticação administrativa não configurada." }, { status: 503 });
+  }
+  if (tokenResult?.status === 403 || cookieResult?.status === 403) {
+    return NextResponse.json({ ok: false, message: "Usuário sem permissão para esta ação." }, { status: 403 });
   }
 
   return NextResponse.json({ ok: false, message: "Nao autorizado." }, { status: 401 });

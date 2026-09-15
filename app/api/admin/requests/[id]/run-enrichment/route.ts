@@ -11,7 +11,7 @@ import { runPaidEnrichment } from "@/src/server/services/crm";
 type Params = { params: Promise<{ id: string }> };
 
 export async function POST(request: Request, { params }: Params) {
-  const denied = await requireAdmin(request);
+  const denied = await requireAdmin(request, "enrichment:run");
   if (denied) return denied;
   const { id } = await params;
 

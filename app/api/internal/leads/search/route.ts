@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { requireAdmin, integrationStatus } from "@/lib/server/admin-auth";
 
 export async function POST(request: Request) {
-  const denied = await requireAdmin(request);
+  const denied = await requireAdmin(request, "internal:read");
   if (denied) return denied;
   const body = await request.json();
   return NextResponse.json({

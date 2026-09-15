@@ -18,7 +18,7 @@ function hasLocalUrl(value: string) {
 }
 
 export async function POST(request: Request) {
-  const adminError = await requireAdmin(request);
+  const adminError = await requireAdmin(request, "content:write");
   if (adminError) return adminError;
 
   const parsed = publishSchema.safeParse(await request.json().catch(() => null));

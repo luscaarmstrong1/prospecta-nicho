@@ -6,11 +6,11 @@ export const metadata: Metadata = { title: "Login administrativo", robots: { ind
 
 export default function AdminLoginPage() {
   return (
-    <AdminShell title="Login administrativo" eyebrow="Área protegida">
+    <AdminShell title="Login administrativo" eyebrow="Area protegida">
       <div className="admin-panel">
         <p>
-          Informe o token administrativo configurado no servidor. A sessão usa cookie httpOnly e não expõe service role no
-          frontend.
+          Entre com o usuário do Supabase Auth autorizado no CRM. A sessão usa cookie httpOnly no backend dinâmico e JWT
+          temporário no site estático, sem expor service role no frontend.
         </p>
         <AdminLoginForm />
       </div>

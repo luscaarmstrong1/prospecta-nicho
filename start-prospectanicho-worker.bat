@@ -2,8 +2,8 @@
 setlocal
 cd /d "%~dp0"
 if exist ".venv\Scripts\python.exe" (
-  ".venv\Scripts\python.exe" -m workers.rfb_cnpj run-job --job-id %1
+  ".venv\Scripts\python.exe" -m workers.rfb_cnpj watch
 ) else (
-  python -m workers.rfb_cnpj run-job --job-id %1
+  python -m workers.rfb_cnpj watch
 )
 pause

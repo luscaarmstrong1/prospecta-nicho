@@ -5,6 +5,7 @@ import { apiFetch, saveAdminSessionToken } from "@/src/lib/api/client";
 import { withBasePath } from "@/src/lib/api/runtime";
 
 export function AdminLoginForm() {
+  const allowTokenLogin = process.env.NEXT_PUBLIC_ENABLE_ADMIN_TOKEN_LOGIN === "true";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [token, setToken] = useState("");
@@ -16,7 +17,8 @@ export function AdminLoginForm() {
     setPending(true);
     setMessage("");
 
-    const payload = email.trim() && password ? { email: email.trim(), password } : { token };
+    const fallbackToken = allowTokenLogin ? token.trim() : "";
+    const payload = email.trim() && password ? { email: email.trim(), password } : { token: fallbackToken };
     const response = await apiFetch("/api/admin/session", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -31,11 +33,15 @@ export function AdminLoginForm() {
     }
 
     const body = (await response.json().catch(() => null)) as { session?: { accessToken?: string } } | null;
-    saveAdminSessionToken(body?.session?.accessToken || token);
+    if (body?.session?.accessToken) {
+      saveAdminSessionToken(body.session.accessToken);
+    } else if (allowTokenLogin && fallbackToken) {
+      saveAdminSessionToken(fallbackToken);
+    }
     window.location.href = withBasePath("/admin/");
   }
 
-  const canSubmit = Boolean((email.trim() && password) || token.trim());
+  const canSubmit = Boolean((email.trim() && password) || (allowTokenLogin && token.trim()));
 
   return (
     <form className="admin-form" onSubmit={handleSubmit}>
@@ -60,16 +66,18 @@ export function AdminLoginForm() {
           value={password}
         />
       </label>
-      <label>
-        Token administrativo de fallback
-        <input
-          autoComplete="current-password"
-          onChange={(event) => setToken(event.target.value)}
-          placeholder="Cole o ADMIN_API_TOKEN"
-          type="password"
-          value={token}
-        />
-      </label>
+      {allowTokenLogin ? (
+        <label>
+          Token administrativo de desenvolvimento
+          <input
+            autoComplete="current-password"
+            onChange={(event) => setToken(event.target.value)}
+            placeholder="Token temporário do servidor"
+            type="password"
+            value={token}
+          />
+        </label>
+      ) : null}
       <button className="button button--primary" disabled={pending || !canSubmit} type="submit">
         {pending ? "Validando..." : "Entrar"}
       </button>

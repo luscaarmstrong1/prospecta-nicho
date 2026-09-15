@@ -177,6 +177,7 @@ def main() -> None:
             "export",
             "run-job",
             "run-local",
+            "watch",
         ],
     )
     parser.add_argument("--sample", action="store_true")
@@ -184,6 +185,8 @@ def main() -> None:
     parser.add_argument("--filters")
     parser.add_argument("--output")
     parser.add_argument("--job-id")
+    parser.add_argument("--once", action="store_true")
+    parser.add_argument("--interval-seconds", type=int, default=15)
     args = parser.parse_args()
 
     if args.command == "discover":
@@ -204,6 +207,10 @@ def main() -> None:
         result = run_local(Path(args.filters) if args.filters else None, Path(args.output or "outputs/rfb-cnpj/output.xlsx"), Path(args.data_dir) if args.data_dir else None)
     elif args.command == "run-job":
         result = run_job_from_supabase(args.job_id or "")
+    elif args.command == "watch":
+        from workers.rfb_cnpj.queue import watch_queue
+
+        result = watch_queue(config, once=args.once, interval_seconds=args.interval_seconds)
     else:
         result = command_status(args.command, sample=args.sample)
 

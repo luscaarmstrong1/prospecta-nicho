@@ -1,6 +1,7 @@
 import { env } from "./env.ts";
 import { errorJson } from "./responses.ts";
 import { serviceClient } from "./db.ts";
+import { type AdminPermission, normalizeAdminRole, roleHasPermission } from "./permissions.ts";
 
 export function getBearerToken(request: Request) {
   const authorization = request.headers.get("authorization") || "";
@@ -8,9 +9,7 @@ export function getBearerToken(request: Request) {
   return request.headers.get("x-admin-session") || "";
 }
 
-const allowedRoles = new Set(["admin", "editor", "operador", "operator", "leitura", "read"]);
-
-export async function requireAdmin(request: Request) {
+export async function requireAdmin(request: Request, permission: AdminPermission = "admin:read") {
   const token = getBearerToken(request);
   const expected = env("ADMIN_API_TOKEN");
   if (expected && token === expected) return null;
@@ -26,8 +25,11 @@ export async function requireAdmin(request: Request) {
     const { data: profile } = adminProfile
       ? { data: null }
       : await supabase.from("profiles").select("role").eq("id", userId).maybeSingle();
-    const role = String(adminProfile?.role || profile?.role || "").toLowerCase();
-    if (!allowedRoles.has(role)) return errorJson(request, "ADMIN_FORBIDDEN", "Usuario sem perfil administrativo.", 403);
+    const role = normalizeAdminRole(adminProfile?.role || profile?.role);
+    if (!role) return errorJson(request, "ADMIN_FORBIDDEN", "Usuario sem perfil administrativo.", 403);
+    if (!roleHasPermission(role, permission)) {
+      return errorJson(request, "ADMIN_FORBIDDEN", "Usuario sem permissao para esta acao.", 403);
+    }
   } catch (_error) {
     return errorJson(request, "ADMIN_AUTH_UNAVAILABLE", "Nao foi possivel validar a sessao administrativa.", 503);
   }

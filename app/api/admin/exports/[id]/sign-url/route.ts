@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic";
+﻿export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
   return [{ id: "demo" }];
@@ -11,7 +11,7 @@ import { createSignedExportUrl } from "@/src/server/services/crm";
 type Params = { params: Promise<{ id: string }> };
 
 export async function POST(request: Request, { params }: Params) {
-  const denied = await requireAdmin(request);
+  const denied = await requireAdmin(request, "export:sign");
   if (denied) return denied;
 
   const { id } = await params;

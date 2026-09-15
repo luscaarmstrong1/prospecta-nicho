@@ -6,13 +6,13 @@ import { crmRequestSchema } from "@/src/schemas/request.schema";
 import { createManualCrmRequest, listCrmRequests } from "@/src/server/services/crm";
 
 export async function GET(request: Request) {
-  const denied = await requireAdmin(request);
+  const denied = await requireAdmin(request, "request:read");
   if (denied) return denied;
   return NextResponse.json({ ok: true, requests: listCrmRequests() });
 }
 
 export async function POST(request: Request) {
-  const denied = await requireAdmin(request);
+  const denied = await requireAdmin(request, "request:update");
   if (denied) return denied;
 
   const body = await request.json().catch(() => null);

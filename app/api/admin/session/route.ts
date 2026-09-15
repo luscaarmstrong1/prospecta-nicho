@@ -2,6 +2,7 @@
 
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { normalizeAdminRole } from "@/lib/admin-permissions";
 
 const bodySchema = z.object({
   token: z.string().optional(),
@@ -10,7 +11,6 @@ const bodySchema = z.object({
 });
 
 const adminCookieName = "prospecta_admin_session";
-const allowedRoles = new Set(["admin", "editor", "operador", "operator", "leitura", "read"]);
 
 async function readJson(url: string, init: RequestInit) {
   const response = await fetch(url, init);
@@ -28,8 +28,7 @@ async function verifyAdminRole(userId: string) {
   const profiles = adminProfiles?.[0]
     ? null
     : await readJson(`${baseUrl}/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}&select=role&limit=1`, { headers }) as Array<{ role?: string }> | null;
-  const role = String(adminProfiles?.[0]?.role || profiles?.[0]?.role || "").toLowerCase();
-  return allowedRoles.has(role) ? role : "";
+  return normalizeAdminRole(adminProfiles?.[0]?.role || profiles?.[0]?.role);
 }
 
 export async function POST(request: Request) {
@@ -63,7 +62,9 @@ export async function POST(request: Request) {
     return response;
   }
 
-  const expected = process.env.ADMIN_API_TOKEN;
+  const allowTokenLogin =
+    process.env.NODE_ENV !== "production" || process.env.ENABLE_ADMIN_TOKEN_LOGIN === "true";
+  const expected = allowTokenLogin ? process.env.ADMIN_API_TOKEN : "";
   if (!expected) return NextResponse.json({ ok: false, message: "ADMIN_API_TOKEN nao configurado." }, { status: 503 });
   if (!token || token !== expected) return NextResponse.json({ ok: false, message: "Token administrativo invalido." }, { status: 401 });
 

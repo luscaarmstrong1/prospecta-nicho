@@ -12,7 +12,7 @@ import { getCrmRequestForAdmin, listCrmTimelineForAdmin, updateCrmRequest } from
 type Params = { params: Promise<{ id: string }> };
 
 export async function GET(request: Request, { params }: Params) {
-  const denied = await requireAdmin(request);
+  const denied = await requireAdmin(request, "request:read");
   if (denied) return denied;
   const { id } = await params;
   const crmRequest = await getCrmRequestForAdmin(id);
@@ -21,7 +21,7 @@ export async function GET(request: Request, { params }: Params) {
 }
 
 export async function PATCH(request: Request, { params }: Params) {
-  const denied = await requireAdmin(request);
+  const denied = await requireAdmin(request, "request:update");
   if (denied) return denied;
   const { id } = await params;
   const body = await request.json().catch(() => null);

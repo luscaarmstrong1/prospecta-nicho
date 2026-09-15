@@ -12,7 +12,7 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
-  const adminError = await requireAdmin(request);
+  const adminError = await requireAdmin(request, "content:write");
   if (adminError) return adminError;
 
   const parsed = schema.safeParse(await request.json().catch(() => null));

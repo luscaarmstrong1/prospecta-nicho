@@ -5,7 +5,7 @@ import { requireAdmin } from "@/lib/server/admin-auth";
 import { listCnpjJobs } from "@/src/server/services/crm";
 
 export async function GET(request: Request) {
-  const denied = await requireAdmin(request);
+  const denied = await requireAdmin(request, "job:read");
   if (denied) return denied;
   return NextResponse.json({ ok: true, jobs: listCnpjJobs() });
 }

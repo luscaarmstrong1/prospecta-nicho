@@ -5,7 +5,7 @@ import { requireAdmin } from "@/lib/server/admin-auth";
 import { listCrmExports } from "@/src/server/services/crm";
 
 export async function GET(request: Request) {
-  const denied = await requireAdmin(request);
+  const denied = await requireAdmin(request, "export:read");
   if (denied) return denied;
   return NextResponse.json({ ok: true, exports: listCrmExports() });
 }

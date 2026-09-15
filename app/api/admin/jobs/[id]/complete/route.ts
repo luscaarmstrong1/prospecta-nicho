@@ -19,7 +19,7 @@ const bodySchema = z.object({
 });
 
 export async function POST(request: Request, { params }: Params) {
-  const denied = await requireAdmin(request);
+  const denied = await requireAdmin(request, "job:update");
   if (denied) return denied;
 
   const { id } = await params;

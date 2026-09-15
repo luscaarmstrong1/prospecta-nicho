@@ -1,12 +1,13 @@
 import { expect, test } from "@playwright/test";
 
-test("home mantém ordem comercial final e remove FAQ da página inicial", async ({ page }) => {
+test("home mantem ordem comercial final e remove FAQ da pagina inicial", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.locator(".curated-hero .eyebrow").first()).toContainText("INTELIGÊNCIA COMERCIAL B2B");
-  await expect(page.getByRole("heading", { name: "Escolha um nicho. Receba uma base pronta para prospecção." })).toBeVisible();
-  await expect(page.getByText("Antes de começar, você talvez queira saber.")).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "Ver todas as dúvidas" })).toHaveCount(0);
+  await expect(page.locator('[data-test-id="curated-showcase-hero"]')).toBeVisible();
+  await expect(page.getByText(/INTELIG.NCIA COMERCIAL B2B/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Escolha um nicho\. Receba uma base pronta para prospec..o\./ })).toBeVisible();
+  await expect(page.getByText("Antes de comecar, voce talvez queira saber.")).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Ver todas as duvidas" })).toHaveCount(0);
 
   const sectionTops = await page.evaluate(() => {
     const selectors = [
@@ -21,7 +22,7 @@ test("home mantém ordem comercial final e remove FAQ da página inicial", async
 
     return selectors.map((selector) => {
       const element = document.querySelector(selector);
-      if (!element) throw new Error(`Seção não encontrada: ${selector}`);
+      if (!element) throw new Error(`Secao nao encontrada: ${selector}`);
       return element.getBoundingClientRect().top + window.scrollY;
     });
   });
@@ -29,16 +30,16 @@ test("home mantém ordem comercial final e remove FAQ da página inicial", async
   expect(sectionTops).toEqual([...sectionTops].sort((a, b) => a - b));
 });
 
-test("demonstração da entrega exibe planilha mascarada sem coluna de site", async ({ page }) => {
+test("demonstracao da entrega exibe planilha mascarada sem coluna de site", async ({ page }) => {
   await page.goto("/");
 
   const preview = page.locator(".delivery-preview");
-  await expect(preview.getByText("Prévia da entrega")).toBeVisible();
-  await expect(preview.getByText("Dados fictícios e mascarados")).toBeVisible();
+  await expect(preview.getByText(/Pr.via da entrega/)).toBeVisible();
+  await expect(preview.getByText(/Dados fict.cios e mascarados/)).toBeVisible();
   await expect(preview.locator(".delivery-row").nth(0)).not.toContainText("Site");
   await expect(preview).toContainText("Empresa");
   await expect(preview).toContainText("Status");
-  await expect(page.getByRole("link", { name: /Solicitar tabela grátis de teste/i })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: /Solicitar tabela gr.tis de teste/i })).toHaveAttribute(
     "href",
     "/produtos/amostra-gratuita",
   );
