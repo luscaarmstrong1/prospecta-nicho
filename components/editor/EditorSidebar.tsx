@@ -3,6 +3,7 @@
 import { Copy, RotateCcw } from "lucide-react";
 import { LeadPreview } from "@/components/editor/LeadPreview";
 import { estimateInvestment, recommendProduct, serializePublicFilters, summarizeBuilder } from "@/lib/editor-utils";
+import { withBasePath } from "@/src/lib/api/runtime";
 import type { BaseBuilderData } from "@/types/editor";
 
 type Props = {
@@ -17,7 +18,7 @@ export function EditorSidebar({ data, onClear }: Props) {
 
   async function copyShareLink() {
     if (typeof window === "undefined") return;
-    const url = `${window.location.origin}/montar-minha-base${query ? `?${query}` : ""}`;
+    const url = `${window.location.origin}${withBasePath(`/montar-minha-base${query ? `?${query}` : ""}`)}`;
     await navigator.clipboard?.writeText(url);
   }
 

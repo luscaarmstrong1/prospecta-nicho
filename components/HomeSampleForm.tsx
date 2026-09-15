@@ -3,9 +3,9 @@
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { isExternalHref, site } from "@/lib/site";
-import { isStaticExport } from "@/lib/static-export";
 import { trackEvent } from "@/lib/tracking";
 import { createWhatsAppLink } from "@/lib/whatsapp";
+import { apiFetch } from "@/src/lib/api/client";
 
 export function HomeSampleForm() {
   const [sent, setSent] = useState(false);
@@ -27,16 +27,9 @@ export function HomeSampleForm() {
     setLoading(true);
     const form = new FormData(event.currentTarget);
 
-    if (isStaticExport) {
-      trackEvent("sample_form_submitted");
-      setLoading(false);
-      setSent(true);
-      return;
-    }
-
     let response: Response;
     try {
-      response = await fetch("/api/free-sample-request", {
+      response = await apiFetch("/api/free-sample-request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

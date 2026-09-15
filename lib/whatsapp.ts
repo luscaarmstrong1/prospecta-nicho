@@ -4,7 +4,7 @@ export const defaultWhatsAppMessage =
 const defaultWhatsAppNumber = "5535998905896";
 
 export function getWhatsAppNumber() {
-  return (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || defaultWhatsAppNumber).replace(/\D/g, "");
+  return (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || process.env.WHATSAPP_NUMBER || defaultWhatsAppNumber).replace(/\D/g, "");
 }
 
 export function createWhatsAppLink(message = defaultWhatsAppMessage) {

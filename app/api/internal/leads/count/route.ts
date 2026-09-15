@@ -1,3 +1,5 @@
+﻿export const dynamic = "force-static";
+
 import { NextResponse } from "next/server";
 import { requireAdmin, integrationStatus } from "@/lib/server/admin-auth";
 
@@ -8,6 +10,8 @@ export async function POST(request: Request) {
     ok: true,
     countRange: null,
     integrations: integrationStatus(),
-    message: "Contagem depende do ClickHouse configurado e não é simulada publicamente.",
+    message: "Contagem depende do ClickHouse configurado e nao e simulada publicamente.",
   });
 }
+
+

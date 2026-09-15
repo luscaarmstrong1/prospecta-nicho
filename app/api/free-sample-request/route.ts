@@ -1,15 +1,11 @@
+﻿export const dynamic = "force-static";
+
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { persistLead, sendTransactionalEmail, writeAuditLog } from "@/lib/server/integrations";
-import {
-  hasHoneypot,
-  parseJsonBody,
-  rateLimit,
-  requireTrustedOrigin,
-  sanitizePhone,
-  sanitizeText,
-  verifyTurnstileIfConfigured,
-} from "@/lib/server/security";
+import { hasHoneypot, parseJsonBody, rateLimit, requireTrustedOrigin, sanitizePhone, sanitizeText, verifyTurnstileIfConfigured } from "@/lib/server/security";
+import { createCrmRequest } from "@/src/features/crm/request-normalizer";
+import { registerCrmRequest } from "@/src/server/services/crm";
 
 const sampleRequestSchema = z.object({
   name: z.string().min(2).max(120),
@@ -61,14 +57,39 @@ export async function POST(request: Request) {
   };
 
   const persistence = await persistLead("leads", payload);
+  const crmRequest = await registerCrmRequest(
+    createCrmRequest({
+      id: persistence.id,
+      source: payload.source,
+      customer: {
+        name: payload.name,
+        company: payload.company || undefined,
+        email: payload.email || undefined,
+        whatsapp: payload.whatsapp,
+      },
+      commercialGoal: parsed.data.goal || "Solicitação de amostra gratuita de planilha CNPJ",
+      filters: {
+        segment: payload.niche,
+        city: payload.city,
+        quantity: 50,
+      },
+      notes: "Amostra gratuita: entrega demonstrativa e mascarada.",
+    }),
+  );
   const internalEmail = await sendTransactionalEmail("sample_internal", payload);
   const confirmationEmail = await sendTransactionalEmail("sample_confirmation", payload);
-  await writeAuditLog("sample_requested", { whatsapp: payload.whatsapp, niche: payload.niche });
+  await writeAuditLog("sample_requested", { whatsapp: payload.whatsapp, niche: payload.niche, requestId: crmRequest.id });
 
   return NextResponse.json({
     ok: true,
     id: persistence.id,
-    message: "Amostra solicitada. A amostra demonstra estrutura e não entrega uma base comercial completa.",
+    crm: {
+      requestId: crmRequest.id,
+      publicCode: crmRequest.publicCode,
+      product: "Gerador de planilhas com dados públicos de CNPJ",
+      enrichment: "locked_paid_addon",
+    },
+    message: "Amostra solicitada. A amostra demonstra estrutura e nao entrega uma base comercial completa.",
     integrations: {
       supabase: persistence.configured,
       resendInternal: internalEmail.configured,
@@ -76,3 +97,5 @@ export async function POST(request: Request) {
     },
   });
 }
+
+

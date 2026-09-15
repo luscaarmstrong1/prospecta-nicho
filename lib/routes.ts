@@ -20,6 +20,7 @@ export const routes = {
   checkoutSuccess: "/compra/sucesso",
   checkoutPending: "/compra/pendente",
   checkoutError: "/compra/erro",
+  orderStatus: "/pedido/",
   order: "/pedido/[id]",
   admin: "/admin",
 } as const;
@@ -46,6 +47,7 @@ export const publicRoutes = [
   routes.checkoutSuccess,
   routes.checkoutPending,
   routes.checkoutError,
+  routes.orderStatus,
 ];
 
 export const legacyRedirects = ["/blog", "/conteudos", "/solucoes", "/insights"];

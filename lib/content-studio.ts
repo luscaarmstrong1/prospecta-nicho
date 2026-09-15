@@ -33,6 +33,12 @@ export const revalidationRoutes = [
 
 export const contentStudioNav = [
   { href: "/admin", label: "Visão geral" },
+  { href: "/admin/requests", label: "CRM CNPJ" },
+  { href: "/admin/jobs", label: "Jobs CNPJ" },
+  { href: "/admin/exports", label: "Exports CRM" },
+  { href: "/admin/segment-mapping", label: "Mapeamento" },
+  { href: "/admin/concessionarias", label: "Concessionárias" },
+  { href: "/admin/suppression-list", label: "Supressão" },
   { href: "/admin/conteudo", label: "Conteúdo" },
   { href: "/admin/produtos", label: "Produtos" },
   { href: "/admin/precos", label: "Preços" },

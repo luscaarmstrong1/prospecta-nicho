@@ -1,5 +1,6 @@
 "use client";
 
+// cspell:words codigo
 import { ArrowRight, MessageCircle, Send, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -7,8 +8,8 @@ import { useMemo, useState } from "react";
 import { assetPath } from "@/lib/asset-path";
 import { getSegmentAsset } from "@/lib/segment-assets";
 import { buildQuickRequestHref, getSegmentById, segmentCards } from "@/lib/segments";
-import { isStaticExport } from "@/lib/static-export";
-import { createWhatsAppLink } from "@/lib/whatsapp";
+import { apiFetch } from "@/src/lib/api/client";
+import { isGithubPagesRuntime, withBasePath } from "@/src/lib/api/runtime";
 
 const periodOptions = [
   "últimos 30 dias",
@@ -35,7 +36,12 @@ type FormState = {
 
 type SuccessState = {
   id?: string;
+  publicCode?: string;
   whatsappUrl?: string;
+  crm?: {
+    requestId?: string;
+    publicCode?: string;
+  };
   summary?: {
     segment?: string;
     location?: string;
@@ -74,7 +80,9 @@ export function QuickPlanilhaRequestForm() {
 
   const selectedSegment = getSegmentById(form.segment);
   const selectedAsset = getSegmentAsset(selectedSegment.id);
-  const refineHref = `/montar-minha-base?segment=${encodeURIComponent(selectedSegment.id)}&audience=${encodeURIComponent(selectedSegment.label)}`;
+  const refineHref = withBasePath(
+    `/montar-minha-base?segment=${encodeURIComponent(selectedSegment.id)}&audience=${encodeURIComponent(selectedSegment.label)}`,
+  );
 
   function updateField(field: keyof FormState, value: string | boolean) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -87,32 +95,9 @@ export function QuickPlanilhaRequestForm() {
     setError("");
     setIsSubmitting(true);
 
-    if (isStaticExport) {
-      const whatsappMessage =
-        `Olá, quero solicitar uma planilha da ProspectaNicho.\n` +
-        `Segmento: ${selectedSegment.label}\n` +
-        `Região: ${form.location}${form.state ? `/${form.state}` : ""}\n` +
-        `Período: ${form.period}\n` +
-        `Nome: ${form.name}`;
-
-      setIsSubmitting(false);
-      setSuccess({
-        id: `static-${idempotencyKey}`,
-        whatsappUrl: createWhatsAppLink(whatsappMessage),
-        summary: {
-          segment: selectedSegment.label,
-          location: form.location,
-          state: form.state,
-          period: form.period,
-          quantity: form.quantity,
-        },
-      });
-      return;
-    }
-
     let response: Response;
     try {
-      response = await fetch("/api/custom-requests", {
+      response = await apiFetch("/api/custom-requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, source, idempotencyKey }),
@@ -122,6 +107,7 @@ export function QuickPlanilhaRequestForm() {
       setError("Não foi possível conectar agora. Tente novamente em instantes ou chame pelo WhatsApp.");
       return;
     }
+
     const payload = (await response.json().catch(() => ({}))) as SuccessState & { ok?: boolean; message?: string };
 
     setIsSubmitting(false);
@@ -131,6 +117,10 @@ export function QuickPlanilhaRequestForm() {
     }
 
     setSuccess(payload);
+    const publicCode = payload.publicCode || payload.crm?.publicCode;
+    if (isGithubPagesRuntime() && publicCode) {
+      window.location.assign(withBasePath(`/pedido/?codigo=${encodeURIComponent(publicCode)}`));
+    }
   }
 
   if (success) {
@@ -148,7 +138,7 @@ export function QuickPlanilhaRequestForm() {
               <span><strong>Segmento</strong>{success.summary?.segment || selectedSegment.label}</span>
               <span><strong>Região</strong>{success.summary?.location || form.location}</span>
               <span><strong>Período</strong>{success.summary?.period || form.period}</span>
-              <span><strong>Protocolo</strong>{success.id || "registrado"}</span>
+              <span><strong>Protocolo</strong>{success.publicCode || success.crm?.publicCode || success.id || "registrado"}</span>
             </div>
             <div className="btn-row">
               {success.whatsappUrl ? (

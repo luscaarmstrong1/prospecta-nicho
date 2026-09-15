@@ -2,25 +2,53 @@
 
 ## Runtime recomendado
 
-Produção completa deve rodar em Vercel ou ambiente compatível com Next.js server routes. GitHub Pages serve apenas HTML/CSS/JS estático e não executa APIs.
+O frontend público da ProspectaNicho pode rodar no GitHub Pages como site estatico em:
 
-## Preview estático / GitHub Pages
+`https://luscaarmstrong1.github.io/prospecta-nicho/`
 
-GitHub Pages deve ser tratado como preview/export estático temporário da ProspectaNicho. Formulários que dependem de API precisam de fallback estático ou endpoint externo nesse ambiente.
+GitHub Pages nao executa API Routes do Next.js. Por isso, em producao estatica, formularios, CRM e status de pedido chamam Supabase Edge Functions. O worker Python continua externo ao Next.js e processa os Dados Abertos da Receita Federal fora do navegador.
 
-Se o repositório fonte estiver privado, GitHub Pages público pode ficar indisponível conforme o plano da conta. Em 2026-07-28, após a mudança para privado, a API de Pages e a URL antiga de Pages retornaram 404. Para manter acesso público sem expor o código-fonte, publique apenas o artefato estático em um repositório público separado ou use Vercel/hosting equivalente com repositório privado.
+## GitHub Pages + Supabase Functions
 
-Em 2026-07-28, o repositório foi retornado para público e GitHub Pages foi reativado pela branch `gh-pages`, path `/`, com HTTPS enforced. Isso não torna `github.io` a URL canônica de produção.
+O build estatico deve usar:
 
-Para gerar preview estático com basePath, habilite explicitamente:
+`npm run export:github`
 
-- `GITHUB_PAGES=true` ou `NEXT_PUBLIC_STATIC_EXPORT=true`
-- `NEXT_PUBLIC_BASE_PATH=/prospecta-nicho`
+Esse script define:
+
+- `DEPLOY_TARGET=github-pages`
+- `NEXT_PUBLIC_RUNTIME_TARGET=github-pages`
+- `NEXT_PUBLIC_STATIC_EXPORT=true`
 - `NEXT_PUBLIC_ALLOW_GITHUB_PAGES=true`
+- `NEXT_PUBLIC_BASE_PATH=/prospecta-nicho`
+- `NEXT_PUBLIC_SITE_URL=https://luscaarmstrong1.github.io/prospecta-nicho`
 
-Sem essas variáveis, `NEXT_PUBLIC_BASE_PATH` não deve alterar assets ou metadata de produção.
+As variaveis publicas do GitHub Actions podem incluir apenas:
 
-## Variáveis mínimas em produção
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_SUPABASE_FUNCTIONS_URL`
+- `NEXT_PUBLIC_WHATSAPP_NUMBER`
+
+Segredos como `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_API_TOKEN`, `EXPORT_SIGNING_SECRET`, credenciais R2/S3 e diretorios RFB devem ficar no Supabase Functions ou no worker, nunca no frontend.
+
+## Supabase Functions
+
+As Functions ficam em `supabase/functions/*` e devem ser publicadas com o Supabase CLI, por exemplo:
+
+`supabase functions deploy public-create-request public-sample-request public-contact public-request-status health admin-login admin-requests admin-request-detail admin-update-request admin-create-job admin-process-request admin-mark-paid admin-mark-delivered admin-jobs-logs admin-exports admin-export-detail admin-sign-export admin-offer-enrichment admin-mark-enrichment-paid admin-run-enrichment`
+
+Configure no ambiente do Supabase:
+
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `ADMIN_API_TOKEN`
+- `EXPORTS_BUCKET` ou `SUPABASE_EXPORTS_BUCKET`
+- segredos de storage/worker conforme infraestrutura adotada
+
+## Variaveis minimas em producao Next.js server
+
+Se a aplicacao for executada em Vercel ou ambiente compatível com Next.js server routes, producao exige:
 
 - `NEXT_PUBLIC_SITE_URL`
 - `NEXT_PUBLIC_WHATSAPP_NUMBER`
@@ -28,8 +56,9 @@ Sem essas variáveis, `NEXT_PUBLIC_BASE_PATH` não deve alterar assets ou metada
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `RESEND_API_KEY`
 - `ADMIN_API_TOKEN`
-- Segredos de pagamento, storage, Redis e Turnstile conforme módulos ativados.
+- `EXPORT_SIGNING_SECRET`
+- segredos de pagamento, storage, Redis e Turnstile conforme modulos ativados
 
 ## Rollback
 
-Reverter deploy estático pelo branch `gh-pages` ou usar rollback da plataforma runtime. Nunca commitar `.env` para "corrigir rápido".
+Reverter deploy estatico pelo GitHub Pages ou usar rollback da plataforma runtime. Nunca commitar `.env` para corrigir rapidamente uma integracao.

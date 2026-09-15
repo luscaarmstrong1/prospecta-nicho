@@ -1,3 +1,5 @@
+﻿export const dynamic = "force-static";
+
 import crypto from "node:crypto";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -15,7 +17,7 @@ export async function POST(request: Request) {
 
   const parsed = schema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ ok: false, message: "Payload inválido.", issues: parsed.error.issues }, { status: 400 });
+    return NextResponse.json({ ok: false, message: "Payload invalido.", issues: parsed.error.issues }, { status: 400 });
   }
 
   const expiresAt = Date.now() + parsed.data.expiresInHours * 60 * 60 * 1000;
@@ -32,3 +34,5 @@ export async function POST(request: Request) {
     revocable: true,
   });
 }
+
+

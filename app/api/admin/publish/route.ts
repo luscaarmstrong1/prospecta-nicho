@@ -1,3 +1,5 @@
+﻿export const dynamic = "force-static";
+
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -21,13 +23,13 @@ export async function POST(request: Request) {
 
   const parsed = publishSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return NextResponse.json({ ok: false, message: "Payload de publicação inválido.", issues: parsed.error.issues }, { status: 400 });
+    return NextResponse.json({ ok: false, message: "Payload de publicação invalido.", issues: parsed.error.issues }, { status: 400 });
   }
 
   const routes = [...new Set([...(parsed.data.routes || []), ...revalidationRoutes])];
   const invalidRoute = routes.find((route) => hasLocalUrl(route) || !route.startsWith("/"));
   if (invalidRoute) {
-    return NextResponse.json({ ok: false, message: `Rota inválida para revalidação: ${invalidRoute}` }, { status: 400 });
+    return NextResponse.json({ ok: false, message: `Rota invalida para revalidação: ${invalidRoute}` }, { status: 400 });
   }
 
   for (const route of routes) {
@@ -44,3 +46,5 @@ export async function POST(request: Request) {
     audited: true,
   });
 }
+
+

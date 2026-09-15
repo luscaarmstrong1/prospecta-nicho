@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { requireAdmin, integrationStatus } from "@/lib/server/admin-auth";
 
 export const dynamic = "force-static";
@@ -12,3 +12,4 @@ export async function GET(request: Request) {
     integrations: integrationStatus(),
   });
 }
+

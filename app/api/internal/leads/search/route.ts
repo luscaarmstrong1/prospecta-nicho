@@ -1,3 +1,5 @@
+﻿export const dynamic = "force-static";
+
 import { NextResponse } from "next/server";
 import { requireAdmin, integrationStatus } from "@/lib/server/admin-auth";
 
@@ -11,6 +13,8 @@ export async function POST(request: Request) {
     maskedPreview: true,
     filters: body,
     integrations: integrationStatus(),
-    message: "Consulta interna pronta para plugar ClickHouse. Nenhum dado real é exposto sem integração configurada.",
+    message: "Consulta interna pronta para plugar ClickHouse. Nenhum dado real e exposto sem integração configurada.",
   });
 }
+
+

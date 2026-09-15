@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { isExternalHref, site, waLink } from "@/lib/site";
-import { isStaticExport } from "@/lib/static-export";
+import { apiFetch } from "@/src/lib/api/client";
 
 const baseSchema = z.object({
   name: z.string().min(2, "Informe seu nome."),
@@ -45,16 +45,12 @@ export function LeadForm({ mode }: Props) {
   async function submit(data: FormData) {
     if (data.companySite) return;
     setSubmitError("");
-    if (isStaticExport) {
-      setDone(true);
-      return;
-    }
 
     const endpoint =
       mode === "sample" ? "/api/free-sample-request" : mode === "custom" ? "/api/custom-base-request" : "/api/contact";
     let response: Response;
     try {
-      response = await fetch(endpoint, {
+      response = await apiFetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

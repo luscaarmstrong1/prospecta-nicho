@@ -1,3 +1,5 @@
+﻿export const dynamic = "force-static";
+
 import { NextResponse } from "next/server";
 import { requireAdmin, integrationStatus } from "@/lib/server/admin-auth";
 
@@ -11,3 +13,5 @@ export async function POST(request: Request) {
     message: "Importação nacional deve rodar no worker Python, fora de Vercel/GitHub Pages.",
   });
 }
+
+

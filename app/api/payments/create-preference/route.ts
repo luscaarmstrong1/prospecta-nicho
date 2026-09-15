@@ -1,3 +1,5 @@
+﻿export const dynamic = "force-static";
+
 import { NextResponse } from "next/server";
 import { getConfiguredPaymentProvider } from "@/lib/payments/provider";
 import { parseJsonBody, rateLimit, requireTrustedOrigin } from "@/lib/server/security";
@@ -50,3 +52,5 @@ export async function POST(request: Request) {
     { status: 501 },
   );
 }
+
+

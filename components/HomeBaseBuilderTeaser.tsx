@@ -6,6 +6,7 @@ import { useState } from "react";
 import { assetPath } from "@/lib/asset-path";
 import { getSegmentAsset } from "@/lib/segment-assets";
 import { getSegmentById, segmentCards } from "@/lib/segments";
+import { withBasePath } from "@/src/lib/api/runtime";
 
 const audiences = segmentCards.slice(0, 8);
 
@@ -30,7 +31,7 @@ export function HomeBaseBuilderTeaser() {
     const params = new URLSearchParams({ segment, source: "home-quick-request" });
     if (city.trim()) params.set("city", city.trim());
     if (period) params.set("period", period);
-    router.push(`/solicitar-planilha?${params.toString()}`);
+    router.push(withBasePath(`/solicitar-planilha?${params.toString()}`));
   }
 
   return (

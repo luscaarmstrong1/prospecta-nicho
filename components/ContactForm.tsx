@@ -2,8 +2,8 @@
 
 import { Send } from "lucide-react";
 import { useState } from "react";
-import { isStaticExport } from "@/lib/static-export";
 import { createWhatsAppLink, defaultWhatsAppMessage } from "@/lib/whatsapp";
+import { apiFetch } from "@/src/lib/api/client";
 
 const subjects = [
   "Dúvida sobre uma base",
@@ -27,16 +27,9 @@ export function ContactForm() {
     setMessage("");
     const form = new FormData(event.currentTarget);
 
-    if (isStaticExport) {
-      setStatus("success");
-      setMessage("Recebemos sua mensagem. Abra o WhatsApp para continuar o atendimento.");
-      event.currentTarget.reset();
-      return;
-    }
-
     let response: Response;
     try {
-      response = await fetch("/api/contact", {
+      response = await apiFetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(Object.fromEntries(form.entries())),

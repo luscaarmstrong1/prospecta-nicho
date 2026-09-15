@@ -3245,6 +3245,67 @@ textarea {
   padding: 12px;
 }
 
+.admin-action-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.admin-action-grid .button,
+.admin-inline-form .button,
+.admin-export-actions .button {
+  min-height: 42px;
+}
+
+.admin-action-status {
+  margin: 12px 0 0;
+  color: var(--navy);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.admin-inline-form {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(220px, 1fr) minmax(92px, 140px) auto;
+  gap: 10px;
+  align-items: end;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.admin-inline-form label,
+.admin-export-actions label {
+  display: grid;
+  gap: 6px;
+  color: var(--navy);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.admin-inline-form input,
+.admin-export-actions input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: var(--white);
+  padding: 10px 12px;
+}
+
+.admin-export-actions {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.admin-export-actions input {
+  font-size: 0.84rem;
+}
+
 .studio-field textarea {
   min-height: 112px;
   resize: vertical;
@@ -3393,6 +3454,10 @@ textarea {
   }
 
   .admin-table-row {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-inline-form {
     grid-template-columns: 1fr;
   }
 

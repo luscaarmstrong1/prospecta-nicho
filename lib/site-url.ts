@@ -4,7 +4,9 @@ const blockedPublicHosts = /localhost|127\.0\.0\.1|:3000|:3001|github\.io|luscaa
 const allowStaticPreviewUrl =
   process.env.NEXT_PUBLIC_STATIC_EXPORT === "true" ||
   process.env.NEXT_PUBLIC_ALLOW_GITHUB_PAGES === "true" ||
-  process.env.GITHUB_PAGES === "true";
+  process.env.GITHUB_PAGES === "true" ||
+  process.env.DEPLOY_TARGET === "github-pages" ||
+  process.env.NEXT_PUBLIC_RUNTIME_TARGET === "github-pages";
 
 function cleanBaseUrl(value: string) {
   return value.replace(/\/+$/, "");

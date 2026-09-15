@@ -1,15 +1,16 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const baseURL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3000";
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:3100";
 const webServerCommand =
   process.env.PLAYWRIGHT_WEB_SERVER_COMMAND ||
-  "node node_modules/next/dist/bin/next dev --hostname 127.0.0.1 --port 3000";
+  "node node_modules/next/dist/bin/next dev --hostname 127.0.0.1 --port 3100";
 
 export default defineConfig({
   testDir: "./e2e",
   outputDir: "artifacts/visual-qc",
   timeout: 30_000,
   fullyParallel: false,
+  workers: Number(process.env.PLAYWRIGHT_WORKERS || 1),
   retries: 0,
   use: {
     baseURL,
@@ -20,8 +21,12 @@ export default defineConfig({
     ? undefined
     : {
         command: webServerCommand,
+        env: {
+          ...process.env,
+          ADMIN_API_TOKEN: process.env.ADMIN_API_TOKEN || "playwright-admin-token",
+        },
         url: baseURL,
-        reuseExistingServer: true,
+        reuseExistingServer: !process.env.CI,
         timeout: 120_000,
       },
   projects: [

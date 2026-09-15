@@ -2,7 +2,9 @@ import type { CustomRequestInput } from "@/src/schemas/custom-request";
 import { sanitizePhone, sanitizeText } from "@/lib/server/security";
 import { getSegmentById } from "@/lib/segments";
 import { createWhatsAppLink } from "@/lib/whatsapp";
+import { createCrmRequestFromQuickRequest } from "@/src/features/crm/request-normalizer";
 import { createAuditLog, createLead, sendEmail } from "@/src/server/repositories/lead-repository";
+import { registerCrmRequest } from "@/src/server/services/crm";
 
 type CachedResponse = {
   expiresAt: number;
@@ -38,11 +40,16 @@ export async function submitCustomRequest(data: CustomRequestInput) {
   const segment = getSegmentById(data.segment);
   const createdAt = new Date().toISOString();
   const email = sanitizeText(data.email, 180) || null;
+  const crmDraft = createCrmRequestFromQuickRequest(data);
   const payload = {
+    id: crmDraft.id,
+    publicCode: crmDraft.publicCode,
     source: sanitizeText(data.source, 80) || "quick-planilha",
     segmentSlug: segment.id,
+    segmentLabel: segment.label,
     segment: segment.label,
     niche: segment.label,
+    productSlug: "gerador-planilhas-cnpj",
     city: sanitizeText(data.location, 160),
     location: sanitizeText(data.location, 160),
     state: sanitizeText(data.state, 2).toUpperCase(),
@@ -54,12 +61,18 @@ export async function submitCustomRequest(data: CustomRequestInput) {
     whatsapp: sanitizePhone(data.whatsapp),
     notes: sanitizeText(data.notes, 900),
     consent: true,
-    status: "analysis",
+    status: "em_validacao",
+    priority: "normal",
+    isPaid: false,
+    enrichmentRequested: false,
+    enrichmentPaid: false,
+    enrichmentEnabled: false,
+    enrichmentStatus: "locked",
     idempotencyKey,
     createdAt,
   };
 
-  const requestRecord = await createLead("custom_requests", payload);
+  const crmRequest = await registerCrmRequest(crmDraft);
   const leadRecord = await createLead("leads", {
     source: "quick-planilha",
     name: payload.name,
@@ -74,24 +87,30 @@ export async function submitCustomRequest(data: CustomRequestInput) {
   const internalEmail = await sendEmail("custom_request_internal", payload);
   const confirmationEmail = await sendEmail("custom_request_confirmation", payload);
   await createAuditLog("custom_request_submitted", {
-    id: requestRecord.id,
+    id: crmRequest.id,
     leadId: leadRecord.id,
     source: payload.source,
     segment: payload.segment,
   });
 
   const whatsappMessage =
-    `Olá, solicitei uma planilha no site da ProspectaNicho.\n` +
+    `Ola, solicitei uma planilha no site da ProspectaNicho.\n` +
     `Segmento: ${payload.segment}\n` +
-    `Região: ${payload.location}${payload.state ? `/${payload.state}` : ""}\n` +
-    `Período: ${payload.openedPeriod}\n` +
+    `Regiao: ${payload.location}${payload.state ? `/${payload.state}` : ""}\n` +
+    `Periodo: ${payload.openedPeriod}\n` +
     `Nome: ${payload.name}`;
   const responseBody = {
     ok: true,
-    id: requestRecord.id,
+    id: crmRequest.id,
     leadId: leadRecord.id,
     status: "analysis",
-    message: "Solicitação recebida. Vamos validar filtros, disponibilidade e escopo antes de qualquer cobrança.",
+    crm: {
+      requestId: crmRequest.id,
+      publicCode: crmRequest.publicCode,
+      product: "Gerador de planilhas com dados publicos de CNPJ",
+      enrichment: "locked_paid_addon",
+    },
+    message: "Solicitacao recebida. Vamos validar filtros, disponibilidade e escopo antes de qualquer cobranca.",
     summary: {
       segment: payload.segment,
       location: payload.location,
@@ -101,7 +120,7 @@ export async function submitCustomRequest(data: CustomRequestInput) {
     },
     whatsappUrl: createWhatsAppLink(whatsappMessage),
     integrations: {
-      supabase: requestRecord.configured,
+      supabase: leadRecord.configured,
       resendInternal: internalEmail.configured,
       resendConfirmation: confirmationEmail.configured,
     },

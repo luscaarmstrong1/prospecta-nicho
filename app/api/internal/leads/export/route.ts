@@ -1,3 +1,5 @@
+﻿export const dynamic = "force-static";
+
 import { NextResponse } from "next/server";
 import { requireAdmin, integrationStatus } from "@/lib/server/admin-auth";
 
@@ -10,6 +12,8 @@ export async function POST(request: Request) {
     exportQueued: false,
     filtersFrozen: body,
     integrations: integrationStatus(),
-    message: "Exportação só será enfileirada após pagamento aprovado ou aprovação interna e infraestrutura configurada.",
+    message: "Exportação so sera enfileirada apos pagamento aprovado ou aprovação interna e infraestrutura configurada.",
   });
 }
+
+

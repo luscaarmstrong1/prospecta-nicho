@@ -1,7 +1,11 @@
+﻿export const dynamic = "force-static";
+
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { builderSchema } from "@/lib/editor-schema";
 import { persistLead, sendTransactionalEmail, writeAuditLog } from "@/lib/server/integrations";
+import { createCrmRequest, createCrmRequestFromBuilder } from "@/src/features/crm/request-normalizer";
+import { registerCrmRequest } from "@/src/server/services/crm";
 import {
   hasHoneypot,
   parseJsonBody,
@@ -75,6 +79,27 @@ export async function POST(request: Request) {
   };
 
   const persistence = await persistLead("custom_requests", payload);
+  const crmRequest = await registerCrmRequest(
+    parsed.success
+      ? createCrmRequestFromBuilder(parsed.data, persistence.id)
+      : createCrmRequest({
+          id: persistence.id,
+          source,
+          customer: {
+            name: payload.name,
+            company: payload.company || undefined,
+            email: payload.email || undefined,
+            whatsapp: payload.whatsapp,
+          },
+          commercialGoal: payload.objective,
+          filters: {
+            segment: payload.segment,
+            uf: sanitizeText("state" in data ? data.state : "", 2).toUpperCase() || undefined,
+            city: payload.city,
+            cnaes: "cnae" in data && data.cnae ? [sanitizeText(data.cnae, 20).replace(/\D/g, "")].filter(Boolean) : [],
+          },
+        }),
+  );
   const internalEmail = await sendTransactionalEmail("custom_request_internal", payload);
   const confirmationEmail = await sendTransactionalEmail("custom_request_confirmation", payload);
   await writeAuditLog("custom_request_submitted", { id: persistence.id, source, email: payload.email });
@@ -84,6 +109,12 @@ export async function POST(request: Request) {
     id: persistence.id,
     leadSource: source,
     status: "analysis",
+    crm: {
+      requestId: crmRequest.id,
+      publicCode: crmRequest.publicCode,
+      product: "Gerador de planilhas com dados públicos de CNPJ",
+      enrichment: "locked_paid_addon",
+    },
     message: "Solicitação recebida. A equipe valida filtros, disponibilidade e escopo antes de cobrança.",
     integrations: {
       supabase: persistence.configured,
@@ -92,3 +123,5 @@ export async function POST(request: Request) {
     },
   });
 }
+
+

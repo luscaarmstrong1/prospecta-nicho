@@ -1,7 +1,9 @@
 const allowStaticBasePath =
   process.env.NEXT_PUBLIC_STATIC_EXPORT === "true" ||
   process.env.NEXT_PUBLIC_ALLOW_GITHUB_PAGES === "true" ||
-  process.env.GITHUB_PAGES === "true";
+  process.env.GITHUB_PAGES === "true" ||
+  process.env.DEPLOY_TARGET === "github-pages" ||
+  process.env.NEXT_PUBLIC_RUNTIME_TARGET === "github-pages";
 const basePath = allowStaticBasePath ? process.env.NEXT_PUBLIC_BASE_PATH || "" : "";
 
 export function assetPath(path: string) {

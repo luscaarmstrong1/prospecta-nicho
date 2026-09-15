@@ -1,27 +1,18 @@
 import type { Metadata } from "next";
 import { AdminShell } from "@/components/admin/AdminShell";
+import { AdminLoginForm } from "./AdminLoginForm";
 
 export const metadata: Metadata = { title: "Login administrativo", robots: { index: false, follow: false } };
 
 export default function AdminLoginPage() {
   return (
-    <AdminShell title="Login administrativo" eyebrow="Supabase Auth">
+    <AdminShell title="Login administrativo" eyebrow="Área protegida">
       <div className="admin-panel">
         <p>
-          A autenticação deve ser feita com Supabase Auth em produção. Esta tela mantém o fluxo separado da área pública e
-          evita qualquer exposição de service role no frontend.
+          Informe o token administrativo configurado no servidor. A sessão usa cookie httpOnly e não expõe service role no
+          frontend.
         </p>
-        <form className="admin-form">
-          <label>
-            E-mail
-            <input type="email" placeholder="admin@prospectanicho.com.br" />
-          </label>
-          <label>
-            Senha
-            <input type="password" placeholder="••••••••" />
-          </label>
-          <button className="button button--primary" type="button">Entrar</button>
-        </form>
+        <AdminLoginForm />
       </div>
     </AdminShell>
   );

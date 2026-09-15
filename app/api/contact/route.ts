@@ -1,3 +1,5 @@
+﻿export const dynamic = "force-static";
+
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { persistLead, sendTransactionalEmail, writeAuditLog } from "@/lib/server/integrations";
@@ -17,7 +19,7 @@ const schema = z.object({
   email: z.string().email().max(180),
   whatsapp: z.string().min(8).max(32),
   subject: z.enum([
-    "Dúvida sobre uma base",
+    "Duvida sobre uma base",
     "Solicitar base personalizada",
     "Suporte sobre pedido",
     "Pagamento",
@@ -83,3 +85,5 @@ export async function POST(request: Request) {
     },
   });
 }
+
+

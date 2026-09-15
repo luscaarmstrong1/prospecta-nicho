@@ -36,6 +36,101 @@ create table if not exists public.custom_requests (
   status text not null default 'new'
 );
 
+alter table public.custom_requests add column if not exists public_code text;
+alter table public.custom_requests add column if not exists requester_name text;
+alter table public.custom_requests add column if not exists requester_whatsapp text;
+alter table public.custom_requests add column if not exists requester_email text;
+alter table public.custom_requests add column if not exists requester_company text;
+alter table public.custom_requests add column if not exists segment_slug text;
+alter table public.custom_requests add column if not exists segment_label text;
+alter table public.custom_requests add column if not exists product_slug text;
+alter table public.custom_requests add column if not exists source text;
+alter table public.custom_requests add column if not exists priority text not null default 'normal';
+alter table public.custom_requests add column if not exists is_paid boolean not null default false;
+alter table public.custom_requests add column if not exists paid_at timestamptz;
+alter table public.custom_requests add column if not exists enrichment_requested boolean not null default false;
+alter table public.custom_requests add column if not exists enrichment_paid boolean not null default false;
+alter table public.custom_requests add column if not exists enrichment_enabled boolean not null default false;
+alter table public.custom_requests add column if not exists enrichment_status text not null default 'locked';
+alter table public.custom_requests add column if not exists internal_notes text;
+alter table public.custom_requests add column if not exists updated_at timestamptz not null default now();
+
+create unique index if not exists custom_requests_public_code_uidx
+on public.custom_requests(public_code)
+where public_code is not null;
+
+create table if not exists public.request_filters (
+  id uuid primary key default gen_random_uuid(),
+  request_id uuid references public.custom_requests(id) on delete cascade,
+  uf text,
+  city text,
+  cities jsonb default '[]'::jsonb,
+  utility_id uuid,
+  opening_period text,
+  opening_date_start date,
+  opening_date_end date,
+  company_sizes jsonb default '[]'::jsonb,
+  registration_status text default 'ATIVA',
+  establishment_type text default 'qualquer',
+  min_capital numeric,
+  max_capital numeric,
+  cnae_principal jsonb default '[]'::jsonb,
+  cnae_secondary jsonb default '[]'::jsonb,
+  include_secondary_cnaes boolean default true,
+  exclude_mei boolean default true,
+  only_headquarters boolean default false,
+  desired_quantity integer,
+  delivery_format text default 'xlsx',
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.request_fields (
+  id uuid primary key default gen_random_uuid(),
+  request_id uuid references public.custom_requests(id) on delete cascade,
+  field_key text not null,
+  field_label text not null,
+  is_default boolean not null default true,
+  is_available boolean not null default true,
+  requires_validation boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.request_status_events (
+  id uuid primary key default gen_random_uuid(),
+  request_id uuid references public.custom_requests(id) on delete cascade,
+  status text not null,
+  message text not null,
+  metadata jsonb default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.rfb_processing_jobs (
+  id uuid primary key default gen_random_uuid(),
+  request_id uuid references public.custom_requests(id) on delete cascade,
+  job_type text not null default 'rfb_export',
+  status text not null default 'queued',
+  progress integer not null default 0,
+  current_step text,
+  error_message text,
+  worker_id text,
+  attempts integer not null default 0,
+  started_at timestamptz,
+  finished_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.rfb_job_logs (
+  id uuid primary key default gen_random_uuid(),
+  job_id uuid references public.rfb_processing_jobs(id) on delete cascade,
+  request_id uuid references public.custom_requests(id) on delete cascade,
+  level text not null default 'info',
+  step text,
+  message text not null,
+  metadata jsonb default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
 create table if not exists public.orders (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
@@ -98,6 +193,12 @@ create table if not exists public.payments (
   raw_payload jsonb not null default '{}'::jsonb
 );
 
+alter table public.payments add column if not exists request_id uuid references public.custom_requests(id) on delete cascade;
+alter table public.payments add column if not exists product_slug text;
+alter table public.payments add column if not exists amount_cents integer not null default 0;
+alter table public.payments add column if not exists currency text not null default 'BRL';
+alter table public.payments add column if not exists paid_at timestamptz;
+
 create table if not exists public.exports (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
@@ -110,6 +211,34 @@ create table if not exists public.exports (
   expires_at timestamptz
 );
 
+alter table public.exports add column if not exists request_id uuid references public.custom_requests(id) on delete cascade;
+alter table public.exports add column if not exists job_id uuid references public.rfb_processing_jobs(id);
+alter table public.exports add column if not exists row_count integer default 0;
+alter table public.exports add column if not exists file_name text;
+alter table public.exports add column if not exists file_format text default 'xlsx';
+alter table public.exports add column if not exists storage_provider text default 'local';
+alter table public.exports add column if not exists storage_bucket text;
+alter table public.exports add column if not exists storage_path text;
+alter table public.exports add column if not exists signed_url text;
+alter table public.exports add column if not exists signed_url_expires_at timestamptz;
+alter table public.exports add column if not exists filters_snapshot jsonb not null default '{}'::jsonb;
+alter table public.exports add column if not exists fields_snapshot jsonb not null default '[]'::jsonb;
+alter table public.exports add column if not exists generated_by text default 'rfb_worker';
+
+create table if not exists public.export_files (
+  id uuid primary key default gen_random_uuid(),
+  export_id uuid references public.exports(id) on delete cascade,
+  request_id uuid references public.custom_requests(id) on delete cascade,
+  file_name text not null,
+  file_format text not null,
+  storage_provider text not null default 'local',
+  storage_bucket text,
+  storage_path text,
+  byte_size bigint,
+  checksum text,
+  created_at timestamptz not null default now()
+);
+
 create table if not exists public.export_downloads (
   id uuid primary key default gen_random_uuid(),
   created_at timestamptz not null default now(),
@@ -117,6 +246,9 @@ create table if not exists public.export_downloads (
   ip_hash text,
   user_agent text
 );
+
+alter table public.export_downloads add column if not exists request_id uuid references public.custom_requests(id) on delete cascade;
+alter table public.export_downloads add column if not exists downloaded_by uuid;
 
 create table if not exists public.consents (
   id uuid primary key default gen_random_uuid(),
@@ -360,12 +492,18 @@ on conflict (id) do nothing;
 
 alter table public.leads enable row level security;
 alter table public.custom_requests enable row level security;
+alter table public.request_filters enable row level security;
+alter table public.request_fields enable row level security;
+alter table public.request_status_events enable row level security;
+alter table public.rfb_processing_jobs enable row level security;
+alter table public.rfb_job_logs enable row level security;
 alter table public.orders enable row level security;
 alter table public.audit_logs enable row level security;
 alter table public.contact_requests enable row level security;
 alter table public.sample_requests enable row level security;
 alter table public.payments enable row level security;
 alter table public.exports enable row level security;
+alter table public.export_files enable row level security;
 alter table public.export_downloads enable row level security;
 alter table public.consents enable row level security;
 alter table public.suppression_list enable row level security;
@@ -409,12 +547,18 @@ $$;
 
 create policy "service role manages leads" on public.leads for all using (auth.role() = 'service_role');
 create policy "service role manages custom requests" on public.custom_requests for all using (auth.role() = 'service_role');
+create policy "service role manages request filters" on public.request_filters for all using (auth.role() = 'service_role') with check (auth.role() = 'service_role');
+create policy "service role manages request fields" on public.request_fields for all using (auth.role() = 'service_role') with check (auth.role() = 'service_role');
+create policy "service role manages request status events" on public.request_status_events for all using (auth.role() = 'service_role') with check (auth.role() = 'service_role');
+create policy "service role manages rfb processing jobs" on public.rfb_processing_jobs for all using (auth.role() = 'service_role') with check (auth.role() = 'service_role');
+create policy "service role manages rfb job logs" on public.rfb_job_logs for all using (auth.role() = 'service_role') with check (auth.role() = 'service_role');
 create policy "service role manages orders" on public.orders for all using (auth.role() = 'service_role');
 create policy "service role manages audit logs" on public.audit_logs for all using (auth.role() = 'service_role');
 create policy "service role manages contact requests" on public.contact_requests for all using (auth.role() = 'service_role');
 create policy "service role manages sample requests" on public.sample_requests for all using (auth.role() = 'service_role');
 create policy "service role manages payments" on public.payments for all using (auth.role() = 'service_role');
 create policy "service role manages exports" on public.exports for all using (auth.role() = 'service_role');
+create policy "service role manages export files" on public.export_files for all using (auth.role() = 'service_role') with check (auth.role() = 'service_role');
 create policy "service role manages export downloads" on public.export_downloads for all using (auth.role() = 'service_role');
 create policy "service role manages consents" on public.consents for all using (auth.role() = 'service_role');
 create policy "service role manages suppression list" on public.suppression_list for all using (auth.role() = 'service_role');
@@ -444,3 +588,97 @@ create policy "public reads public brand assets" on storage.objects
   for select using (bucket_id in ('brand-assets', 'site-media', 'product-media'));
 create policy "admins manage site storage assets" on storage.objects
   for all using (bucket_id in ('brand-assets', 'site-media', 'product-media', 'preview-assets') and public.is_admin_role(array['admin', 'editor']));
+
+create table if not exists public.crm_requests (
+  id uuid primary key default gen_random_uuid(),
+  public_code text not null unique,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  source text not null,
+  status text not null default 'analysis',
+  customer_json jsonb not null default '{}'::jsonb,
+  filters_json jsonb not null default '{}'::jsonb,
+  commercial_goal text,
+  notes text,
+  payment_status text not null default 'pending',
+  enrichment_paid boolean not null default false,
+  enrichment_enabled boolean not null default false,
+  enrichment_status text not null default 'locked',
+  job_id uuid,
+  export_id uuid
+);
+
+create table if not exists public.cnpj_jobs (
+  id uuid primary key default gen_random_uuid(),
+  request_id uuid not null references public.crm_requests(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  status text not null default 'queued',
+  worker text not null default 'rfb_cnpj',
+  filters_snapshot jsonb not null default '{}'::jsonb,
+  rows_matched integer not null default 0,
+  rows_exported integer not null default 0,
+  logs jsonb not null default '[]'::jsonb,
+  error text
+);
+
+create table if not exists public.crm_exports (
+  id uuid primary key default gen_random_uuid(),
+  request_id uuid not null references public.crm_requests(id) on delete cascade,
+  job_id uuid references public.cnpj_jobs(id) on delete set null,
+  created_at timestamptz not null default now(),
+  status text not null default 'pending',
+  format text not null default 'xlsx',
+  fields text[] not null default array[]::text[],
+  row_count integer not null default 0,
+  file_url text,
+  storage_provider text not null default 'supabase',
+  expires_at timestamptz
+);
+
+create table if not exists public.segment_mappings (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  segment text not null,
+  cnaes text[] not null default array[]::text[],
+  keywords text[] not null default array[]::text[],
+  active boolean not null default true,
+  notes text
+);
+
+create table if not exists public.concessionarias (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  name text not null,
+  uf text not null,
+  cities text[] not null default array[]::text[],
+  aliases text[] not null default array[]::text[],
+  active boolean not null default true,
+  notes text
+);
+
+create table if not exists public.enrichment_runs (
+  id uuid primary key default gen_random_uuid(),
+  request_id uuid not null references public.crm_requests(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  status text not null default 'locked',
+  paid_confirmed boolean not null default false,
+  executed_by uuid,
+  input_export_id uuid references public.crm_exports(id) on delete set null,
+  output_export_id uuid references public.crm_exports(id) on delete set null,
+  logs jsonb not null default '[]'::jsonb
+);
+
+alter table public.crm_requests enable row level security;
+alter table public.cnpj_jobs enable row level security;
+alter table public.crm_exports enable row level security;
+alter table public.segment_mappings enable row level security;
+alter table public.concessionarias enable row level security;
+alter table public.enrichment_runs enable row level security;
+
+create policy "service role manages crm requests" on public.crm_requests for all using (auth.role() = 'service_role');
+create policy "service role manages cnpj jobs" on public.cnpj_jobs for all using (auth.role() = 'service_role');
+create policy "service role manages crm exports" on public.crm_exports for all using (auth.role() = 'service_role');
+create policy "service role manages segment mappings" on public.segment_mappings for all using (auth.role() = 'service_role');
+create policy "service role manages concessionarias" on public.concessionarias for all using (auth.role() = 'service_role');
+create policy "service role manages enrichment runs" on public.enrichment_runs for all using (auth.role() = 'service_role');

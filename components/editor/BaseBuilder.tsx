@@ -20,9 +20,9 @@ import {
 } from "@/lib/editor-schema";
 import { defaultBuilderData, segmentPresets } from "@/lib/editor-presets";
 import { applyPreset, restorePublicFilters } from "@/lib/editor-utils";
-import { isStaticExport } from "@/lib/static-export";
 import { createWhatsAppLink, defaultWhatsAppMessage } from "@/lib/whatsapp";
 import { trackEvent } from "@/lib/tracking";
+import { apiFetch } from "@/src/lib/api/client";
 import type { BaseBuilderData, BuilderStep, SegmentPreset } from "@/types/editor";
 
 const storageKey = "prospectanicho:base-builder";
@@ -94,16 +94,10 @@ export function BaseBuilder({ initialSearch = "" }: Props) {
   async function submit(values: BaseBuilderData) {
     if (values.companySite) return;
     setSubmitError("");
-    if (isStaticExport) {
-      window.localStorage.removeItem(storageKey);
-      trackEvent("editor_submitted", { segment: values.segment, city: values.city });
-      setSubmitted(values);
-      return;
-    }
 
     let response: Response;
     try {
-      response = await fetch("/api/custom-base-request", {
+      response = await apiFetch("/api/custom-base-request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...values, source: "base-builder" }),

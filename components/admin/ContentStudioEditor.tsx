@@ -3,6 +3,7 @@
 import { Eye, Monitor, RotateCcw, Save, Send, Smartphone, Tablet, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { editablePages } from "@/lib/content-studio";
+import { apiFetch } from "@/src/lib/api/client";
 
 type Device = "desktop" | "tablet" | "mobile";
 
@@ -29,7 +30,7 @@ export function ContentStudioEditor({ pageSlug = "home" }: { pageSlug?: string }
       return;
     }
     setStatus("Salvando");
-    const response = await fetch("/api/admin/publish", {
+    const response = await apiFetch("/api/admin/publish", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ entityType: "content_page", entityId: page.slug, version: Date.now(), routes: ["/"] }),

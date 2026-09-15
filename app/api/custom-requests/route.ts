@@ -1,3 +1,5 @@
+﻿export const dynamic = "force-static";
+
 import { NextResponse } from "next/server";
 import { customRequestSchema } from "@/src/schemas/custom-request";
 import { submitCustomRequest } from "@/src/server/services/custom-requests";
@@ -42,6 +44,8 @@ export async function POST(request: Request) {
     return NextResponse.json(responseBody);
   } catch (error) {
     logger.error("custom_request_failed", { error: error instanceof Error ? error.message : "unknown" });
-    return NextResponse.json({ ok: false, message: "Não foi possível salvar a solicitação agora." }, { status: 500 });
+    return NextResponse.json({ ok: false, message: "Nao foi possível salvar a solicitação agora." }, { status: 500 });
   }
 }
+
+

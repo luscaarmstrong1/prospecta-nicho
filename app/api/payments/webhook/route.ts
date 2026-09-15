@@ -1,3 +1,5 @@
+﻿export const dynamic = "force-static";
+
 import { NextResponse } from "next/server";
 import { writeAuditLog } from "@/lib/server/integrations";
 import { logger } from "@/src/lib/security/logger";
@@ -22,3 +24,5 @@ export async function POST(request: Request) {
     message: "Webhook recebido. A aprovação de pedido exige validação de assinatura, idempotência e persistência configuradas.",
   });
 }
+
+
