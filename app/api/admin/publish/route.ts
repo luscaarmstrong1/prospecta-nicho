@@ -18,7 +18,7 @@ function hasLocalUrl(value: string) {
 }
 
 export async function POST(request: Request) {
-  const adminError = requireAdmin(request);
+  const adminError = await requireAdmin(request);
   if (adminError) return adminError;
 
   const parsed = publishSchema.safeParse(await request.json().catch(() => null));
@@ -46,5 +46,6 @@ export async function POST(request: Request) {
     audited: true,
   });
 }
+
 
 

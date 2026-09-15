@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { requireAdmin, integrationStatus } from "@/lib/server/admin-auth";
 
 export async function POST(request: Request) {
-  const denied = requireAdmin(request);
+  const denied = await requireAdmin(request);
   if (denied) return denied;
   return NextResponse.json({
     ok: true,
@@ -13,5 +13,6 @@ export async function POST(request: Request) {
     message: "Importação nacional deve rodar no worker Python, fora de Vercel/GitHub Pages.",
   });
 }
+
 
 

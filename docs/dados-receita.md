@@ -37,3 +37,12 @@ O processamento da base nacional não deve acontecer em API Route da Vercel. Dow
 
 Campos sensíveis, dados pessoais de sócios e contatos pessoais ficam bloqueados no export padrão.
 
+
+
+## Setup operacional local
+
+Scripts adicionados na raiz: `setup-prospectanicho-local.bat`, `setup-dados-receita.bat`, `update-dados-receita.bat`, `status-prospectanicho.bat` e `start-prospectanicho-worker.bat <job-id>`.
+
+Variaveis principais: `RFB_CNPJ_DATA_DIR`, `RFB_CNPJ_OUTPUT_DIR`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` e `SUPABASE_STORAGE_BUCKET`. A service role e qualquer segredo devem ficar somente no ambiente servidor/worker.
+
+O downloader exige empresas, estabelecimentos e tabelas auxiliares. Arquivos de socios ficam fora do fluxo padrao para reduzir risco LGPD e evitar exportacao de dados pessoais.

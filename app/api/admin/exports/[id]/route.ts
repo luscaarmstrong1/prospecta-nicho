@@ -11,7 +11,7 @@ import { getCrmExportForAdmin } from "@/src/server/services/crm";
 type Params = { params: Promise<{ id: string }> };
 
 export async function GET(request: Request, { params }: Params) {
-  const denied = requireAdmin(request);
+  const denied = await requireAdmin(request);
   if (denied) return denied;
 
   const { id } = await params;

@@ -6,7 +6,7 @@ import { json, errorJson } from "../_shared/responses.ts";
 Deno.serve(async (request) => {
   const cors = handleCors(request);
   if (cors) return cors;
-  const denied = requireAdmin(request);
+  const denied = await requireAdmin(request);
   if (denied) return denied;
   const supabase = serviceClient();
   const [{ data: jobs, error }, { data: logs }] = await Promise.all([

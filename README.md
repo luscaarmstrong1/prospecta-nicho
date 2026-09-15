@@ -71,3 +71,20 @@ Não inclua tokens, chaves, credenciais, dados pessoais sensíveis ou arquivos `
 ## Status
 
 Produto digital em evolução.
+
+
+## Operacao local gratuita do CRM CNPJ
+
+O CRM da ProspectaNicho foi mantido em arquitetura de custo zero controlado: frontend Next.js/GitHub Pages, backend Supabase Free e worker Python local para Dados Abertos do CNPJ. Nenhum `.env`, service role ou dado sensivel deve ser publicado.
+
+Comandos principais:
+
+```bash
+npm install
+setup-prospectanicho-local.bat
+setup-dados-receita.bat
+status-prospectanicho.bat
+start-prospectanicho-worker.bat <job-id>
+```
+
+Se a fonte externa da Receita estiver indisponivel, o setup retorna `REMOTE_UNAVAILABLE` em JSON em vez de encerrar com traceback.

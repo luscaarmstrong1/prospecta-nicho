@@ -4,7 +4,7 @@ import { requireAdmin, integrationStatus } from "@/lib/server/admin-auth";
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
-  const denied = requireAdmin(request);
+  const denied = await requireAdmin(request);
   if (denied) return denied;
   return NextResponse.json({
     ok: true,
@@ -12,4 +12,5 @@ export async function GET(request: Request) {
     integrations: integrationStatus(),
   });
 }
+
 

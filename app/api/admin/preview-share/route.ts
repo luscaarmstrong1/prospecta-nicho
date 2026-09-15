@@ -12,7 +12,7 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
-  const adminError = requireAdmin(request);
+  const adminError = await requireAdmin(request);
   if (adminError) return adminError;
 
   const parsed = schema.safeParse(await request.json().catch(() => null));
@@ -34,5 +34,6 @@ export async function POST(request: Request) {
     revocable: true,
   });
 }
+
 
 

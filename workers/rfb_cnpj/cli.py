@@ -3,11 +3,13 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import sys
 from shutil import copyfile
 from pathlib import Path
 from typing import Any
 
 from workers.rfb_cnpj.config import load_config
+from workers.rfb_cnpj.data_cli import handle_data_command
 from workers.rfb_cnpj.discover import expected_groups
 from workers.rfb_cnpj.job_runner import run_job
 from workers.rfb_cnpj.models import CnpjFilters, CnpjRecord
@@ -154,6 +156,12 @@ def run_job_from_supabase(job_id: str) -> dict[str, object]:
 
 
 def main() -> None:
+    config = load_config()
+    if len(sys.argv) > 1 and sys.argv[1] == "data":
+        result = handle_data_command(sys.argv[2:], Path(config.data_dir))
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return
+
     parser = argparse.ArgumentParser(prog="python -m workers.rfb_cnpj")
     parser.add_argument(
         "command",
@@ -177,7 +185,6 @@ def main() -> None:
     parser.add_argument("--output")
     parser.add_argument("--job-id")
     args = parser.parse_args()
-    config = load_config()
 
     if args.command == "discover":
         result = {"ok": True, "minimum_groups": list(expected_groups())}

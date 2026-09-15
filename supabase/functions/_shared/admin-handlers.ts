@@ -13,7 +13,7 @@ async function event(supabase: ReturnType<typeof serviceClient>, requestId: stri
 }
 
 export async function adminListRequests(request: Request) {
-  const denied = requireAdmin(request);
+  const denied = await requireAdmin(request);
   if (denied) return denied;
   const supabase = serviceClient();
   const { data, error } = await supabase.from("custom_requests").select("*").order("created_at", { ascending: false }).limit(100);
@@ -22,7 +22,7 @@ export async function adminListRequests(request: Request) {
 }
 
 export async function adminRequestDetail(request: Request) {
-  const denied = requireAdmin(request);
+  const denied = await requireAdmin(request);
   if (denied) return denied;
   const requestId = idFrom(request);
   const supabase = serviceClient();
@@ -40,7 +40,7 @@ export async function adminRequestDetail(request: Request) {
 }
 
 export async function adminUpdateRequest(request: Request, forcedStatus?: string) {
-  const denied = requireAdmin(request);
+  const denied = await requireAdmin(request);
   if (denied) return denied;
   const requestId = idFrom(request);
   const body = await request.json().catch(() => ({})) as Record<string, unknown>;
@@ -60,7 +60,7 @@ export async function adminUpdateRequest(request: Request, forcedStatus?: string
 }
 
 export async function adminCreateJob(request: Request) {
-  const denied = requireAdmin(request);
+  const denied = await requireAdmin(request);
   if (denied) return denied;
   const requestId = idFrom(request);
   if (!requestId) return errorJson(request, "MISSING_REQUEST_ID", "Pedido nao informado.", 400);
@@ -81,7 +81,7 @@ export async function adminCreateJob(request: Request) {
 }
 
 export async function adminCompleteJob(request: Request) {
-  const denied = requireAdmin(request);
+  const denied = await requireAdmin(request);
   if (denied) return denied;
   const jobId = idFrom(request);
   const body = await request.json().catch(() => ({})) as Record<string, unknown>;
@@ -107,7 +107,7 @@ export async function adminCompleteJob(request: Request) {
 }
 
 export async function adminSignExport(request: Request) {
-  const denied = requireAdmin(request);
+  const denied = await requireAdmin(request);
   if (denied) return denied;
   const exportId = idFrom(request);
   const body = await request.json().catch(() => ({})) as Record<string, unknown>;
@@ -129,7 +129,7 @@ export async function adminSignExport(request: Request) {
 }
 
 export async function adminRunEnrichment(request: Request) {
-  const denied = requireAdmin(request);
+  const denied = await requireAdmin(request);
   if (denied) return denied;
   const requestId = idFrom(request);
   const supabase = serviceClient();

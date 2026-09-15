@@ -5,6 +5,8 @@ dist
 .env
 .env.local
 .env.*.local
+!.env.example
+!.env.worker.example
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -16,6 +18,10 @@ coverage
 .codex
 work
 outputs
+data/
+data/rfb-cnpj/
+logs/
+*.part
 artifacts/
 artifacts/visual-qc/
 __pycache__/

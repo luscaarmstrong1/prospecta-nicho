@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { requireAdmin, integrationStatus } from "@/lib/server/admin-auth";
 
 export async function POST(request: Request) {
-  const denied = requireAdmin(request);
+  const denied = await requireAdmin(request);
   if (denied) return denied;
   const body = await request.json();
   return NextResponse.json({
@@ -15,5 +15,6 @@ export async function POST(request: Request) {
     message: "Exportação so sera enfileirada apos pagamento aprovado ou aprovação interna e infraestrutura configurada.",
   });
 }
+
 
 

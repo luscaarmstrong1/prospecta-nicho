@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { readdirSync, renameSync, rmSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 function listRouteFiles(dir) {
@@ -19,18 +19,14 @@ function prepareStaticApiRoutes() {
   const originals = [];
 
   for (const routeFile of listRouteFiles("app/api")) {
-    const source = readFileSync(routeFile, "utf8");
-    const staticSource = source.replaceAll("force-dynamic", "force-static");
-
-    if (staticSource !== source) {
-      originals.push([routeFile, source]);
-      writeFileSync(routeFile, staticSource, "utf8");
-    }
+    const disabledRouteFile = `${routeFile}.static-export-disabled`;
+    renameSync(routeFile, disabledRouteFile);
+    originals.push([disabledRouteFile, routeFile]);
   }
 
   return () => {
-    for (const [routeFile, source] of originals) {
-      writeFileSync(routeFile, source, "utf8");
+    for (const [disabledRouteFile, routeFile] of originals) {
+      renameSync(disabledRouteFile, routeFile);
     }
   };
 }
@@ -50,6 +46,7 @@ const restoreApiRoutes = prepareStaticApiRoutes();
 let result;
 
 try {
+  rmSync("out", { recursive: true, force: true });
   result = spawnSync(process.execPath, ["node_modules/next/dist/bin/next", "build"], {
     env,
     stdio: "inherit",
