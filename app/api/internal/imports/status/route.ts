@@ -1,7 +1,7 @@
 ﻿import { NextResponse } from "next/server";
 import { requireAdmin, integrationStatus } from "@/lib/server/admin-auth";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   const denied = requireAdmin(request);

@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { assertProductionEnv } from "@/src/config/env";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 type CheckStatus = "configured" | "missing" | "waiting_data" | "local_dev";
 

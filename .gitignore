@@ -41,6 +41,8 @@ tsconfig.tsbuildinfo
 *.csr
 uploads/
 exports/
+!app/api/admin/exports/
+!app/api/admin/exports/**
 rfb-data/
 secrets/
 credentials/
