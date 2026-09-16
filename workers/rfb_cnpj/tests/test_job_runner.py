@@ -8,12 +8,14 @@ from workers.rfb_cnpj.models import CnpjFilters, CnpjRecord
 def test_run_job_generates_export_without_enrichment(tmp_path: Path):
     result = run_job(
         [CnpjRecord(cnpj="1", razao_social="Empresa Teste", cnae_principal="4321500", municipio="Campinas", uf="SP", porte="ME")],
-        CnpjFilters(segment="Energia solar", uf="SP", delivery_format="csv"),
+        CnpjFilters(segment="Energia solar", uf="SP", delivery_format="csv", public_code="PN-TESTE01"),
         tmp_path,
     )
 
     assert result["ok"] is True
     assert result["row_count"] == 1
+    assert Path(str(result["path"])).parent.name == "PN-TESTE01"
+    assert Path(str(result["path"])).exists()
 
 
 def test_enrichment_requires_admin_paid_and_payment_confirmation():

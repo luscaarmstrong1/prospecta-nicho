@@ -21,7 +21,7 @@ export default async function AdminRequestDetailPage({ params }: Params) {
       {request ? (
         <>
           <p className="lead">{request.publicCode}</p>
-          <CrmRequestActions requestId={request.id} publicCode={request.publicCode} exportId={request.exportId} />
+          <CrmRequestActions requestId={request.id} publicCode={request.publicCode} exportId={request.exportId} whatsapp={request.customer.whatsapp} />
           <div className="admin-panel">
             <div className="admin-table">
               <div className="admin-table-row">

@@ -20,6 +20,13 @@ def _contains(value: str | None, expected: str | None) -> bool:
     return expected.strip().casefold() in str(value or "").strip().casefold()
 
 
+def _city_in_list(value: str | None, expected: tuple[str, ...]) -> bool:
+    if not expected:
+        return True
+    normalized = normalize_city(str(value or ""))
+    return normalized in {normalize_city(city) for city in expected if str(city).strip()}
+
+
 def _digits(value: str | None) -> str:
     return "".join(char for char in str(value or "") if char.isdigit())
 
@@ -90,6 +97,13 @@ def matches_filters(record: CnpjRecord, filters: CnpjFilters) -> bool:
     if not _same(record.uf, filters.uf):
         return False
     if not _contains(record.municipio, filters.city):
+        return False
+    if not _city_in_list(record.municipio, filters.cities):
+        return False
+    requested_codes = {_digits(filters.city_ibge_code), *(_digits(code) for code in filters.city_ibge_codes)}
+    requested_codes.discard("")
+    record_ibge = _digits(str(record.extra.get("codigo_municipio_ibge") or ""))
+    if requested_codes and record_ibge and record_ibge not in requested_codes:
         return False
     if concessionaria_cities and normalize_city(record.municipio) not in concessionaria_cities:
         return False

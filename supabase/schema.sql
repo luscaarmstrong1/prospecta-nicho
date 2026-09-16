@@ -54,6 +54,7 @@ alter table public.custom_requests add column if not exists enrichment_enabled b
 alter table public.custom_requests add column if not exists enrichment_status text not null default 'locked';
 alter table public.custom_requests add column if not exists internal_notes text;
 alter table public.custom_requests add column if not exists updated_at timestamptz not null default now();
+alter table public.custom_requests add column if not exists delivered_at timestamptz;
 
 create unique index if not exists custom_requests_public_code_uidx
 on public.custom_requests(public_code)
@@ -65,6 +66,8 @@ create table if not exists public.request_filters (
   uf text,
   city text,
   cities jsonb default '[]'::jsonb,
+  city_ibge_code text,
+  city_ibge_codes jsonb default '[]'::jsonb,
   utility_id uuid,
   opening_period text,
   opening_date_start date,
@@ -117,7 +120,8 @@ create table if not exists public.rfb_processing_jobs (
   started_at timestamptz,
   finished_at timestamptz,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  delivery_mode text not null default 'local'
 );
 
 create table if not exists public.rfb_job_logs (

@@ -4,6 +4,7 @@ import argparse
 import asyncio
 import csv
 import json
+import os
 import sys
 from shutil import copyfile
 from pathlib import Path
@@ -57,10 +58,24 @@ def _filters_from_dict(payload: dict[str, Any]) -> CnpjFilters:
                 return tuple(item.strip() for item in value.split(",") if item.strip())
         return ()
 
+    def numeric_value(*keys: str) -> float | None:
+        for key in keys:
+            value = payload.get(key)
+            if value in {None, ""}:
+                continue
+            try:
+                return float(str(value).replace(".", "").replace(",", "."))
+            except (TypeError, ValueError):
+                continue
+        return None
+
     return CnpjFilters(
         segment=str(payload.get("segment") or payload.get("segmento") or "Geral"),
         uf=payload.get("uf") or payload.get("state"),
         city=payload.get("city") or payload.get("cidade"),
+        cities=tuple_value("cities", "cidades"),
+        city_ibge_code=payload.get("cityIbgeCode") or payload.get("city_ibge_code") or payload.get("codigo_municipio_ibge"),
+        city_ibge_codes=tuple_value("cityIbgeCodes", "city_ibge_codes", "municipioIbgeCodes"),
         concessionaria=payload.get("concessionaria"),
         opening_period=payload.get("openingPeriod") or payload.get("opening_period"),
         opening_date_start=payload.get("openingDateStart") or payload.get("opening_date_start"),
@@ -72,9 +87,10 @@ def _filters_from_dict(payload: dict[str, Any]) -> CnpjFilters:
         include_secondary_cnaes=bool(payload.get("includeSecondaryCnaes", payload.get("include_secondary_cnaes", True))),
         exclude_mei=bool(payload.get("excludeMei", payload.get("exclude_mei", True))),
         only_headquarters=bool(payload.get("onlyHeadquarters", payload.get("only_headquarters", False))),
-        min_capital_social=payload.get("minCapital") or payload.get("min_capital_social"),
-        max_capital_social=payload.get("maxCapital") or payload.get("max_capital_social"),
+        min_capital_social=numeric_value("minCapital", "min_capital_social", "min_capital"),
+        max_capital_social=numeric_value("maxCapital", "max_capital_social", "max_capital"),
         quantity=int(payload.get("quantity") or 500),
+        public_code=payload.get("publicCode") or payload.get("public_code"),
         fields=tuple_value("fields", "campos") or allowed_export_fields(),
         delivery_format=str(payload.get("deliveryFormat") or payload.get("delivery_format") or "xlsx"),
     )
@@ -152,14 +168,29 @@ def run_local(filters_path: Path | None, output_path: Path, data_dir: Path | Non
 def run_job_from_supabase(job_id: str) -> dict[str, object]:
     if not job_id:
         return {"ok": False, "status": "invalid", "message": "Informe --job-id."}
-    if not (load_config().storage_bucket):
+    config = load_config()
+    if not (config.supabase_url and config.supabase_service_role_key):
         return {
             "ok": False,
             "status": "waiting_integration",
             "jobId": job_id,
-            "message": "Configure Supabase/R2 e banco do worker antes de processar jobs reais.",
+            "message": "Configure SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY antes de processar jobs reais.",
         }
     return {"ok": True, "status": "queued_external_worker", "jobId": job_id}
+
+
+def open_export_folder(request_code: str) -> dict[str, object]:
+    code = "".join(char for char in request_code.strip().upper() if char.isalnum() or char in {"-", "_"})
+    if not code:
+        return {"ok": False, "status": "invalid", "message": "Informe --request-code PN-ABC123."}
+    folder = Path(load_config().output_dir) / code
+    if not folder.exists():
+        return {"ok": False, "status": "not_found", "path": str(folder), "message": "Pasta de export nao encontrada."}
+    if os.name == "nt":
+        os.startfile(str(folder))  # type: ignore[attr-defined]
+    else:
+        print(str(folder))
+    return {"ok": True, "status": "opened", "path": str(folder)}
 
 
 async def provider_health() -> dict[str, object]:
@@ -237,6 +268,7 @@ def main() -> None:
             "search",
             "provider",
             "watch",
+            "open-export",
         ],
     )
     parser.add_argument("--sample", action="store_true")
@@ -244,6 +276,7 @@ def main() -> None:
     parser.add_argument("--filters")
     parser.add_argument("--output")
     parser.add_argument("--job-id")
+    parser.add_argument("--request-code")
     parser.add_argument("--once", action="store_true")
     parser.add_argument("--interval-seconds", type=int, default=15)
     parser.add_argument("provider_command", nargs="?", default="health")
@@ -286,6 +319,8 @@ def main() -> None:
         from workers.rfb_cnpj.queue import watch_queue
 
         result = watch_queue(config, once=args.once, interval_seconds=args.interval_seconds)
+    elif args.command == "open-export":
+        result = open_export_folder(args.request_code or "")
     else:
         result = command_status(args.command, sample=args.sample)
 

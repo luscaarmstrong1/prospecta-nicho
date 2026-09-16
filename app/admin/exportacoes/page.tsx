@@ -11,7 +11,7 @@ export default async function AdminExportsPage() {
   return (
     <AdminShell title="Exportações" eyebrow="Arquivos temporários">
       <div className="admin-panel">
-        <p>Exports exigem pedido aprovado, links temporários e armazenamento fora do GitHub.</p>
+        <p>No modo local, o worker registra o caminho controlado do arquivo para o operador copiar e entregar manualmente.</p>
         <div className="admin-table">
           {exports.length ? (
             exports.map((item) => (
@@ -21,7 +21,12 @@ export default async function AdminExportsPage() {
                 <span>{item.storageProvider}</span>
                 <span>{item.rowCount} linhas</span>
                 <span>{item.fileUrl ? "arquivo registrado" : "sem arquivo"}</span>
-                <CrmExportLinkActions exportId={item.id} />
+                <CrmExportLinkActions
+                  exportId={item.id}
+                  fileName={item.fileUrl?.split(/[\\/]/).pop()}
+                  fileUrl={item.fileUrl}
+                  storageProvider={item.storageProvider}
+                />
               </div>
             ))
           ) : (

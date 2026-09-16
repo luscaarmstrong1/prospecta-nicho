@@ -18,5 +18,6 @@ def run_job(records: list[CnpjRecord], filters: CnpjFilters, output_dir: Path) -
         "row_count": export.row_count,
         "fields": list(export.fields),
         "format": export.format,
+        "files": [str(path) for path in export.files],
         "logs": logs,
     }

@@ -8,6 +8,7 @@ type CrmRequestActionsProps = {
   requestId: string;
   publicCode: string;
   exportId?: string;
+  whatsapp?: string;
 };
 
 const actions = [
@@ -19,7 +20,15 @@ const actions = [
   { label: "Rodar enriquecimento pago", endpoint: "run-enrichment" },
 ];
 
-export function CrmRequestActions({ requestId, publicCode, exportId }: CrmRequestActionsProps) {
+function whatsappUrl(phone: string | undefined, publicCode: string) {
+  const digits = String(phone || "").replace(/\D/g, "");
+  if (!digits) return "";
+  const withCountry = digits.startsWith("55") ? digits : `55${digits}`;
+  const text = `Olá! A base ProspectaNicho do protocolo ${publicCode} já está pronta para envio. Posso te encaminhar a planilha por aqui?`;
+  return `https://wa.me/${withCountry}?text=${encodeURIComponent(text)}`;
+}
+
+export function CrmRequestActions({ requestId, publicCode, exportId, whatsapp }: CrmRequestActionsProps) {
   const router = useRouter();
   const [pending, setPending] = useState<string | null>(null);
   const [message, setMessage] = useState("");
@@ -47,6 +56,11 @@ export function CrmRequestActions({ requestId, publicCode, exportId }: CrmReques
         Protocolo público: <strong>{publicCode}</strong>
       </p>
       <div className="admin-action-grid">
+        {whatsappUrl(whatsapp, publicCode) ? (
+          <a className="button button--secondary" href={whatsappUrl(whatsapp, publicCode)} rel="noreferrer" target="_blank">
+            Abrir WhatsApp do cliente
+          </a>
+        ) : null}
         {actions.map((action) => (
           <button
             className="button button--secondary"

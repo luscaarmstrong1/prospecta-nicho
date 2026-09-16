@@ -1,4 +1,12 @@
-export type CnpjJobStatus = "queued" | "running" | "completed" | "failed" | "cancelled";
+export type CnpjJobStatus =
+  | "queued"
+  | "running"
+  | "completed"
+  | "ready_for_delivery"
+  | "completed_partial"
+  | "no_results"
+  | "failed"
+  | "cancelled";
 
 export type CnpjJob = {
   id: string;

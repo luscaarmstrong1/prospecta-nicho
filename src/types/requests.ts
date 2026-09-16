@@ -7,6 +7,7 @@ export type CrmRequestStatus =
   | "queued"
   | "processing"
   | "ready"
+  | "ready_for_delivery"
   | "delivered"
   | "cancelled";
 
@@ -19,6 +20,9 @@ export type CnpjRequestFilters = {
   segment: string;
   uf?: string;
   city?: string;
+  cities?: string[];
+  cityIbgeCode?: string;
+  cityIbgeCodes?: string[];
   concessionaria?: string;
   openingPeriod?: string;
   openingDateStart?: string;

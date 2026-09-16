@@ -34,6 +34,7 @@ class ProviderSearchResult:
     records_kept: int
     stopped_reason: str
     warnings: tuple[str, ...] = ()
+    extra_stats: dict[str, Any] = field(default_factory=dict)
 
     def stats(self) -> dict[str, Any]:
         return {
@@ -43,6 +44,7 @@ class ProviderSearchResult:
             "records_kept": self.records_kept,
             "stopped_reason": self.stopped_reason,
             "warnings": list(self.warnings),
+            **self.extra_stats,
         }
 
 

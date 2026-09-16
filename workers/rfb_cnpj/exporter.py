@@ -24,6 +24,8 @@ def _filters_summary(filters: CnpjFilters | None) -> list[tuple[str, str]]:
         ("segmento", filters.segment),
         ("uf", filters.uf or "qualquer"),
         ("cidade", filters.city or "qualquer"),
+        ("cidades", ", ".join(filters.cities) or "nao aplicado"),
+        ("codigo_municipio_ibge", filters.city_ibge_code or ", ".join(filters.city_ibge_codes) or "nao aplicado"),
         ("concessionaria", filters.concessionaria or "nao aplicada"),
         ("periodo_abertura", filters.opening_period or "sem filtro"),
         ("porte", ", ".join(filters.company_size) or "qualquer"),

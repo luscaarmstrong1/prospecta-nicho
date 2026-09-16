@@ -101,6 +101,8 @@ export async function registerCrmRequest(request: CrmRequest) {
     uf: request.filters.uf,
     city: request.filters.city,
     cities: request.filters.city ? [request.filters.city] : [],
+    cityIbgeCode: request.filters.cityIbgeCode,
+    cityIbgeCodes: request.filters.cityIbgeCodes,
     openingPeriod: request.filters.openingPeriod,
     openingDateStart: request.filters.openingDateStart,
     openingDateEnd: request.filters.openingDateEnd,
@@ -232,6 +234,11 @@ function rowToCrmRequest(
       segment: stringValue(row.segment_slug, stringValue(row.segment_label, stringValue(legacyFilters.segment, "base-cnpj"))),
       uf: stringValue(filtersRow?.uf, stringValue(legacyFilters.uf)) || undefined,
       city: stringValue(filtersRow?.city, stringValue(legacyFilters.city)) || undefined,
+      cities: stringArrayValue(filtersRow?.cities).length ? stringArrayValue(filtersRow?.cities) : stringArrayValue(legacyFilters.cities),
+      cityIbgeCode: stringValue(filtersRow?.city_ibge_code, stringValue(legacyFilters.cityIbgeCode)) || undefined,
+      cityIbgeCodes: stringArrayValue(filtersRow?.city_ibge_codes).length
+        ? stringArrayValue(filtersRow?.city_ibge_codes)
+        : stringArrayValue(legacyFilters.cityIbgeCodes),
       concessionaria: stringValue(filtersRow?.concessionaria, stringValue(legacyFilters.concessionaria)) || undefined,
       openingPeriod: stringValue(filtersRow?.opening_period, stringValue(legacyFilters.openingPeriod)) || undefined,
       openingDateStart: stringValue(filtersRow?.opening_date_start, stringValue(legacyFilters.openingDateStart)) || undefined,
@@ -397,7 +404,7 @@ export async function createCnpjJob(id: string) {
     updatedAt: nowIso(),
     status: "queued",
     worker: "rfb_cnpj",
-    filtersSnapshot: request.filters,
+    filtersSnapshot: { ...request.filters, publicCode: request.publicCode },
     rowsMatched: 0,
     rowsExported: 0,
     logs: [],
@@ -417,6 +424,7 @@ export async function createCnpjJob(id: string) {
     current_step: "queued",
     progress: 0,
     search_provider: "minha_receita",
+    delivery_mode: process.env.EXPORT_DELIVERY_MODE || "local",
     filters_snapshot: job.filtersSnapshot,
     search_stats: {
       provider: "minha_receita",
@@ -501,7 +509,7 @@ export async function completeJobWithExport(
 
   const request = await getCrmRequestForAdmin(job.requestId);
   if (request) {
-    const next = { ...request, status: "ready" as const, exportId: exportRecord.id, updatedAt: nowIso() };
+    const next = { ...request, status: "ready_for_delivery" as const, exportId: exportRecord.id, updatedAt: nowIso() };
     store.requests.set(request.id, next);
     appendRequestEvent(request.id, `Export ${exportRecord.id} pronto para link assinado.`);
     await updateLead("custom_requests", request.id, {
@@ -515,9 +523,9 @@ export async function completeJobWithExport(
   }
 
   await updateLead("rfb_processing_jobs", completed.id, {
-    status: completed.status,
-    progress: 100,
-    current_step: "completed",
+      status: "ready_for_delivery",
+      progress: 100,
+      current_step: "ready_for_delivery",
     finished_at: nowIso(),
     updated_at: completed.updatedAt,
   });
@@ -550,6 +558,7 @@ export async function completeJobWithExport(
     fileFormat: exportRecord.format,
     storageProvider: exportRecord.storageProvider,
     storagePath: exportRecord.fileUrl,
+    byte_size: 0,
   });
   await writeAuditLog("cnpj_export_ready", { jobId, exportId: exportRecord.id, rowCount });
   return exportRecord;
@@ -664,9 +673,9 @@ export function getPublicRequestStatus(publicCode: string) {
     city: request.filters.city,
     concessionaria: request.filters.concessionaria,
     quantity: request.filters.quantity,
-    exportReady: request.status === "ready" || request.status === "delivered",
+    exportReady: request.status === "ready" || request.status === "ready_for_delivery" || request.status === "delivered",
     enrichmentStatus: request.enrichmentStatus,
-    timeline: listCrmTimeline(request.id),
+    timeline: [],
   };
 }
 
@@ -684,9 +693,9 @@ export async function getPublicRequestStatusForProtocol(publicCode: string) {
     city: request.filters.city,
     concessionaria: request.filters.concessionaria,
     quantity: request.filters.quantity,
-    exportReady: request.status === "ready" || request.status === "delivered",
+    exportReady: request.status === "ready" || request.status === "ready_for_delivery" || request.status === "delivered",
     enrichmentStatus: request.enrichmentStatus,
-    timeline: await listCrmTimelineForAdmin(request.id),
+    timeline: [],
   };
 }
 

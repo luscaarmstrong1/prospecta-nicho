@@ -37,6 +37,7 @@ def _company(cnpj: str, cnae: str = "6209100", cidade: str = "BRASILIA") -> dict
         "descricao_situacao_cadastral": "ATIVA",
         "descricao_identificador_matriz_filial": "MATRIZ",
         "capital_social": "10000,00",
+        "codigo_municipio_ibge": "5300108" if cidade == "BRASILIA" else "2611606",
         "qsa": [{"nome_socio": "Nao deve sair"}],
         "cnpf": "00000000000",
     }
@@ -102,6 +103,14 @@ def test_provider_resolves_concessionaria_to_municipio_batch(tmp_path, monkeypat
 
     def handler(request: httpx.Request) -> httpx.Response:
         seen_urls.append(str(request.url))
+        if "servicodados.ibge.gov.br" in str(request.url):
+            return httpx.Response(
+                200,
+                json=[
+                    {"id": 2611606, "nome": "Recife", "microrregiao": {"mesorregiao": {"UF": {"sigla": "PE"}}}},
+                    {"id": 2609600, "nome": "Olinda", "microrregiao": {"mesorregiao": {"UF": {"sigla": "PE"}}}},
+                ],
+            )
         company = _company("00000000000110", cidade="RECIFE")
         company["uf"] = "PE"
         return httpx.Response(200, json={"data": [company]})
@@ -112,5 +121,30 @@ def test_provider_resolves_concessionaria_to_municipio_batch(tmp_path, monkeypat
     )
 
     assert result.records_kept == 1
-    assert "municipio=" in seen_urls[0]
-    assert "RECIFE" in seen_urls[0]
+    minha_receita_urls = [url for url in seen_urls if "minhareceita.test" in url]
+    assert "municipio=2611606" in minha_receita_urls[0]
+
+
+def test_provider_uses_explicit_ibge_code_for_city_filter(tmp_path):
+    seen_urls: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen_urls.append(str(request.url))
+        return httpx.Response(200, json={"data": [_company("00000000000110")]})
+
+    provider = MinhaReceitaProvider(_config(tmp_path), transport=httpx.MockTransport(handler))
+    result = asyncio.run(
+        provider.search(
+            CnpjFilters(
+                segment="software",
+                uf="DF",
+                city="Brasilia",
+                city_ibge_code="5300108",
+                cnaes=("6209100",),
+                quantity=1,
+            )
+        )
+    )
+
+    assert result.records_kept == 1
+    assert "municipio=5300108" in seen_urls[0]

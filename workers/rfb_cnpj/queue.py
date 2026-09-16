@@ -6,6 +6,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import uuid
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -50,8 +51,8 @@ def _request_json(config: WorkerConfig, method: str, table: str, query = "", bod
         method=method,
     )
     with urllib.request.urlopen(request, timeout=30) as response:
-      payload = response.read().decode("utf-8")
-      return json.loads(payload) if payload else None
+        payload = response.read().decode("utf-8")
+        return json.loads(payload) if payload else None
 
 
 def _insert(config: WorkerConfig, table: str, body: dict[str, Any]) -> None:
@@ -77,6 +78,81 @@ def _log(config: WorkerConfig, job: dict[str, Any], step: str, message: str, lev
             "metadata": {"worker_id": config.worker_id},
         },
     )
+
+
+def _request_public_code(config: WorkerConfig, request_id: str) -> str | None:
+    if not request_id:
+        return None
+    rows = _request_json(
+        config,
+        "GET",
+        "custom_requests",
+        f"?select=public_code&id=eq.{urllib.parse.quote(request_id)}&limit=1",
+    )
+    if isinstance(rows, list) and rows:
+        value = rows[0].get("public_code")
+        return str(value) if value else None
+    return None
+
+
+def _canonical_request_snapshot(config: WorkerConfig, request_id: str) -> dict[str, Any]:
+    if not request_id:
+        return {}
+    filter_rows = _request_json(
+        config,
+        "GET",
+        "request_filters",
+        f"?select=*&request_id=eq.{urllib.parse.quote(request_id)}&limit=1",
+    )
+    field_rows = _request_json(
+        config,
+        "GET",
+        "request_fields",
+        f"?select=field_key&request_id=eq.{urllib.parse.quote(request_id)}&order=created_at.asc",
+    )
+    row = filter_rows[0] if isinstance(filter_rows, list) and filter_rows else {}
+    if not isinstance(row, dict):
+        row = {}
+    cnaes = [*(row.get("cnae_principal") or []), *(row.get("cnae_secondary") or [])]
+    fields = [
+        str(item.get("field_key"))
+        for item in (field_rows if isinstance(field_rows, list) else [])
+        if isinstance(item, dict) and item.get("field_key")
+    ]
+    snapshot: dict[str, Any] = {
+        "uf": row.get("uf"),
+        "city": row.get("city"),
+        "cities": row.get("cities") or [],
+        "city_ibge_code": row.get("city_ibge_code"),
+        "city_ibge_codes": row.get("city_ibge_codes") or [],
+        "concessionaria": row.get("concessionaria"),
+        "opening_period": row.get("opening_period"),
+        "opening_date_start": row.get("opening_date_start"),
+        "opening_date_end": row.get("opening_date_end"),
+        "company_size": row.get("company_sizes") or [],
+        "registration_status": row.get("registration_status"),
+        "branch_type": row.get("establishment_type"),
+        "cnaes": cnaes,
+        "include_secondary_cnaes": row.get("include_secondary_cnaes"),
+        "exclude_mei": row.get("exclude_mei"),
+        "only_headquarters": row.get("only_headquarters"),
+        "min_capital": row.get("min_capital"),
+        "max_capital": row.get("max_capital"),
+        "quantity": row.get("desired_quantity"),
+        "fields": fields,
+        "delivery_format": row.get("delivery_format"),
+    }
+    return {key: value for key, value in snapshot.items() if value not in (None, "", [])}
+
+
+def _job_filters_snapshot(config: WorkerConfig, job: dict[str, Any]) -> dict[str, Any]:
+    request_id = str(job.get("request_id") or "")
+    snapshot = {**_canonical_request_snapshot(config, request_id), **dict(job.get("filters_snapshot") or {})}
+    if not snapshot.get("publicCode") and not snapshot.get("public_code"):
+        public_code = _request_public_code(config, request_id)
+        if public_code:
+            snapshot["publicCode"] = public_code
+    return snapshot
 
 
 def _job_id_query(job: dict[str, Any]) -> str:
@@ -131,8 +207,14 @@ def _patch_progress(config: WorkerConfig, job: dict[str, Any], progress: Provide
             "current_step": progress.step,
             "search_stats": {
                 "provider": progress.provider,
+                "queries_total": progress.metadata.get("queries_total"),
+                "queries_completed": progress.metadata.get("queries_completed"),
+                "current_city": progress.metadata.get("current_city"),
+                "current_city_code": progress.metadata.get("current_city_code"),
+                "api_requests": progress.metadata.get("api_requests"),
                 "pages_read": progress.pages_read,
                 "records_seen": progress.records_seen,
+                "unique_records": progress.records_kept,
                 "records_kept": progress.records_kept,
                 "message": progress.message,
                 "metadata": progress.metadata,
@@ -152,7 +234,7 @@ def _patch_progress(config: WorkerConfig, job: dict[str, Any], progress: Provide
 
 async def _search_records(config: WorkerConfig, job: dict[str, Any]) -> tuple[list[Any], dict[str, Any]]:
     provider = get_company_search_provider(config)
-    filters = _filters_from_dict(job.get("filters_snapshot") or {})
+    filters = _filters_from_dict(_job_filters_snapshot(config, job))
 
     async def progress_callback(progress: ProviderProgress) -> None:
         _patch_progress(config, job, progress)
@@ -169,49 +251,72 @@ async def _search_records(config: WorkerConfig, job: dict[str, Any]) -> tuple[li
 def _complete_request(config: WorkerConfig, job: dict[str, Any], export_result: dict[str, Any], search_stats: dict[str, Any]) -> None:
     request_id = str(job.get("request_id") or "")
     export_path = str(export_result.get("path") or "")
-    format_name = str(export_result.get("format") or Path(export_path).suffix.lstrip(".") or "xlsx")
     fields = list(export_result.get("fields") or [])
     row_count = int(export_result.get("row_count") or 0)
-    export_rows = _request_json(
-        config,
-        "GET",
-        "exports",
-        f"?select=*&job_id=eq.{urllib.parse.quote(str(job['id']))}&file_format=eq.{urllib.parse.quote(format_name)}&limit=1",
-    )
-    if not export_rows:
+    files = [str(path) for path in (export_result.get("files") or [])] or [export_path]
+    for file_path in files:
+        if not file_path:
+            continue
+        format_name = Path(file_path).suffix.lstrip(".") or str(export_result.get("format") or "xlsx")
+        export_rows = _request_json(
+            config,
+            "GET",
+            "exports",
+            f"?select=*&job_id=eq.{urllib.parse.quote(str(job['id']))}&file_format=eq.{urllib.parse.quote(format_name)}&storage_path=eq.{urllib.parse.quote(file_path)}&limit=1",
+        )
+        if export_rows:
+            continue
+        export_id = str(uuid.uuid4())
         _insert(
             config,
             "exports",
             {
+                "id": export_id,
                 "request_id": request_id,
                 "job_id": job.get("id"),
                 "status": "ready",
                 "row_count": row_count,
-                "file_name": Path(export_path).name,
+                "file_name": Path(file_path).name,
                 "file_format": format_name,
                 "storage_provider": "local",
-                "storage_bucket": config.storage_bucket,
-                "storage_path": export_path,
+                "storage_bucket": None,
+                "storage_path": file_path,
                 "filters_snapshot": job.get("filters_snapshot") or {},
                 "fields_snapshot": fields,
-                "generated_by": "rfb_worker_minha_receita",
+                "generated_by": "minha_receita_worker",
             },
         )
+        try:
+            _insert(
+                config,
+                "export_files",
+                {
+                    "export_id": export_id,
+                    "request_id": request_id,
+                    "file_name": Path(file_path).name,
+                    "file_format": format_name,
+                    "storage_provider": "local",
+                    "storage_path": file_path,
+                    "byte_size": Path(file_path).stat().st_size if Path(file_path).exists() else None,
+                },
+            )
+        except Exception:
+            pass
     _patch(
         config,
         "rfb_processing_jobs",
         _job_id_query(job),
         {
-            "status": "completed",
+            "status": "ready_for_delivery",
             "progress": 100,
-            "current_step": "completed",
+            "current_step": "ready_for_delivery",
             "search_stats": search_stats,
             "finished_at": _now_iso(),
             "updated_at": _now_iso(),
         },
     )
     if request_id:
-        _patch(config, "custom_requests", f"?id=eq.{urllib.parse.quote(request_id)}", {"status": "ready", "updated_at": _now_iso()})
+        _patch(config, "custom_requests", f"?id=eq.{urllib.parse.quote(request_id)}", {"status": "ready_for_delivery", "updated_at": _now_iso()})
 
 
 def process_one_queued_job(config: WorkerConfig) -> dict[str, Any]:
@@ -220,20 +325,36 @@ def process_one_queued_job(config: WorkerConfig) -> dict[str, Any]:
         return {"ok": True, "status": "idle", "message": "Nenhum job queued encontrado."}
     try:
         _log(config, job, "running", "Worker local assumiu o job CNPJ.")
-        filters = _filters_from_dict(job.get("filters_snapshot") or {})
+        filters = _filters_from_dict(_job_filters_snapshot(config, job))
         records, search_stats = asyncio.run(_search_records(config, job))
         if not records:
-            raise RuntimeError("A busca na Minha Receita nao retornou empresas elegiveis para os filtros informados.")
+            _patch(
+                config,
+                "rfb_processing_jobs",
+                _job_id_query(job),
+                {
+                    "status": "no_results",
+                    "progress": 100,
+                    "current_step": "no_results",
+                    "search_stats": search_stats,
+                    "finished_at": _now_iso(),
+                    "updated_at": _now_iso(),
+                },
+            )
+            if job.get("request_id"):
+                _patch(config, "custom_requests", f"?id=eq.{urllib.parse.quote(str(job.get('request_id')))}", {"status": "analysis", "updated_at": _now_iso()})
+            _log(config, job, "no_results", "Minha Receita nao retornou empresas elegiveis para os filtros informados.", "warning")
+            return {"ok": False, "status": "no_results", "jobId": job.get("id"), "message": "Nenhum registro encontrado para os filtros."}
         _patch(
             config,
             "rfb_processing_jobs",
             _job_id_query(job),
-            {"progress": 35, "current_step": "exporting", "updated_at": _now_iso()},
+            {"progress": 90, "current_step": "saving_local_files", "updated_at": _now_iso()},
         )
         export_result = run_job(records, filters, Path(config.output_dir))
         _complete_request(config, job, export_result, search_stats)
-        _log(config, job, "completed", f"Export gerado com {export_result.get('row_count', 0)} linhas.")
-        return {"ok": True, "status": "completed", "jobId": job.get("id"), "export": export_result}
+        _log(config, job, "ready_for_delivery", f"Export local gerado com {export_result.get('row_count', 0)} linhas.")
+        return {"ok": True, "status": "ready_for_delivery", "jobId": job.get("id"), "export": export_result}
     except Exception as error:
         message = str(error)
         _patch(

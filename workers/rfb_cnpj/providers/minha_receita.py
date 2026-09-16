@@ -14,19 +14,18 @@ from typing import Any
 
 import httpx
 
-from workers.rfb_cnpj.city_mapping import cities_for_concessionaria
-from workers.rfb_cnpj.cnae_mapping import cnaes_for_segment
 from workers.rfb_cnpj.config import WorkerConfig
 from workers.rfb_cnpj.filters import matches_filters
 from workers.rfb_cnpj.models import CnpjFilters, CnpjRecord
+from workers.rfb_cnpj.municipality_resolver import MunicipalityResolver, normalize_municipality, only_digits
 from workers.rfb_cnpj.providers.base import CancelCallback, ProgressCallback
 from workers.rfb_cnpj.providers.models import (
     ProviderHealth,
     ProviderProgress,
     ProviderSearchResult,
     ProviderUnavailableError,
-    QueryTooBroadError,
 )
+from workers.rfb_cnpj.query_planner import PlannedQuery, QueryPlanner
 
 RETRYABLE_STATUS = {408, 425, 429, 500, 502, 503, 504}
 SENSITIVE_KEYS = {"qsa", "socios", "socio", "cpf", "cnpf", "representante_legal"}
@@ -79,6 +78,7 @@ def _safe_extra(payload: dict[str, Any]) -> dict[str, Any]:
         "opcao_pelo_mei",
         "cnaes_secundarios",
         "natureza_juridica",
+        "codigo_municipio_ibge",
     }
     for key in keys:
         if key in payload and key.lower() not in SENSITIVE_KEYS:
@@ -113,6 +113,19 @@ def _safe_extra(payload: dict[str, Any]) -> dict[str, Any]:
             if _digits(item.get("codigo") if isinstance(item, dict) else item)
         ]
     return extra
+
+
+def _strip_sensitive_payload(value: Any) -> Any:
+    if isinstance(value, dict):
+        safe: dict[str, Any] = {}
+        for key, item in value.items():
+            if key.lower() in SENSITIVE_KEYS:
+                continue
+            safe[key] = _strip_sensitive_payload(item)
+        return safe
+    if isinstance(value, list):
+        return [_strip_sensitive_payload(item) for item in value]
+    return value
 
 
 async def _maybe_call(callback: ProgressCallback | None, progress: ProviderProgress) -> None:
@@ -150,6 +163,12 @@ class MinhaReceitaProvider:
         cache_dir = Path(config.minha_receita_cache_dir)
         cache_dir.mkdir(parents=True, exist_ok=True)
         self.cache_path = cache_dir / "minha_receita.sqlite"
+        self.municipality_resolver = MunicipalityResolver(
+            self.cache_path,
+            timeout_seconds=config.ibge_timeout_seconds,
+            transport=transport,
+        )
+        self.query_planner = QueryPlanner(config.minha_receita_page_limit)
         self._init_cache()
 
     def _init_cache(self) -> None:
@@ -234,7 +253,7 @@ class MinhaReceitaProvider:
                 payload = response.json()
                 if not isinstance(payload, dict):
                     raise ProviderUnavailableError("Resposta inesperada da Minha Receita.")
-                self._cache_set(cache_key, payload)
+                self._cache_set(cache_key, _strip_sensitive_payload(payload))
                 return payload
             except (httpx.TimeoutException, httpx.TransportError) as error:
                 if attempt >= self.config.minha_receita_max_retries:
@@ -248,28 +267,14 @@ class MinhaReceitaProvider:
     async def health(self) -> ProviderHealth:
         started = time.perf_counter()
         try:
-            await self._paced_get("/", {"uf": "DF", "limit": 1})
+            await self._paced_get("/", {"uf": "DF", "cnae_fiscal": "6209100", "limit": 1})
         except Exception as error:
             return ProviderHealth(self.name, "OFFLINE", message=str(error))
         latency = int((time.perf_counter() - started) * 1000)
         return ProviderHealth(self.name, "ONLINE", latency_ms=latency, message="Provider pronto para consultas paginadas.")
 
-    def _search_params(self, filters: CnpjFilters) -> dict[str, Any]:
-        cnaes = tuple(_digits(cnae) for cnae in (filters.cnaes or cnaes_for_segment(filters.segment)) if _digits(cnae))
-        concessionaria_cities = cities_for_concessionaria(filters.concessionaria) if filters.concessionaria else ()
-        has_strong_filter = bool(filters.city or cnaes or concessionaria_cities)
-        if not has_strong_filter:
-            raise QueryTooBroadError("Informe cidade, CNAE, segmento mapeado ou concessionaria antes de processar a busca.")
-        params: dict[str, Any] = {"limit": min(max(self.config.minha_receita_page_limit, 1), 1024)}
-        if filters.uf:
-            params["uf"] = filters.uf.strip().upper()
-        if filters.city:
-            params["municipio"] = filters.city.strip()
-        elif concessionaria_cities:
-            params["municipio"] = ",".join(sorted(concessionaria_cities)[:5])
-        if cnaes:
-            params["cnae" if filters.include_secondary_cnaes else "cnae_fiscal"] = ",".join(cnaes[:10])
-        return params
+    async def _planned_queries(self, filters: CnpjFilters) -> tuple[PlannedQuery, ...]:
+        return await self.query_planner.build(filters, self.municipality_resolver)
 
     def normalize(self, raw_company: dict[str, Any]) -> CnpjRecord | None:
         clean = {key: value for key, value in raw_company.items() if key.lower() not in SENSITIVE_KEYS}
@@ -291,6 +296,18 @@ class MinhaReceitaProvider:
             extra=_safe_extra(clean),
         )
 
+    def _geography_matches(self, record: CnpjRecord, query: PlannedQuery, filters: CnpjFilters) -> bool:
+        municipality = query.municipality
+        record_code = only_digits(record.extra.get("codigo_municipio_ibge"))
+        if municipality and municipality.ibge_code:
+            return record_code == municipality.ibge_code if record_code else (
+                normalize_municipality(record.municipio) == municipality.normalized_city
+                and record.uf.strip().upper() == municipality.uf
+            )
+        if filters.uf and record.uf.strip().upper() != filters.uf.strip().upper():
+            return False
+        return True
+
     async def get_company(self, cnpj: str) -> CnpjRecord | None:
         payload = await self._paced_get(f"/{_digits(cnpj)}", {})
         return self.normalize(payload)
@@ -301,66 +318,94 @@ class MinhaReceitaProvider:
         progress_callback: ProgressCallback | None = None,
         cancel_callback: CancelCallback | None = None,
     ) -> ProviderSearchResult:
-        params = self._search_params(filters)
+        started_at = time.perf_counter()
+        planned_queries = await self._planned_queries(filters)
         target = max(int(filters.quantity or 1), 1) * max(self.config.minha_receita_oversample_factor, 1)
-        cursor: str | None = None
-        previous_cursor: str | None = None
         records: dict[str, CnpjRecord] = {}
+        queries_completed = 0
         pages_read = 0
         records_seen = 0
+        valid_records = 0
+        geography_mismatch_count = 0
+        duplicate_count = 0
+        api_requests = 0
         warnings: list[str] = []
         stopped_reason = "cursor_ended"
 
-        await _maybe_call(progress_callback, ProviderProgress(self.name, "search_started", message="Busca iniciada na Minha Receita."))
-        while pages_read < max(self.config.minha_receita_max_pages_per_query, 1):
-            if await _maybe_cancel(cancel_callback):
-                stopped_reason = "cancelled"
+        await _maybe_call(progress_callback, ProviderProgress(self.name, "resolving_municipalities", message="Municipios resolvidos para codigos IBGE."))
+        await _maybe_call(progress_callback, ProviderProgress(self.name, "planning_queries", message=f"{len(planned_queries)} consulta(s) planejada(s)."))
+        for query_index, query in enumerate(planned_queries, start=1):
+            cursor: str | None = None
+            previous_cursor: str | None = None
+            query_pages = 0
+            while pages_read < max(self.config.minha_receita_max_pages_per_query, 1):
+                if await _maybe_cancel(cancel_callback):
+                    stopped_reason = "cancelled"
+                    break
+                page_params = dict(query.params)
+                if cursor:
+                    page_params["cursor"] = cursor
+                payload = await self._paced_get("/", page_params)
+                api_requests += 1
+                raw_items = payload.get("data")
+                items = raw_items if isinstance(raw_items, list) else []
+                pages_read += 1
+                query_pages += 1
+                records_seen += len(items)
+                for item in items:
+                    if not isinstance(item, dict):
+                        continue
+                    record = self.normalize(item)
+                    if not record:
+                        continue
+                    if not self._geography_matches(record, query, filters):
+                        geography_mismatch_count += 1
+                        continue
+                    if matches_filters(record, filters):
+                        valid_records += 1
+                        current = records.get(record.cnpj)
+                        if current:
+                            duplicate_count += 1
+                            merged_extra = {**current.extra, **record.extra}
+                            records[record.cnpj] = CnpjRecord(**{**record.__dict__, "extra": merged_extra})
+                        else:
+                            records[record.cnpj] = record
+                await _maybe_call(
+                    progress_callback,
+                    ProviderProgress(
+                        self.name,
+                        "querying_provider",
+                        pages_read=pages_read,
+                        records_seen=records_seen,
+                        records_kept=len(records),
+                        metadata={
+                            "query_index": query_index,
+                            "queries_total": len(planned_queries),
+                            "current_city": query.municipality.official_name if query.municipality else None,
+                            "current_city_code": query.municipality.ibge_code if query.municipality else None,
+                            "params": query.params,
+                        },
+                    ),
+                )
+                if len(records) >= target:
+                    stopped_reason = "target_oversample_reached"
+                    break
+                next_cursor = payload.get("cursor")
+                cursor = str(next_cursor) if next_cursor not in {None, ""} else None
+                if not cursor:
+                    stopped_reason = "cursor_ended"
+                    break
+                if cursor == previous_cursor:
+                    warnings.append("Cursor repetido pela API; paginacao encerrada para evitar loop.")
+                    stopped_reason = "repeated_cursor"
+                    break
+                previous_cursor = cursor
+            queries_completed += 1
+            if stopped_reason in {"cancelled", "target_oversample_reached", "repeated_cursor"}:
                 break
-            page_params = dict(params)
-            if cursor:
-                page_params["cursor"] = cursor
-            payload = await self._paced_get("/", page_params)
-            raw_items = payload.get("data")
-            items = raw_items if isinstance(raw_items, list) else []
-            pages_read += 1
-            records_seen += len(items)
-            for item in items:
-                if not isinstance(item, dict):
-                    continue
-                record = self.normalize(item)
-                if record and matches_filters(record, filters):
-                    current = records.get(record.cnpj)
-                    if current:
-                        merged_extra = {**current.extra, **record.extra}
-                        records[record.cnpj] = CnpjRecord(**{**record.__dict__, "extra": merged_extra})
-                    else:
-                        records[record.cnpj] = record
-            await _maybe_call(
-                progress_callback,
-                ProviderProgress(
-                    self.name,
-                    "page_read",
-                    pages_read=pages_read,
-                    records_seen=records_seen,
-                    records_kept=len(records),
-                    metadata={"cursor": cursor, "params": params},
-                ),
-            )
-            if len(records) >= target:
-                stopped_reason = "target_oversample_reached"
+            if query_pages >= max(self.config.minha_receita_max_pages_per_query, 1):
+                stopped_reason = "max_pages_reached"
                 break
-            next_cursor = payload.get("cursor")
-            cursor = str(next_cursor) if next_cursor not in {None, ""} else None
-            if not cursor:
-                stopped_reason = "cursor_ended"
-                break
-            if cursor == previous_cursor:
-                warnings.append("Cursor repetido pela API; paginacao encerrada para evitar loop.")
-                stopped_reason = "repeated_cursor"
-                break
-            previous_cursor = cursor
-        else:
-            stopped_reason = "max_pages_reached"
 
         await _maybe_call(
             progress_callback,
@@ -371,6 +416,17 @@ class MinhaReceitaProvider:
                 records_seen=records_seen,
                 records_kept=len(records),
                 message=f"Busca finalizada: {len(records)} registros elegiveis.",
+                metadata={
+                    "queries_total": len(planned_queries),
+                    "queries_completed": queries_completed,
+                    "api_requests": api_requests,
+                    "valid_records": valid_records,
+                    "duplicates_removed": duplicate_count,
+                    "geography_mismatch_count": geography_mismatch_count,
+                    "target_records": filters.quantity,
+                    "cache_hits": self.municipality_resolver.cache_hits,
+                    "cache_misses": self.municipality_resolver.cache_misses,
+                },
             ),
         )
         return ProviderSearchResult(
@@ -381,4 +437,19 @@ class MinhaReceitaProvider:
             records_kept=len(records),
             stopped_reason=stopped_reason,
             warnings=tuple(warnings),
+            extra_stats={
+                "queries_total": len(planned_queries),
+                "queries_completed": queries_completed,
+                "api_requests": api_requests,
+                "valid_records": valid_records,
+                "unique_records": len(records),
+                "duplicates_removed": duplicate_count,
+                "geography_mismatch_count": geography_mismatch_count,
+                "filtered_records": max(records_seen - valid_records - geography_mismatch_count, 0),
+                "suppressed_records": 0,
+                "target_records": filters.quantity,
+                "cache_hits": self.municipality_resolver.cache_hits,
+                "cache_misses": self.municipality_resolver.cache_misses,
+                "elapsed_seconds": round(time.perf_counter() - started_at, 3),
+            },
         )

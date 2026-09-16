@@ -5,12 +5,20 @@ import { apiFetch } from "@/src/lib/api/client";
 
 type CrmExportLinkActionsProps = {
   exportId: string;
+  storageProvider: "supabase" | "r2" | "local";
+  fileUrl?: string;
+  fileName?: string;
 };
 
-export function CrmExportLinkActions({ exportId }: CrmExportLinkActionsProps) {
+export function CrmExportLinkActions({ exportId, storageProvider, fileUrl, fileName }: CrmExportLinkActionsProps) {
   const [pending, setPending] = useState(false);
   const [signedUrl, setSignedUrl] = useState("");
   const [message, setMessage] = useState("");
+
+  async function copyText(value: string, label: string) {
+    await navigator.clipboard.writeText(value);
+    setMessage(`${label} copiado.`);
+  }
 
   async function createLink() {
     setPending(true);
@@ -36,9 +44,20 @@ export function CrmExportLinkActions({ exportId }: CrmExportLinkActionsProps) {
 
   return (
     <div className="admin-export-actions">
-      <button className="button button--secondary" disabled={pending} onClick={createLink} type="button">
-        {pending ? "Gerando..." : "Gerar link 24h"}
-      </button>
+      {storageProvider === "local" ? (
+        <>
+          <button className="button button--secondary" disabled={!fileUrl} onClick={() => fileUrl && copyText(fileUrl, "Caminho local")} type="button">
+            Copiar caminho
+          </button>
+          <button className="button button--secondary" disabled={!fileName} onClick={() => fileName && copyText(fileName, "Nome do arquivo")} type="button">
+            Copiar arquivo
+          </button>
+        </>
+      ) : (
+        <button className="button button--secondary" disabled={pending} onClick={createLink} type="button">
+          {pending ? "Gerando..." : "Gerar link 24h"}
+        </button>
+      )}
       {signedUrl ? (
         <input aria-label="Link assinado do export" readOnly value={signedUrl} onFocus={(event) => event.currentTarget.select()} />
       ) : null}

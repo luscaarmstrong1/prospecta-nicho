@@ -34,8 +34,8 @@ export default async function PedidoPage({ params }: Params) {
                 {[status.city, status.uf].filter(Boolean).join("/") || "a validar"}.
               </p>
               <p>
-                Arquivos finais não ficam públicos nesta página. Quando o export estiver pronto, a equipe envia um link
-                assinado e temporário.
+                Arquivos finais não ficam públicos nesta página. Quando o export estiver pronto, a equipe envia a planilha
+                pelo canal combinado.
               </p>
             </>
           ) : (

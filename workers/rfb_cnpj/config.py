@@ -36,6 +36,7 @@ def _default_cache_dir() -> str:
 class WorkerConfig:
     data_dir: str = _default_data_dir()
     output_dir: str = _default_output_dir()
+    export_delivery_mode: str = getenv("EXPORT_DELIVERY_MODE") or "local"
     storage_bucket: str | None = getenv("R2_BUCKET") or getenv("SUPABASE_STORAGE_BUCKET")
     supabase_url: str | None = getenv("SUPABASE_URL")
     supabase_service_role_key: str | None = getenv("SUPABASE_SERVICE_ROLE_KEY")
@@ -51,6 +52,7 @@ class WorkerConfig:
     minha_receita_max_pages_per_query: int = int(getenv("MINHA_RECEITA_MAX_PAGES_PER_QUERY") or "1000")
     minha_receita_oversample_factor: int = int(getenv("MINHA_RECEITA_OVERSAMPLE_FACTOR") or "2")
     minha_receita_cache_dir: str = _default_cache_dir()
+    ibge_timeout_seconds: float = float(getenv("IBGE_TIMEOUT_SECONDS") or "20")
     export_retention_days: int = int(getenv("EXPORT_RETENTION_DAYS") or "30")
 
 

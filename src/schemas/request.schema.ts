@@ -15,7 +15,9 @@ export const crmRequestSchema = z.object({
 });
 
 export const crmRequestPatchSchema = z.object({
-  status: z.enum(["new", "analysis", "validated", "waiting_payment", "paid", "queued", "processing", "ready", "delivered", "cancelled"]).optional(),
+  status: z
+    .enum(["new", "analysis", "validated", "waiting_payment", "paid", "queued", "processing", "ready", "ready_for_delivery", "delivered", "cancelled"])
+    .optional(),
   notes: z.string().max(1200).optional(),
 });
 

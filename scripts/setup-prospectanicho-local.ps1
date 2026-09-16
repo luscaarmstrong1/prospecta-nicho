@@ -37,15 +37,16 @@ if (!(Test-Path ".venv\Scripts\python.exe")) {
 & ".venv\Scripts\python.exe" -m pip install --upgrade pip
 & ".venv\Scripts\python.exe" -m pip install -e ".\workers\rfb_cnpj[test]"
 
-New-Item -ItemType Directory -Force "$env:USERPROFILE\ProspectaNicho\RFB" | Out-Null
 New-Item -ItemType Directory -Force "$env:USERPROFILE\ProspectaNicho\Exports" | Out-Null
+New-Item -ItemType Directory -Force "$env:USERPROFILE\ProspectaNicho\Cache" | Out-Null
 New-Item -ItemType Directory -Force "logs" | Out-Null
 
 npm run check:env
-& ".venv\Scripts\python.exe" -m workers.rfb_cnpj data status
+& ".venv\Scripts\python.exe" -m workers.rfb_cnpj provider health
 
 Write-Host ""
 Write-Host "Instalacao local preparada."
 Write-Host "Proximos comandos:"
-Write-Host "1. setup-dados-receita.bat"
-Write-Host "2. start-prospectanicho-worker.bat <job-id>"
+Write-Host "1. Preencha SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY em .env.worker"
+Write-Host "2. start-prospectanicho-worker.bat"
+Write-Host "3. abrir-export-prospectanicho.bat para abrir a pasta de um protocolo"

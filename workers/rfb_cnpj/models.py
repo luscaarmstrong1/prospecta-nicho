@@ -10,6 +10,9 @@ class CnpjFilters:
     segment: str
     uf: str | None = None
     city: str | None = None
+    cities: tuple[str, ...] = ()
+    city_ibge_code: str | None = None
+    city_ibge_codes: tuple[str, ...] = ()
     concessionaria: str | None = None
     opening_period: str | None = None
     opening_date_start: str | None = None
@@ -24,6 +27,7 @@ class CnpjFilters:
     min_capital_social: float | None = None
     max_capital_social: float | None = None
     quantity: int = 500
+    public_code: str | None = None
     fields: tuple[str, ...] = (
         "cnpj",
         "razao_social",

@@ -47,7 +47,9 @@ export const serverEnvSchema = publicEnvSchema.extend({
   WHATSAPP_NUMBER: z.string().optional().or(z.literal("")),
   TURNSTILE_SECRET_KEY: optionalSecret,
   ADMIN_API_TOKEN: optionalSecret,
+  ENABLE_BREAK_GLASS_ADMIN: z.string().optional().or(z.literal("")),
   EXPORT_SIGNING_SECRET: optionalSecret,
+  EXPORT_DELIVERY_MODE: z.enum(["local", "signed_url", "storage"]).optional().or(z.literal("")),
   SENTRY_DSN: optionalUrl,
   NEXT_PUBLIC_SENTRY_DSN: optionalUrl,
 });
@@ -60,8 +62,6 @@ const productionRequiredKeys = [
   "SUPABASE_URL",
   "SUPABASE_SERVICE_ROLE_KEY",
   "RESEND_API_KEY",
-  "ADMIN_API_TOKEN",
-  "EXPORT_SIGNING_SECRET",
 ] as const;
 
 export function isStaticHostingEnv(env: NodeJS.ProcessEnv = process.env) {
@@ -95,7 +95,11 @@ export function assertProductionEnv(env: NodeJS.ProcessEnv = process.env) {
     };
   }
 
-  const missing = getMissingProductionEnv(env);
+  const missing = [
+    ...getMissingProductionEnv(env),
+    ...(env.ENABLE_BREAK_GLASS_ADMIN === "true" && !env.ADMIN_API_TOKEN ? ["ADMIN_API_TOKEN"] : []),
+    ...((env.EXPORT_DELIVERY_MODE || "local") !== "local" && !env.EXPORT_SIGNING_SECRET ? ["EXPORT_SIGNING_SECRET"] : []),
+  ];
   return {
     ok: missing.length === 0,
     issues: missing.map((key) => `${key} não configurada em produção`),
