@@ -1,0 +1,59 @@
+[functions.health]
+verify_jwt = false
+
+[functions.public-create-request]
+verify_jwt = false
+
+[functions.public-sample-request]
+verify_jwt = false
+
+[functions.public-contact]
+verify_jwt = false
+
+[functions.public-request-status]
+verify_jwt = false
+
+[functions.admin-login]
+verify_jwt = false
+
+[functions.admin-requests]
+verify_jwt = false
+
+[functions.admin-request-detail]
+verify_jwt = false
+
+[functions.admin-update-request]
+verify_jwt = false
+
+[functions.admin-create-job]
+verify_jwt = false
+
+[functions.admin-process-request]
+verify_jwt = false
+
+[functions.admin-mark-paid]
+verify_jwt = false
+
+[functions.admin-mark-delivered]
+verify_jwt = false
+
+[functions.admin-jobs-logs]
+verify_jwt = false
+
+[functions.admin-exports]
+verify_jwt = false
+
+[functions.admin-export-detail]
+verify_jwt = false
+
+[functions.admin-sign-export]
+verify_jwt = false
+
+[functions.admin-offer-enrichment]
+verify_jwt = false
+
+[functions.admin-mark-enrichment-paid]
+verify_jwt = false
+
+[functions.admin-run-enrichment]
+verify_jwt = false
