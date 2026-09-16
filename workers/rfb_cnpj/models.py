@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -24,8 +25,8 @@ class CnpjFilters:
     include_secondary_cnaes: bool = True
     exclude_mei: bool = True
     only_headquarters: bool = False
-    min_capital_social: float | None = None
-    max_capital_social: float | None = None
+    min_capital_social: Decimal | None = None
+    max_capital_social: Decimal | None = None
     quantity: int = 500
     public_code: str | None = None
     fields: tuple[str, ...] = (
@@ -52,9 +53,9 @@ class CnpjRecord:
     uf: str = ""
     porte: str = ""
     data_abertura: str = ""
-    situacao_cadastral: str = "ATIVA"
-    matriz_filial: str = "MATRIZ"
-    capital_social: float | None = None
+    situacao_cadastral: str = "DESCONHECIDA"
+    matriz_filial: str = "DESCONHECIDO"
+    capital_social: Decimal | None = None
     extra: dict[str, Any] = field(default_factory=dict)
 
     def as_dict(self) -> dict[str, Any]:

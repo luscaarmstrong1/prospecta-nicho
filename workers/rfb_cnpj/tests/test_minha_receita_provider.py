@@ -61,7 +61,7 @@ def test_provider_paginates_deduplicates_and_strips_sensitive_fields(tmp_path):
     assert result.pages_read == 2
     assert result.records_seen == 3
     assert [record.cnpj for record in result.records] == ["00000000000110", "00000000000200"]
-    assert "qsa" not in json.dumps([record.as_dict() for record in result.records]).lower()
+    assert "qsa" not in json.dumps([record.as_dict() for record in result.records], default=str).lower()
     assert len(calls) == 2
 
 
@@ -148,3 +148,49 @@ def test_provider_uses_explicit_ibge_code_for_city_filter(tmp_path):
 
     assert result.records_kept == 1
     assert "municipio=5300108" in seen_urls[0]
+
+
+def test_provider_does_not_invent_missing_status_or_branch_and_preserves_decimal_capital(tmp_path):
+    provider = MinhaReceitaProvider(_config(tmp_path), transport=httpx.MockTransport(lambda _request: httpx.Response(200, json={})))
+
+    record = provider.normalize(
+        {
+            "cnpj": "00.000.000/0001-00",
+            "razao_social": "Empresa Sem Status",
+            "cnae_fiscal": "6209100",
+            "capital_social": "1.234,56",
+            "correio_eletronico": "COMERCIAL@EXEMPLO.COM",
+            "ddd_telefone_1": "(11) 99999-0000",
+            "opcao_pelo_mei": "",
+            "opcao_pelo_simples": "",
+            "qsa": [{"nome_socio": "Nao deve sair"}],
+        }
+    )
+
+    assert record is not None
+    assert record.situacao_cadastral == "DESCONHECIDA"
+    assert record.matriz_filial == "DESCONHECIDO"
+    assert str(record.capital_social) == "1234.56"
+    assert record.extra["email_comercial"] == "comercial@exemplo.com"
+    assert record.extra["phone_1"] == "11999990000"
+    assert record.extra["mei"] == "DESCONHECIDO"
+    assert "qsa" not in json.dumps(record.as_dict(), default=str).lower()
+
+
+def test_provider_cache_strips_sensitive_nested_payload(tmp_path):
+    calls = 0
+
+    def handler(_request: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        return httpx.Response(200, json={"data": [_company("00000000000110")], "socios": [{"cpf": "123"}]})
+
+    provider = MinhaReceitaProvider(_config(tmp_path), transport=httpx.MockTransport(handler))
+    asyncio.run(provider.search(CnpjFilters(segment="software", uf="DF", cnaes=("6209100",), quantity=1)))
+
+    with provider.cache_path.open("rb") as handle:
+        cached = handle.read().decode("utf-8", errors="ignore").lower()
+
+    assert calls == 1
+    assert "cpf" not in cached
+    assert "socios" not in cached

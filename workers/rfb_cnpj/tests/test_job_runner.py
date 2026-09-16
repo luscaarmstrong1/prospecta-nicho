@@ -7,7 +7,7 @@ from workers.rfb_cnpj.models import CnpjFilters, CnpjRecord
 
 def test_run_job_generates_export_without_enrichment(tmp_path: Path):
     result = run_job(
-        [CnpjRecord(cnpj="1", razao_social="Empresa Teste", cnae_principal="4321500", municipio="Campinas", uf="SP", porte="ME")],
+        [CnpjRecord(cnpj="1", razao_social="Empresa Teste", cnae_principal="4321500", municipio="Campinas", uf="SP", porte="ME", situacao_cadastral="ATIVA")],
         CnpjFilters(segment="Energia solar", uf="SP", delivery_format="csv", public_code="PN-TESTE01"),
         tmp_path,
     )

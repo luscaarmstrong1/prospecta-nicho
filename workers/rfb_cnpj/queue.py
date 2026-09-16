@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -15,7 +16,11 @@ from workers.rfb_cnpj.cli import _filters_from_dict
 from workers.rfb_cnpj.config import WorkerConfig
 from workers.rfb_cnpj.job_runner import run_job
 from workers.rfb_cnpj.providers import get_company_search_provider
-from workers.rfb_cnpj.providers.models import ProviderProgress
+from workers.rfb_cnpj.providers.models import ProviderProgress, ProviderUnavailableError, QueryTooBroadError
+
+
+class JobCancelled(RuntimeError):
+    pass
 
 
 def _now_iso() -> str:
@@ -42,6 +47,13 @@ def _rest_url(config: WorkerConfig, table: str, query: str = "") -> str:
     return f"{base}/rest/v1/{table}{query}"
 
 
+def _rpc_url(config: WorkerConfig, function_name: str) -> str:
+    if not config.supabase_url:
+        raise RuntimeError("SUPABASE_URL nao configurado.")
+    base = config.supabase_url.rstrip("/")
+    return f"{base}/rest/v1/rpc/{function_name}"
+
+
 def _request_json(config: WorkerConfig, method: str, table: str, query = "", body: dict[str, Any] | None = None) -> Any:
     data = json.dumps(body or {}).encode("utf-8") if body is not None else None
     request = urllib.request.Request(
@@ -53,6 +65,22 @@ def _request_json(config: WorkerConfig, method: str, table: str, query = "", bod
     with urllib.request.urlopen(request, timeout=30) as response:
         payload = response.read().decode("utf-8")
         return json.loads(payload) if payload else None
+
+
+def _rpc(config: WorkerConfig, function_name: str, body: dict[str, Any]) -> Any:
+    request = urllib.request.Request(
+        _rpc_url(config, function_name),
+        data=json.dumps(body).encode("utf-8"),
+        headers=_headers(config, "return=representation"),
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            payload = response.read().decode("utf-8")
+            return json.loads(payload) if payload else None
+    except urllib.error.HTTPError as error:
+        detail = error.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"RPC Supabase {function_name} falhou. Aplique as migrations mais recentes. {detail}") from error
 
 
 def _insert(config: WorkerConfig, table: str, body: dict[str, Any]) -> None:
@@ -160,29 +188,35 @@ def _job_id_query(job: dict[str, Any]) -> str:
 
 
 def _queued_job(config: WorkerConfig) -> dict[str, Any] | None:
-    query = "?select=*&status=eq.queued&order=created_at.asc&limit=1"
-    rows = _request_json(config, "GET", "rfb_processing_jobs", query)
+    rows = _rpc(
+        config,
+        "claim_next_rfb_job",
+        {"p_worker_id": config.worker_id, "p_lease_seconds": config.worker_lease_seconds},
+    )
     if not isinstance(rows, list) or not rows:
         return None
-    job = rows[0]
-    claim_query = f"?id=eq.{urllib.parse.quote(str(job['id']))}&status=eq.queued"
-    claimed = _patch(
-        config,
-        "rfb_processing_jobs",
-        claim_query,
-        {
-            "status": "running",
-            "progress": 5,
-            "current_step": "claimed",
-            "heartbeat_at": _now_iso(),
-            "lease_expires_at": None,
-            "worker_id": config.worker_id,
-            "attempts": int(job.get("attempts") or 0) + 1,
-            "started_at": _now_iso(),
-            "updated_at": _now_iso(),
-        },
-    )
-    return claimed[0] if claimed else None
+    return rows[0]
+
+
+def _recover_stale_jobs(config: WorkerConfig) -> None:
+    _rpc(config, "recover_stale_rfb_jobs", {"p_max_attempts": config.job_max_attempts})
+
+
+def _lease_expires_iso(config: WorkerConfig) -> str:
+    return (datetime.now(UTC) + timedelta(seconds=max(config.worker_lease_seconds, 30))).isoformat()
+
+
+def _heartbeat(config: WorkerConfig, job: dict[str, Any], current_step: str | None = None, progress: int | None = None) -> None:
+    body: dict[str, Any] = {
+        "heartbeat_at": _now_iso(),
+        "lease_expires_at": _lease_expires_iso(config),
+        "updated_at": _now_iso(),
+    }
+    if current_step:
+        body["current_step"] = current_step
+    if progress is not None:
+        body["progress"] = progress
+    _patch(config, "rfb_processing_jobs", _job_id_query(job), body)
 
 
 def _cancel_requested(config: WorkerConfig, job: dict[str, Any]) -> bool:
@@ -194,7 +228,7 @@ def _cancel_requested(config: WorkerConfig, job: dict[str, Any]) -> bool:
 
 def _patch_progress(config: WorkerConfig, job: dict[str, Any], progress: ProviderProgress) -> None:
     percent = 10
-    if progress.step == "page_read":
+    if progress.step == "querying_provider":
         percent = min(85, 20 + progress.pages_read * 3)
     elif progress.step == "search_finished":
         percent = 88
@@ -220,16 +254,29 @@ def _patch_progress(config: WorkerConfig, job: dict[str, Any], progress: Provide
                 "metadata": progress.metadata,
             },
             "heartbeat_at": _now_iso(),
+            "lease_expires_at": _lease_expires_iso(config),
             "updated_at": _now_iso(),
         },
     )
-    if progress.message or progress.step == "page_read":
+    if progress.message or progress.step == "querying_provider":
         _log(
             config,
             job,
             progress.step,
             progress.message or f"Pagina {progress.pages_read}: {progress.records_kept} registros elegiveis.",
         )
+
+
+async def _heartbeat_loop(config: WorkerConfig, job: dict[str, Any], stop: asyncio.Event) -> None:
+    while not stop.is_set():
+        try:
+            _heartbeat(config, job)
+        except Exception:
+            pass
+        try:
+            await asyncio.wait_for(stop.wait(), timeout=max(config.worker_heartbeat_seconds, 5))
+        except TimeoutError:
+            continue
 
 
 async def _search_records(config: WorkerConfig, job: dict[str, Any]) -> tuple[list[Any], dict[str, Any]]:
@@ -244,8 +291,42 @@ async def _search_records(config: WorkerConfig, job: dict[str, Any]) -> tuple[li
 
     result = await provider.search(filters, progress_callback=progress_callback, cancel_callback=cancel_callback)
     if result.stopped_reason == "cancelled":
-        raise RuntimeError("Job cancelado pelo administrador.")
+        raise JobCancelled("Job cancelado pelo administrador.")
     return list(result.records), result.stats()
+
+
+async def _search_records_with_heartbeat(config: WorkerConfig, job: dict[str, Any]) -> tuple[list[Any], dict[str, Any]]:
+    stop = asyncio.Event()
+    heartbeat_task = asyncio.create_task(_heartbeat_loop(config, job, stop))
+    try:
+        return await _search_records(config, job)
+    finally:
+        stop.set()
+        await heartbeat_task
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _verified_export_files(export_result: dict[str, Any]) -> list[Path]:
+    export_path = str(export_result.get("path") or "")
+    files = [str(path) for path in (export_result.get("files") or [])] or [export_path]
+    verified: list[Path] = []
+    for raw_path in files:
+        if not raw_path:
+            continue
+        path = Path(raw_path)
+        if not path.exists() or path.stat().st_size <= 0:
+            raise RuntimeError(f"Export local ausente ou vazio: {path}")
+        verified.append(path)
+    if not verified:
+        raise RuntimeError("Nenhum arquivo de export foi gerado.")
+    return verified
 
 
 def _complete_request(config: WorkerConfig, job: dict[str, Any], export_result: dict[str, Any], search_stats: dict[str, Any]) -> None:
@@ -253,11 +334,14 @@ def _complete_request(config: WorkerConfig, job: dict[str, Any], export_result: 
     export_path = str(export_result.get("path") or "")
     fields = list(export_result.get("fields") or [])
     row_count = int(export_result.get("row_count") or 0)
-    files = [str(path) for path in (export_result.get("files") or [])] or [export_path]
-    for file_path in files:
-        if not file_path:
-            continue
-        format_name = Path(file_path).suffix.lstrip(".") or str(export_result.get("format") or "xlsx")
+    files = _verified_export_files(export_result)
+    target_records = int((search_stats or {}).get("target_records") or 0)
+    completed_status = "completed_partial" if target_records and row_count and row_count < target_records else "ready_for_delivery"
+    completed_stats = {**search_stats, "partial": completed_status == "completed_partial", "delivered_records": row_count}
+    for path in files:
+        file_path = str(path)
+        format_name = path.suffix.lstrip(".") or str(export_result.get("format") or "xlsx")
+        checksum = _sha256_file(path)
         export_rows = _request_json(
             config,
             "GET",
@@ -286,32 +370,33 @@ def _complete_request(config: WorkerConfig, job: dict[str, Any], export_result: 
                 "generated_by": "minha_receita_worker",
             },
         )
-        try:
-            _insert(
-                config,
-                "export_files",
-                {
-                    "export_id": export_id,
-                    "request_id": request_id,
-                    "file_name": Path(file_path).name,
-                    "file_format": format_name,
-                    "storage_provider": "local",
-                    "storage_path": file_path,
-                    "byte_size": Path(file_path).stat().st_size if Path(file_path).exists() else None,
-                },
-            )
-        except Exception:
-            pass
+        _insert(
+            config,
+            "export_files",
+            {
+                "export_id": export_id,
+                "request_id": request_id,
+                "file_name": path.name,
+                "file_format": format_name,
+                "storage_provider": "local",
+                "storage_path": file_path,
+                "byte_size": path.stat().st_size,
+                "checksum": checksum,
+                "checksum_sha256": checksum,
+            },
+        )
     _patch(
         config,
         "rfb_processing_jobs",
         _job_id_query(job),
         {
-            "status": "ready_for_delivery",
+            "status": completed_status,
             "progress": 100,
-            "current_step": "ready_for_delivery",
-            "search_stats": search_stats,
+            "current_step": completed_status,
+            "search_stats": completed_stats,
             "finished_at": _now_iso(),
+            "lease_expires_at": None,
+            "worker_id": None,
             "updated_at": _now_iso(),
         },
     )
@@ -319,14 +404,43 @@ def _complete_request(config: WorkerConfig, job: dict[str, Any], export_result: 
         _patch(config, "custom_requests", f"?id=eq.{urllib.parse.quote(request_id)}", {"status": "ready_for_delivery", "updated_at": _now_iso()})
 
 
+def _schedule_retry(config: WorkerConfig, job: dict[str, Any], error: Exception) -> dict[str, Any] | None:
+    attempts = int(job.get("attempts") or 1)
+    max_attempts = int(job.get("max_attempts") or config.job_max_attempts)
+    if attempts >= max_attempts:
+        return None
+    delay_seconds = [30, 120, 300][min(max(attempts - 1, 0), 2)]
+    next_retry = (datetime.now(UTC) + timedelta(seconds=delay_seconds)).isoformat()
+    message = str(error)
+    _patch(
+        config,
+        "rfb_processing_jobs",
+        _job_id_query(job),
+        {
+            "status": "queued",
+            "current_step": "retry_scheduled",
+            "progress": 0,
+            "error_message": message,
+            "provider_error_code": type(error).__name__,
+            "worker_id": None,
+            "lease_expires_at": None,
+            "next_retry_at": next_retry,
+            "updated_at": _now_iso(),
+        },
+    )
+    _log(config, job, "retry_scheduled", f"Falha temporaria; nova tentativa em {delay_seconds}s. {message}", "warning")
+    return {"ok": False, "status": "retry_scheduled", "jobId": job.get("id"), "nextRetryAt": next_retry, "message": message}
+
+
 def process_one_queued_job(config: WorkerConfig) -> dict[str, Any]:
+    _recover_stale_jobs(config)
     job = _queued_job(config)
     if not job:
         return {"ok": True, "status": "idle", "message": "Nenhum job queued encontrado."}
     try:
         _log(config, job, "running", "Worker local assumiu o job CNPJ.")
         filters = _filters_from_dict(_job_filters_snapshot(config, job))
-        records, search_stats = asyncio.run(_search_records(config, job))
+        records, search_stats = asyncio.run(_search_records_with_heartbeat(config, job))
         if not records:
             _patch(
                 config,
@@ -338,6 +452,8 @@ def process_one_queued_job(config: WorkerConfig) -> dict[str, Any]:
                     "current_step": "no_results",
                     "search_stats": search_stats,
                     "finished_at": _now_iso(),
+                    "lease_expires_at": None,
+                    "worker_id": None,
                     "updated_at": _now_iso(),
                 },
             )
@@ -349,12 +465,73 @@ def process_one_queued_job(config: WorkerConfig) -> dict[str, Any]:
             config,
             "rfb_processing_jobs",
             _job_id_query(job),
-            {"progress": 90, "current_step": "saving_local_files", "updated_at": _now_iso()},
+            {"progress": 90, "current_step": "saving_local_files", "heartbeat_at": _now_iso(), "lease_expires_at": _lease_expires_iso(config), "updated_at": _now_iso()},
         )
         export_result = run_job(records, filters, Path(config.output_dir))
         _complete_request(config, job, export_result, search_stats)
         _log(config, job, "ready_for_delivery", f"Export local gerado com {export_result.get('row_count', 0)} linhas.")
         return {"ok": True, "status": "ready_for_delivery", "jobId": job.get("id"), "export": export_result}
+    except JobCancelled as error:
+        message = str(error)
+        _patch(
+            config,
+            "rfb_processing_jobs",
+            _job_id_query(job),
+            {
+                "status": "cancelled",
+                "current_step": "cancelled",
+                "error_message": message,
+                "worker_id": None,
+                "lease_expires_at": None,
+                "finished_at": _now_iso(),
+                "updated_at": _now_iso(),
+            },
+        )
+        if job.get("request_id"):
+            _patch(config, "custom_requests", f"?id=eq.{urllib.parse.quote(str(job.get('request_id')))}", {"status": "cancelled", "updated_at": _now_iso()})
+        _log(config, job, "cancelled", message, "warning")
+        return {"ok": False, "status": "cancelled", "jobId": job.get("id"), "message": message}
+    except ProviderUnavailableError as error:
+        retry = _schedule_retry(config, job, error)
+        if retry:
+            return retry
+        message = str(error)
+        _patch(
+            config,
+            "rfb_processing_jobs",
+            _job_id_query(job),
+            {
+                "status": "failed",
+                "current_step": "failed",
+                "error_message": message,
+                "provider_error_code": type(error).__name__,
+                "worker_id": None,
+                "lease_expires_at": None,
+                "finished_at": _now_iso(),
+                "updated_at": _now_iso(),
+            },
+        )
+        _log(config, job, "failed", message, "error")
+        return {"ok": False, "status": "failed", "jobId": job.get("id"), "message": message}
+    except QueryTooBroadError as error:
+        message = str(error)
+        _patch(
+            config,
+            "rfb_processing_jobs",
+            _job_id_query(job),
+            {
+                "status": "failed",
+                "current_step": "invalid_filters",
+                "error_message": message,
+                "provider_error_code": type(error).__name__,
+                "worker_id": None,
+                "lease_expires_at": None,
+                "finished_at": _now_iso(),
+                "updated_at": _now_iso(),
+            },
+        )
+        _log(config, job, "invalid_filters", message, "error")
+        return {"ok": False, "status": "failed", "jobId": job.get("id"), "message": message}
     except Exception as error:
         message = str(error)
         _patch(
@@ -366,6 +543,8 @@ def process_one_queued_job(config: WorkerConfig) -> dict[str, Any]:
                 "current_step": "failed",
                 "error_message": message,
                 "provider_error_code": type(error).__name__,
+                "worker_id": None,
+                "lease_expires_at": None,
                 "finished_at": _now_iso(),
                 "updated_at": _now_iso(),
             },

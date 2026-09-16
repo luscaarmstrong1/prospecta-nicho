@@ -119,9 +119,9 @@ def matches_filters(record: CnpjRecord, filters: CnpjFilters) -> bool:
         return False
     if not _record_matches_cnae(record, cnaes, filters.include_secondary_cnaes):
         return False
-    if filters.min_capital_social is not None and (record.capital_social or 0) < filters.min_capital_social:
+    if filters.min_capital_social is not None and (record.capital_social is None or record.capital_social < filters.min_capital_social):
         return False
-    if filters.max_capital_social is not None and (record.capital_social or 0) > filters.max_capital_social:
+    if filters.max_capital_social is not None and (record.capital_social is None or record.capital_social > filters.max_capital_social):
         return False
     start, end = _opening_window(filters)
     opening_date = _parse_date(record.data_abertura)

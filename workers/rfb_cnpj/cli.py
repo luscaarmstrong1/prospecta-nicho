@@ -6,6 +6,7 @@ import csv
 import json
 import os
 import sys
+from decimal import Decimal, InvalidOperation
 from shutil import copyfile
 from pathlib import Path
 from typing import Any
@@ -32,6 +33,8 @@ def _sample_records() -> list[CnpjRecord]:
             uf="SP",
             porte="ME",
             data_abertura="2026-01-10",
+            situacao_cadastral="ATIVA",
+            matriz_filial="MATRIZ",
             capital_social=25000,
         ),
         CnpjRecord(
@@ -43,6 +46,8 @@ def _sample_records() -> list[CnpjRecord]:
             uf="MG",
             porte="EPP",
             data_abertura="2025-11-20",
+            situacao_cadastral="ATIVA",
+            matriz_filial="MATRIZ",
             capital_social=80000,
         ),
     ]
@@ -58,14 +63,14 @@ def _filters_from_dict(payload: dict[str, Any]) -> CnpjFilters:
                 return tuple(item.strip() for item in value.split(",") if item.strip())
         return ()
 
-    def numeric_value(*keys: str) -> float | None:
+    def numeric_value(*keys: str) -> Decimal | None:
         for key in keys:
             value = payload.get(key)
             if value in {None, ""}:
                 continue
             try:
-                return float(str(value).replace(".", "").replace(",", "."))
-            except (TypeError, ValueError):
+                return Decimal(str(value).replace(".", "").replace(",", "."))
+            except (InvalidOperation, TypeError, ValueError):
                 continue
         return None
 

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import csv
+import os
+from decimal import Decimal
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -15,6 +17,21 @@ def _rows(records: list[CnpjRecord], fields: tuple[str, ...]) -> list[dict[str, 
         data = record.as_dict()
         rows.append({field: data.get(field, "") for field in fields})
     return rows
+
+
+def _safe_cell(value: Any) -> Any:
+    if isinstance(value, Decimal):
+        return value
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        text = value.replace("\x00", "").strip()
+        return f"'{text}" if text[:1] in {"=", "+", "-", "@", "\t", "\r", "\n"} else text
+    return value
+
+
+def _atomic_path(path: Path) -> Path:
+    return path.with_name(f".{path.name}.{os.getpid()}.tmp")
 
 
 def _filters_summary(filters: CnpjFilters | None) -> list[tuple[str, str]]:
@@ -41,10 +58,12 @@ def write_csv(records: list[CnpjRecord], fields: tuple[str, ...], output_path: P
     assert_no_prohibited_fields(list(fields))
     output_path.parent.mkdir(parents=True, exist_ok=True)
     rows = _rows(records, fields)
-    with output_path.open("w", encoding="utf-8-sig", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(fields))
+    tmp_path = _atomic_path(output_path)
+    with tmp_path.open("w", encoding="utf-8-sig", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(fields), delimiter=";", lineterminator="\r\n")
         writer.writeheader()
-        writer.writerows(rows)
+        writer.writerows([{key: _safe_cell(value) for key, value in row.items()} for row in rows])
+    tmp_path.replace(output_path)
     return ExportResult(path=output_path, row_count=len(rows), fields=fields, format="csv", files=(output_path,))
 
 
@@ -74,8 +93,13 @@ def write_xlsx(
         cell.fill = header_fill
     for row_index, row in enumerate(rows, start=2):
         for col, field in enumerate(fields, start=1):
-            leads.cell(row=row_index, column=col, value=row[field])
+            cell = leads.cell(row=row_index, column=col, value=_safe_cell(row[field]))
+            if field in {"cnpj", "telefone_comercial", "phone_1", "phone_2", "cep"}:
+                cell.number_format = "@"
+            if field == "capital_social" and isinstance(row[field], Decimal):
+                cell.number_format = '#,##0.00'
     leads.freeze_panes = "A2"
+    leads.auto_filter.ref = leads.dimensions
 
     summary = workbook.create_sheet("Resumo")
     summary.append(["indicador", "valor"])
@@ -100,5 +124,7 @@ def write_xlsx(
             max_length = max(len(str(cell.value or "")) for cell in column_cells)
             sheet.column_dimensions[column_cells[0].column_letter].width = min(max(max_length + 2, 14), 44)
 
-    workbook.save(output_path)
+    tmp_path = _atomic_path(output_path)
+    workbook.save(tmp_path)
+    tmp_path.replace(output_path)
     return ExportResult(path=output_path, row_count=len(rows), fields=fields, format="xlsx", files=(output_path,))

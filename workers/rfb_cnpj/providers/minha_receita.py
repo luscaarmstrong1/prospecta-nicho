@@ -9,6 +9,7 @@ import sqlite3
 import time
 from collections.abc import Awaitable
 from datetime import UTC, datetime
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any
 
@@ -29,6 +30,7 @@ from workers.rfb_cnpj.query_planner import PlannedQuery, QueryPlanner
 
 RETRYABLE_STATUS = {408, 425, 429, 500, 502, 503, 504}
 SENSITIVE_KEYS = {"qsa", "socios", "socio", "cpf", "cnpf", "representante_legal"}
+SENSITIVE_KEY_FRAGMENTS = ("cpf", "socio", "qsa", "representante")
 
 
 def _digits(value: Any) -> str:
@@ -39,12 +41,17 @@ def _text(value: Any) -> str:
     return str(value or "").strip()
 
 
-def _float_or_none(value: Any) -> float | None:
+def _is_sensitive_key(key: Any) -> bool:
+    lowered = str(key or "").strip().lower()
+    return lowered in SENSITIVE_KEYS or any(fragment in lowered for fragment in SENSITIVE_KEY_FRAGMENTS)
+
+
+def _decimal_or_none(value: Any) -> Decimal | None:
     if value in {None, ""}:
         return None
     try:
-        return float(str(value).replace(".", "").replace(",", "."))
-    except (TypeError, ValueError):
+        return Decimal(str(value).replace(".", "").replace(",", "."))
+    except (InvalidOperation, TypeError, ValueError):
         return None
 
 
@@ -57,7 +64,26 @@ def _date_iso(value: Any) -> str:
     match = re.fullmatch(r"(\d{2})/(\d{2})/(\d{4})", text)
     if match:
         return f"{match.group(3)}-{match.group(2)}-{match.group(1)}"
-    return text
+    return ""
+
+
+def _bool_label(value: Any) -> str:
+    text = _text(value).casefold()
+    if text in {"s", "sim", "true", "1"}:
+        return "SIM"
+    if text in {"n", "nao", "não", "false", "0"}:
+        return "NAO"
+    return "DESCONHECIDO"
+
+
+def _normalized_status(value: Any) -> str:
+    text = _text(value).upper()
+    return text or "DESCONHECIDA"
+
+
+def _normalized_branch(value: Any) -> str:
+    text = _text(value).upper()
+    return text or "DESCONHECIDO"
 
 
 def _safe_extra(payload: dict[str, Any]) -> dict[str, Any]:
@@ -81,7 +107,7 @@ def _safe_extra(payload: dict[str, Any]) -> dict[str, Any]:
         "codigo_municipio_ibge",
     }
     for key in keys:
-        if key in payload and key.lower() not in SENSITIVE_KEYS:
+        if key in payload and not _is_sensitive_key(key):
             extra[key] = payload[key]
 
     street = " ".join(
@@ -90,6 +116,7 @@ def _safe_extra(payload: dict[str, Any]) -> dict[str, Any]:
             _text(payload.get("descricao_tipo_logradouro")),
             _text(payload.get("logradouro")),
             _text(payload.get("numero")),
+            _text(payload.get("complemento")),
             _text(payload.get("bairro")),
         ]
         if part
@@ -102,6 +129,18 @@ def _safe_extra(payload: dict[str, Any]) -> dict[str, Any]:
     phone = _digits(payload.get("ddd_telefone_1"))
     if phone:
         extra["telefone_comercial"] = phone
+        extra["phone_1"] = phone
+    phone_2 = _digits(payload.get("ddd_telefone_2"))
+    if phone_2:
+        extra["phone_2"] = phone_2
+    extra["simples"] = _bool_label(payload.get("opcao_pelo_simples"))
+    extra["mei"] = _bool_label(payload.get("opcao_pelo_mei"))
+    natureza = payload.get("natureza_juridica")
+    if isinstance(natureza, dict):
+        extra["natureza_juridica_codigo"] = _digits(natureza.get("codigo"))
+        extra["natureza_juridica_descricao"] = _text(natureza.get("descricao"))
+    elif natureza:
+        extra["natureza_juridica_descricao"] = _text(natureza)
     secondary = payload.get("cnaes_secundarios")
     if isinstance(secondary, list):
         extra["cnaes_secundarios"] = [
@@ -119,7 +158,7 @@ def _strip_sensitive_payload(value: Any) -> Any:
     if isinstance(value, dict):
         safe: dict[str, Any] = {}
         for key, item in value.items():
-            if key.lower() in SENSITIVE_KEYS:
+            if _is_sensitive_key(key):
                 continue
             safe[key] = _strip_sensitive_payload(item)
         return safe
@@ -277,7 +316,7 @@ class MinhaReceitaProvider:
         return await self.query_planner.build(filters, self.municipality_resolver)
 
     def normalize(self, raw_company: dict[str, Any]) -> CnpjRecord | None:
-        clean = {key: value for key, value in raw_company.items() if key.lower() not in SENSITIVE_KEYS}
+        clean = {key: value for key, value in raw_company.items() if not _is_sensitive_key(key)}
         cnpj = _digits(clean.get("cnpj"))
         if len(cnpj) != 14:
             return None
@@ -290,9 +329,9 @@ class MinhaReceitaProvider:
             uf=_text(clean.get("uf")).upper(),
             porte=_text(clean.get("porte")),
             data_abertura=_date_iso(clean.get("data_inicio_atividade") or clean.get("data_abertura")),
-            situacao_cadastral=_text(clean.get("descricao_situacao_cadastral") or clean.get("situacao_cadastral") or "ATIVA").upper(),
-            matriz_filial=_text(clean.get("descricao_identificador_matriz_filial") or clean.get("matriz_filial") or "MATRIZ").upper(),
-            capital_social=_float_or_none(clean.get("capital_social")),
+            situacao_cadastral=_normalized_status(clean.get("descricao_situacao_cadastral") or clean.get("situacao_cadastral")),
+            matriz_filial=_normalized_branch(clean.get("descricao_identificador_matriz_filial") or clean.get("matriz_filial")),
+            capital_social=_decimal_or_none(clean.get("capital_social")),
             extra=_safe_extra(clean),
         )
 

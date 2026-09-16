@@ -1,6 +1,17 @@
 from __future__ import annotations
 
+from decimal import Decimal, InvalidOperation
+
 from workers.rfb_cnpj.models import CnpjRecord
+
+
+def _decimal_or_none(value: object) -> Decimal | None:
+    if value in {None, ""}:
+        return None
+    try:
+        return Decimal(str(value).replace(".", "").replace(",", "."))
+    except (InvalidOperation, TypeError, ValueError):
+        return None
 
 
 def parse_sample_rows(rows: list[dict[str, object]]) -> list[CnpjRecord]:
@@ -14,9 +25,9 @@ def parse_sample_rows(rows: list[dict[str, object]]) -> list[CnpjRecord]:
             uf=str(row.get("uf", "")),
             porte=str(row.get("porte", "")),
             data_abertura=str(row.get("data_abertura", "")),
-            situacao_cadastral=str(row.get("situacao_cadastral", "ATIVA")),
-            matriz_filial=str(row.get("matriz_filial", "MATRIZ")),
-            capital_social=float(row["capital_social"]) if row.get("capital_social") is not None else None,
+            situacao_cadastral=str(row.get("situacao_cadastral") or "DESCONHECIDA"),
+            matriz_filial=str(row.get("matriz_filial") or "DESCONHECIDO"),
+            capital_social=_decimal_or_none(row.get("capital_social")),
         )
         for row in rows
     ]

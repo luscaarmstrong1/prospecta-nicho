@@ -9,6 +9,7 @@ def test_score_record_prioritizes_active_complete_businesses():
         nome_fantasia="Teste",
         porte="ME",
         data_abertura="2026-01-01",
+        situacao_cadastral="ATIVA",
         capital_social=20000,
     )
 

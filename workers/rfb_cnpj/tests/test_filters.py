@@ -4,9 +4,9 @@ from workers.rfb_cnpj.models import CnpjFilters, CnpjRecord
 
 def test_apply_filters_matches_by_uf_city_and_cnae_without_quantity_cutoff():
     records = [
-        CnpjRecord(cnpj="1", razao_social="A", cnae_principal="4321500", municipio="Campinas", uf="SP", porte="ME"),
-        CnpjRecord(cnpj="2", razao_social="B", cnae_principal="4321500", municipio="Campinas", uf="SP", porte="ME"),
-        CnpjRecord(cnpj="3", razao_social="C", cnae_principal="4321500", municipio="Santos", uf="SP", porte="ME"),
+        CnpjRecord(cnpj="1", razao_social="A", cnae_principal="4321500", municipio="Campinas", uf="SP", porte="ME", situacao_cadastral="ATIVA"),
+        CnpjRecord(cnpj="2", razao_social="B", cnae_principal="4321500", municipio="Campinas", uf="SP", porte="ME", situacao_cadastral="ATIVA"),
+        CnpjRecord(cnpj="3", razao_social="C", cnae_principal="4321500", municipio="Santos", uf="SP", porte="ME", situacao_cadastral="ATIVA"),
     ]
 
     selected = apply_filters(records, CnpjFilters(segment="Energia solar", uf="SP", city="Campinas", cnaes=("4321500",), quantity=1))
@@ -23,6 +23,7 @@ def test_apply_filters_can_match_secondary_cnae():
             municipio="Recife",
             uf="PE",
             porte="ME",
+            situacao_cadastral="ATIVA",
             extra={"cnaes_secundarios": [{"codigo": "4321500"}]},
         )
     ]

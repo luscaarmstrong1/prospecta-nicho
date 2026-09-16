@@ -54,6 +54,9 @@ class WorkerConfig:
     minha_receita_cache_dir: str = _default_cache_dir()
     ibge_timeout_seconds: float = float(getenv("IBGE_TIMEOUT_SECONDS") or "20")
     export_retention_days: int = int(getenv("EXPORT_RETENTION_DAYS") or "30")
+    worker_lease_seconds: int = int(getenv("RFB_WORKER_LEASE_SECONDS") or "300")
+    worker_heartbeat_seconds: int = int(getenv("RFB_WORKER_HEARTBEAT_SECONDS") or "30")
+    job_max_attempts: int = int(getenv("RFB_JOB_MAX_ATTEMPTS") or "3")
 
 
 def load_config() -> WorkerConfig:

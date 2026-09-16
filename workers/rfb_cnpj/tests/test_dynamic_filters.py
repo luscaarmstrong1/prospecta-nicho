@@ -14,8 +14,8 @@ def test_filters_resolve_segment_and_concessionaria_from_files(tmp_path: Path, m
     monkeypatch.setenv("RFB_CNPJ_CITY_MAPPING_FILE", str(city_file))
 
     records = [
-        CnpjRecord(cnpj="1", razao_social="Dentro", cnae_principal="4321500", municipio="Campinas", uf="SP", porte="ME"),
-        CnpjRecord(cnpj="2", razao_social="Fora", cnae_principal="7112000", municipio="Santos", uf="SP", porte="ME"),
+        CnpjRecord(cnpj="1", razao_social="Dentro", cnae_principal="4321500", municipio="Campinas", uf="SP", porte="ME", situacao_cadastral="ATIVA"),
+        CnpjRecord(cnpj="2", razao_social="Fora", cnae_principal="7112000", municipio="Santos", uf="SP", porte="ME", situacao_cadastral="ATIVA"),
     ]
 
     selected = apply_filters(records, CnpjFilters(segment="Servicos solares premium", concessionaria="Distribuidora X"))

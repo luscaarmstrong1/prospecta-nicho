@@ -88,3 +88,27 @@ start-prospectanicho-worker.bat <job-id>
 ```
 
 Se a fonte externa da Receita estiver indisponivel, o setup retorna `REMOTE_UNAVAILABLE` em JSON em vez de encerrar com traceback.
+
+### Hardening do worker CRM
+
+Antes de rodar jobs reais, aplique as migracoes Supabase, incluindo:
+
+```bash
+supabase/migrations/20260916103000_harden_rfb_worker_queue.sql
+```
+
+Essa migracao adiciona `claim_next_rfb_job` com `FOR UPDATE SKIP LOCKED`, lease, heartbeat, retry controlado, recuperacao de jobs travados e checksum SHA-256 por arquivo exportado.
+
+Variaveis principais do worker:
+
+```bash
+SUPABASE_URL=...
+SUPABASE_SERVICE_ROLE_KEY=...
+RFB_WORKER_ID=prospectanicho-local-worker
+RFB_WORKER_LEASE_SECONDS=300
+RFB_WORKER_HEARTBEAT_SECONDS=30
+RFB_JOB_MAX_ATTEMPTS=3
+EXPORT_DELIVERY_MODE=local
+```
+
+O fluxo principal usa Minha Receita + IBGE, gera CSV UTF-8 BOM com `;` e XLSX local, bloqueia QSA/CPF/dados sensiveis no export padrao e deixa a entrega manual sob controle do admin.
