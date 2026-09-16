@@ -44,7 +44,7 @@ Deno.serve(async (request) => {
     });
   }
 
-  const expected = env("ADMIN_API_TOKEN");
+  const expected = env("ENABLE_BREAK_GLASS_ADMIN") === "true" ? env("ADMIN_API_TOKEN") : "";
   if (!expected) return errorJson(request, "ADMIN_TOKEN_NOT_CONFIGURED", "ADMIN_API_TOKEN nao configurado no Supabase.", 503);
   if (text(body.token, 200) !== expected) return errorJson(request, "ADMIN_UNAUTHORIZED", "Token administrativo invalido.", 401);
   return json(request, { ok: true, session: { accessToken: expected, expiresAt: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(), role: "admin-token" } });

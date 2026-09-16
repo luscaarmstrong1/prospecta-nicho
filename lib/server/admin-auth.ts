@@ -53,8 +53,9 @@ export async function requireAdmin(request: Request, permission: AdminPermission
   const header = request.headers.get("authorization") || "";
   const token = header.startsWith("Bearer ") ? header.slice(7) : "";
   const cookieToken = readCookieToken(request);
+  const breakGlassEnabled = process.env.ENABLE_BREAK_GLASS_ADMIN === "true";
 
-  if (expected && (token === expected || cookieToken === expected)) return null;
+  if (breakGlassEnabled && expected && (token === expected || cookieToken === expected)) return null;
 
   const tokenResult = token ? await validateSupabaseAdminToken(token, permission) : null;
   if (tokenResult?.ok) return null;

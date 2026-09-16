@@ -63,7 +63,8 @@ export async function POST(request: Request) {
   }
 
   const allowTokenLogin =
-    process.env.NODE_ENV !== "production" || process.env.ENABLE_ADMIN_TOKEN_LOGIN === "true";
+    process.env.ENABLE_BREAK_GLASS_ADMIN === "true" &&
+    (process.env.NODE_ENV !== "production" || process.env.ENABLE_ADMIN_TOKEN_LOGIN === "true");
   const expected = allowTokenLogin ? process.env.ADMIN_API_TOKEN : "";
   if (!expected) return NextResponse.json({ ok: false, message: "ADMIN_API_TOKEN nao configurado." }, { status: 503 });
   if (!token || token !== expected) return NextResponse.json({ ok: false, message: "Token administrativo invalido." }, { status: 401 });

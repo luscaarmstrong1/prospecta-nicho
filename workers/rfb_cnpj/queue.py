@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import time
 import urllib.error
@@ -9,9 +10,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from workers.rfb_cnpj.cli import _filters_from_dict, _load_records_from_data_dir
+from workers.rfb_cnpj.cli import _filters_from_dict
 from workers.rfb_cnpj.config import WorkerConfig
 from workers.rfb_cnpj.job_runner import run_job
+from workers.rfb_cnpj.providers import get_company_search_provider
+from workers.rfb_cnpj.providers.models import ProviderProgress
 
 
 def _now_iso() -> str:
@@ -76,6 +79,10 @@ def _log(config: WorkerConfig, job: dict[str, Any], step: str, message: str, lev
     )
 
 
+def _job_id_query(job: dict[str, Any]) -> str:
+    return f"?id=eq.{urllib.parse.quote(str(job['id']))}"
+
+
 def _queued_job(config: WorkerConfig) -> dict[str, Any] | None:
     query = "?select=*&status=eq.queued&order=created_at.asc&limit=1"
     rows = _request_json(config, "GET", "rfb_processing_jobs", query)
@@ -91,6 +98,8 @@ def _queued_job(config: WorkerConfig) -> dict[str, Any] | None:
             "status": "running",
             "progress": 5,
             "current_step": "claimed",
+            "heartbeat_at": _now_iso(),
+            "lease_expires_at": None,
             "worker_id": config.worker_id,
             "attempts": int(job.get("attempts") or 0) + 1,
             "started_at": _now_iso(),
@@ -100,7 +109,64 @@ def _queued_job(config: WorkerConfig) -> dict[str, Any] | None:
     return claimed[0] if claimed else None
 
 
-def _complete_request(config: WorkerConfig, job: dict[str, Any], export_result: dict[str, Any]) -> None:
+def _cancel_requested(config: WorkerConfig, job: dict[str, Any]) -> bool:
+    rows = _request_json(config, "GET", "rfb_processing_jobs", f"{_job_id_query(job)}&select=cancel_requested_at&limit=1")
+    if not isinstance(rows, list) or not rows:
+        return False
+    return bool(rows[0].get("cancel_requested_at"))
+
+
+def _patch_progress(config: WorkerConfig, job: dict[str, Any], progress: ProviderProgress) -> None:
+    percent = 10
+    if progress.step == "page_read":
+        percent = min(85, 20 + progress.pages_read * 3)
+    elif progress.step == "search_finished":
+        percent = 88
+    _patch(
+        config,
+        "rfb_processing_jobs",
+        _job_id_query(job),
+        {
+            "progress": percent,
+            "current_step": progress.step,
+            "search_stats": {
+                "provider": progress.provider,
+                "pages_read": progress.pages_read,
+                "records_seen": progress.records_seen,
+                "records_kept": progress.records_kept,
+                "message": progress.message,
+                "metadata": progress.metadata,
+            },
+            "heartbeat_at": _now_iso(),
+            "updated_at": _now_iso(),
+        },
+    )
+    if progress.message or progress.step == "page_read":
+        _log(
+            config,
+            job,
+            progress.step,
+            progress.message or f"Pagina {progress.pages_read}: {progress.records_kept} registros elegiveis.",
+        )
+
+
+async def _search_records(config: WorkerConfig, job: dict[str, Any]) -> tuple[list[Any], dict[str, Any]]:
+    provider = get_company_search_provider(config)
+    filters = _filters_from_dict(job.get("filters_snapshot") or {})
+
+    async def progress_callback(progress: ProviderProgress) -> None:
+        _patch_progress(config, job, progress)
+
+    async def cancel_callback() -> bool:
+        return _cancel_requested(config, job)
+
+    result = await provider.search(filters, progress_callback=progress_callback, cancel_callback=cancel_callback)
+    if result.stopped_reason == "cancelled":
+        raise RuntimeError("Job cancelado pelo administrador.")
+    return list(result.records), result.stats()
+
+
+def _complete_request(config: WorkerConfig, job: dict[str, Any], export_result: dict[str, Any], search_stats: dict[str, Any]) -> None:
     request_id = str(job.get("request_id") or "")
     export_path = str(export_result.get("path") or "")
     format_name = str(export_result.get("format") or Path(export_path).suffix.lstrip(".") or "xlsx")
@@ -128,13 +194,21 @@ def _complete_request(config: WorkerConfig, job: dict[str, Any], export_result: 
                 "storage_path": export_path,
                 "filters_snapshot": job.get("filters_snapshot") or {},
                 "fields_snapshot": fields,
+                "generated_by": "rfb_worker_minha_receita",
             },
         )
     _patch(
         config,
         "rfb_processing_jobs",
-        f"?id=eq.{urllib.parse.quote(str(job['id']))}",
-        {"status": "completed", "progress": 100, "current_step": "completed", "finished_at": _now_iso(), "updated_at": _now_iso()},
+        _job_id_query(job),
+        {
+            "status": "completed",
+            "progress": 100,
+            "current_step": "completed",
+            "search_stats": search_stats,
+            "finished_at": _now_iso(),
+            "updated_at": _now_iso(),
+        },
     )
     if request_id:
         _patch(config, "custom_requests", f"?id=eq.{urllib.parse.quote(request_id)}", {"status": "ready", "updated_at": _now_iso()})
@@ -147,17 +221,17 @@ def process_one_queued_job(config: WorkerConfig) -> dict[str, Any]:
     try:
         _log(config, job, "running", "Worker local assumiu o job CNPJ.")
         filters = _filters_from_dict(job.get("filters_snapshot") or {})
-        records = _load_records_from_data_dir(Path(config.data_dir))
+        records, search_stats = asyncio.run(_search_records(config, job))
         if not records:
-            raise RuntimeError("Nenhum arquivo CSV/JSON encontrado no diretorio de dados da Receita.")
+            raise RuntimeError("A busca na Minha Receita nao retornou empresas elegiveis para os filtros informados.")
         _patch(
             config,
             "rfb_processing_jobs",
-            f"?id=eq.{urllib.parse.quote(str(job['id']))}",
+            _job_id_query(job),
             {"progress": 35, "current_step": "exporting", "updated_at": _now_iso()},
         )
         export_result = run_job(records, filters, Path(config.output_dir))
-        _complete_request(config, job, export_result)
+        _complete_request(config, job, export_result, search_stats)
         _log(config, job, "completed", f"Export gerado com {export_result.get('row_count', 0)} linhas.")
         return {"ok": True, "status": "completed", "jobId": job.get("id"), "export": export_result}
     except Exception as error:
@@ -165,8 +239,15 @@ def process_one_queued_job(config: WorkerConfig) -> dict[str, Any]:
         _patch(
             config,
             "rfb_processing_jobs",
-            f"?id=eq.{urllib.parse.quote(str(job['id']))}",
-            {"status": "failed", "current_step": "failed", "error_message": message, "finished_at": _now_iso(), "updated_at": _now_iso()},
+            _job_id_query(job),
+            {
+                "status": "failed",
+                "current_step": "failed",
+                "error_message": message,
+                "provider_error_code": type(error).__name__,
+                "finished_at": _now_iso(),
+                "updated_at": _now_iso(),
+            },
         )
         _log(config, job, "failed", message, "error")
         return {"ok": False, "status": "failed", "jobId": job.get("id"), "message": message}

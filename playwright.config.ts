@@ -24,6 +24,7 @@ export default defineConfig({
         env: {
           ...process.env,
           ADMIN_API_TOKEN: process.env.ADMIN_API_TOKEN || "playwright-admin-token",
+          ENABLE_BREAK_GLASS_ADMIN: "true",
           ENABLE_ADMIN_TOKEN_LOGIN: "true",
           NEXT_PUBLIC_ENABLE_ADMIN_TOKEN_LOGIN: "true",
         },

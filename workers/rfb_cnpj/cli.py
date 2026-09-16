@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 import csv
 import json
 import sys
@@ -15,6 +16,7 @@ from workers.rfb_cnpj.job_runner import run_job
 from workers.rfb_cnpj.models import CnpjFilters, CnpjRecord
 from workers.rfb_cnpj.parser import parse_sample_rows
 from workers.rfb_cnpj.privacy import allowed_export_fields, classify_privacy_risk
+from workers.rfb_cnpj.providers import get_company_search_provider
 from workers.rfb_cnpj.validate_data_dir import validate_data_dir
 
 
@@ -61,10 +63,15 @@ def _filters_from_dict(payload: dict[str, Any]) -> CnpjFilters:
         city=payload.get("city") or payload.get("cidade"),
         concessionaria=payload.get("concessionaria"),
         opening_period=payload.get("openingPeriod") or payload.get("opening_period"),
+        opening_date_start=payload.get("openingDateStart") or payload.get("opening_date_start"),
+        opening_date_end=payload.get("openingDateEnd") or payload.get("opening_date_end"),
         company_size=tuple_value("companySize", "company_size") or ("ME", "EPP"),
         registration_status=str(payload.get("registrationStatus") or payload.get("registration_status") or "ATIVA"),
         branch_type=str(payload.get("branchType") or payload.get("branch_type") or "QUALQUER"),
         cnaes=tuple_value("cnaes"),
+        include_secondary_cnaes=bool(payload.get("includeSecondaryCnaes", payload.get("include_secondary_cnaes", True))),
+        exclude_mei=bool(payload.get("excludeMei", payload.get("exclude_mei", True))),
+        only_headquarters=bool(payload.get("onlyHeadquarters", payload.get("only_headquarters", False))),
         min_capital_social=payload.get("minCapital") or payload.get("min_capital_social"),
         max_capital_social=payload.get("maxCapital") or payload.get("max_capital_social"),
         quantity=int(payload.get("quantity") or 500),
@@ -155,6 +162,56 @@ def run_job_from_supabase(job_id: str) -> dict[str, object]:
     return {"ok": True, "status": "queued_external_worker", "jobId": job_id}
 
 
+async def provider_health() -> dict[str, object]:
+    provider = get_company_search_provider(load_config())
+    health = await provider.health()
+    return {
+        "ok": health.status == "ONLINE",
+        "provider": health.provider,
+        "status": health.status,
+        "latency_ms": health.latency_ms,
+        "message": health.message,
+    }
+
+
+async def search_provider(args: argparse.Namespace) -> dict[str, object]:
+    output = Path(args.output or "outputs/rfb-cnpj/resultado.xlsx")
+    suffix_format = output.suffix.lstrip(".").lower()
+    delivery_format = args.delivery_format or (suffix_format if suffix_format in {"csv", "xlsx"} else "xlsx")
+    cnaes = tuple(str(item).replace(".", "").replace("-", "") for item in (args.cnae or []) if str(item).strip())
+    filters = CnpjFilters(
+        segment=args.segment or "base-cnpj",
+        uf=args.uf,
+        city=args.city,
+        cnaes=cnaes,
+        company_size=("QUALQUER",),
+        quantity=args.quantity,
+        delivery_format=delivery_format,
+        include_secondary_cnaes=not args.primary_cnae_only,
+        exclude_mei=False,
+        fields=tuple(args.field or allowed_export_fields()),
+    )
+    provider = get_company_search_provider(load_config())
+    search_result = await provider.search(filters)
+    export_result = run_job(list(search_result.records), filters, output.parent)
+    generated_path = Path(str(export_result.get("path") or output))
+    if generated_path != output and generated_path.exists():
+        output.parent.mkdir(parents=True, exist_ok=True)
+        copyfile(generated_path, output)
+        generated_path = output
+    return {
+        "ok": True,
+        "provider": search_result.provider,
+        "stats": search_result.stats(),
+        "export": {
+            "path": str(generated_path),
+            "row_count": export_result.get("row_count", 0),
+            "format": export_result.get("format", delivery_format),
+            "files": [str(path) for path in export_result.get("files", [])],
+        },
+    }
+
+
 def main() -> None:
     config = load_config()
     if len(sys.argv) > 1 and sys.argv[1] == "data":
@@ -177,6 +234,8 @@ def main() -> None:
             "export",
             "run-job",
             "run-local",
+            "search",
+            "provider",
             "watch",
         ],
     )
@@ -187,6 +246,15 @@ def main() -> None:
     parser.add_argument("--job-id")
     parser.add_argument("--once", action="store_true")
     parser.add_argument("--interval-seconds", type=int, default=15)
+    parser.add_argument("provider_command", nargs="?", default="health")
+    parser.add_argument("--uf")
+    parser.add_argument("--city")
+    parser.add_argument("--segment")
+    parser.add_argument("--cnae", action="append")
+    parser.add_argument("--quantity", type=int, default=100)
+    parser.add_argument("--format", dest="delivery_format", choices=["csv", "xlsx", "both"])
+    parser.add_argument("--field", action="append")
+    parser.add_argument("--primary-cnae-only", action="store_true")
     args = parser.parse_args()
 
     if args.command == "discover":
@@ -207,6 +275,13 @@ def main() -> None:
         result = run_local(Path(args.filters) if args.filters else None, Path(args.output or "outputs/rfb-cnpj/output.xlsx"), Path(args.data_dir) if args.data_dir else None)
     elif args.command == "run-job":
         result = run_job_from_supabase(args.job_id or "")
+    elif args.command == "provider":
+        if args.provider_command != "health":
+            result = {"ok": False, "status": "invalid", "message": "Comando provider suportado: health."}
+        else:
+            result = asyncio.run(provider_health())
+    elif args.command == "search":
+        result = asyncio.run(search_provider(args))
     elif args.command == "watch":
         from workers.rfb_cnpj.queue import watch_queue
 

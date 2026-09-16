@@ -10,6 +10,11 @@ export type CnpjJob = {
   filtersSnapshot: Record<string, unknown>;
   rowsMatched: number;
   rowsExported: number;
+  progress?: number;
+  currentStep?: string;
+  searchProvider?: string;
+  searchStats?: Record<string, unknown>;
+  warningMessage?: string;
   logs: string[];
   error?: string;
 };

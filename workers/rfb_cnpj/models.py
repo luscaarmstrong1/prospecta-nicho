@@ -12,10 +12,15 @@ class CnpjFilters:
     city: str | None = None
     concessionaria: str | None = None
     opening_period: str | None = None
+    opening_date_start: str | None = None
+    opening_date_end: str | None = None
     company_size: tuple[str, ...] = ("ME", "EPP")
     registration_status: str = "ATIVA"
     branch_type: str = "QUALQUER"
     cnaes: tuple[str, ...] = ()
+    include_secondary_cnaes: bool = True
+    exclude_mei: bool = True
+    only_headquarters: bool = False
     min_capital_social: float | None = None
     max_capital_social: float | None = None
     quantity: int = 500

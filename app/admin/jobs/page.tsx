@@ -10,7 +10,9 @@ export default async function AdminJobsPage() {
 
   return (
     <AdminShell title="Jobs do worker CNPJ" eyebrow="Processamento externo">
-      <p className="lead">O Next.js controla a fila; o processamento pesado dos arquivos da Receita fica no worker Python.</p>
+      <p className="lead">
+        O Next.js controla a fila; o worker Python consulta dados públicos de CNPJ via Minha Receita, filtra, pontua e gera os exports.
+      </p>
       <div className="admin-panel">
         <div className="admin-table">
           {jobs.length ? (
@@ -18,7 +20,8 @@ export default async function AdminJobsPage() {
               <div className="admin-table-row" key={job.id}>
                 <strong>{job.id}</strong>
                 <span>{job.status}</span>
-                <span>{job.worker}</span>
+                <span>{job.searchProvider || job.worker}</span>
+                <span>{job.progress ?? 0}%</span>
                 <span>{job.rowsExported} linhas exportadas</span>
                 {job.status === "queued" || job.status === "running" ? <CnpjJobCompleteForm jobId={job.id} /> : null}
               </div>

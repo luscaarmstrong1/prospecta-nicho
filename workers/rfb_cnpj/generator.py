@@ -10,7 +10,7 @@ from workers.rfb_cnpj.scoring import score_record
 
 def generate_export(records: list[CnpjRecord], filters: CnpjFilters, output_dir: Path) -> ExportResult:
     selected = apply_filters(records, filters)
-    ranked = sorted(selected, key=score_record, reverse=True)
+    ranked = sorted(selected, key=score_record, reverse=True)[: max(filters.quantity, 1)]
     filename_base = f"prospectanicho-cnpj-{filters.segment.lower().replace(' ', '-')}"
     if filters.delivery_format == "both":
         csv_result = write_csv(ranked, filters.fields, output_dir / f"{filename_base}.csv")

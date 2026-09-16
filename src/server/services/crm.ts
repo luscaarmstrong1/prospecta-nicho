@@ -261,6 +261,7 @@ function rowToCrmRequest(
 
 function rowToCnpjJob(row: Record<string, unknown>): CnpjJob {
   const logs = stringArrayValue(row.logs);
+  const searchStats = objectValue<Record<string, unknown>>(row.search_stats, {});
   return {
     id: stringValue(row.id),
     requestId: stringValue(row.request_id),
@@ -269,8 +270,13 @@ function rowToCnpjJob(row: Record<string, unknown>): CnpjJob {
     status: stringValue(row.status, "queued") as CnpjJob["status"],
     worker: "rfb_cnpj",
     filtersSnapshot: objectValue(row.filters_snapshot, {}),
-    rowsMatched: numberValue(row.rows_matched),
+    rowsMatched: numberValue(row.rows_matched, numberValue(searchStats.records_kept)),
     rowsExported: numberValue(row.rows_exported, numberValue(row.row_count)),
+    progress: numberValue(row.progress),
+    currentStep: stringValue(row.current_step) || undefined,
+    searchProvider: stringValue(row.search_provider, "minha_receita"),
+    searchStats,
+    warningMessage: stringValue(row.warning_message) || undefined,
     logs,
     error: stringValue(row.error_message, stringValue(row.error)) || undefined,
   };
@@ -406,8 +412,16 @@ export async function createCnpjJob(id: string) {
   await persistLead("rfb_processing_jobs", {
     id: job.id,
     request_id: request.id,
+    job_type: "rfb_export",
     status: job.status,
     current_step: "queued",
+    progress: 0,
+    search_provider: "minha_receita",
+    filters_snapshot: job.filtersSnapshot,
+    search_stats: {
+      provider: "minha_receita",
+      created_from: "admin_crm",
+    },
   });
   await persistLead("rfb_job_logs", {
     jobId: job.id,
@@ -419,6 +433,7 @@ export async function createCnpjJob(id: string) {
   });
   await updateLead("custom_requests", next.id, {
     status: next.status,
+    job_id: job.id,
     updated_at: next.updatedAt,
   });
   await recordRequestEvent(next.id, next.status, `Job ${job.id} criado e colocado na fila do worker.`, { jobId: job.id });
@@ -747,6 +762,7 @@ export function getCrmSettings() {
     supabase: Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY),
     storage: process.env.R2_BUCKET ? "Cloudflare R2/S3" : process.env.SUPABASE_URL ? "Supabase Storage" : "local controlado",
     worker: "workers/rfb_cnpj",
+    provider: "Minha Receita como provider padrao para dados publicos de CNPJ",
     enrichment: "bloqueado por padrao; liberacao manual apos pagamento do add-on",
   };
 }

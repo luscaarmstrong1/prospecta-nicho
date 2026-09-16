@@ -80,7 +80,7 @@ def write_xlsx(
     summary.append(["linhas_exportadas", len(rows)])
     summary.append(["campos_exportados", len(fields)])
     summary.append(["gerado_em_utc", datetime.now(UTC).isoformat()])
-    summary.append(["origem", "Dados publicos de CNPJ da Receita Federal"])
+    summary.append(["origem", "Dados publicos do CNPJ da Receita Federal, consultados por meio da API Minha Receita"])
     summary.append(["enriquecimento", "nao incluso no export padrao"])
 
     applied = workbook.create_sheet("Filtros aplicados")

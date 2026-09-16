@@ -12,7 +12,7 @@ export function getBearerToken(request: Request) {
 export async function requireAdmin(request: Request, permission: AdminPermission = "admin:read") {
   const token = getBearerToken(request);
   const expected = env("ADMIN_API_TOKEN");
-  if (expected && token === expected) return null;
+  if (env("ENABLE_BREAK_GLASS_ADMIN") === "true" && expected && token === expected) return null;
   if (!token) return errorJson(request, "ADMIN_UNAUTHORIZED", "Sessao administrativa invalida.", 401);
 
   try {
