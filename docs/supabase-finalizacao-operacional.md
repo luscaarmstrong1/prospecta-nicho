@@ -66,7 +66,7 @@ NEXT_PUBLIC_WHATSAPP_NUMBER=5535998905896
 
 Depois, rodar novamente o workflow de Pages.
 
-## Validacao apos deploy
+## Validação apos deploy
 
 Validar a saude das funcoes:
 
