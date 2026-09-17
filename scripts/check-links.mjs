@@ -3,7 +3,8 @@ import { join } from "node:path";
 import { publicRoutes } from "../lib/routes.ts";
 
 const roots = ["app", "components", "lib"];
-const localRouteSet = new Set(publicRoutes);
+const normalizeRoute = (route) => route === "/" ? route : route.replace(/\/+$/, "");
+const localRouteSet = new Set(publicRoutes.map(normalizeRoute));
 const failures = [];
 
 async function* walk(dir) {
@@ -23,7 +24,7 @@ for (const root of roots) {
       const href = match[1];
       if (!href || href === "#") failures.push(`${file}: link vazio`);
       if (/localhost|127\.0\.0\.1|:3000|:3001|javascript:/i.test(href)) failures.push(`${file}: link proibido ${href}`);
-      const routeOnly = href.split("?")[0].split("#")[0];
+      const routeOnly = normalizeRoute(href.split("?")[0].split("#")[0]);
       if (routeOnly.startsWith("/") && !routeOnly.includes("[") && !localRouteSet.has(routeOnly) && !routeOnly.startsWith("/admin")) {
         failures.push(`${file}: rota não catalogada ${href}`);
       }
