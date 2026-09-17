@@ -46,16 +46,8 @@ const rolePermissions: Record<AdminRole, readonly AdminPermission[]> = {
   ],
   editor: [
     "admin:read",
-    "request:read",
-    "request:update",
-    "job:read",
-    "job:create",
-    "job:update",
-    "export:read",
-    "export:sign",
     "content:write",
     "settings:read",
-    "enrichment:offer",
   ],
   operator: [
     "admin:read",
@@ -65,7 +57,6 @@ const rolePermissions: Record<AdminRole, readonly AdminPermission[]> = {
     "job:create",
     "job:update",
     "export:read",
-    "export:sign",
   ],
   read: ["admin:read", "request:read", "job:read", "export:read", "settings:read"],
 };

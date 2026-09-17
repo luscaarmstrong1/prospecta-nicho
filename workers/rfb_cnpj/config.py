@@ -53,11 +53,22 @@ class WorkerConfig:
     minha_receita_oversample_factor: int = int(getenv("MINHA_RECEITA_OVERSAMPLE_FACTOR") or "2")
     minha_receita_cache_dir: str = _default_cache_dir()
     ibge_timeout_seconds: float = float(getenv("IBGE_TIMEOUT_SECONDS") or "20")
+    ibge_cache_ttl_hours: int = int(getenv("IBGE_CACHE_TTL_HOURS") or "720")
     export_retention_days: int = int(getenv("EXPORT_RETENTION_DAYS") or "30")
     worker_lease_seconds: int = int(getenv("RFB_WORKER_LEASE_SECONDS") or "300")
     worker_heartbeat_seconds: int = int(getenv("RFB_WORKER_HEARTBEAT_SECONDS") or "30")
+    worker_heartbeat_max_failures: int = int(getenv("RFB_WORKER_HEARTBEAT_MAX_FAILURES") or "3")
     job_max_attempts: int = int(getenv("RFB_JOB_MAX_ATTEMPTS") or "3")
 
 
 def load_config() -> WorkerConfig:
-    return WorkerConfig()
+    config = WorkerConfig()
+    if config.export_delivery_mode not in {"local", "storage"}:
+        raise ValueError("EXPORT_DELIVERY_MODE deve ser 'local' ou 'storage'.")
+    if config.worker_heartbeat_seconds < 5:
+        raise ValueError("RFB_WORKER_HEARTBEAT_SECONDS deve ser pelo menos 5.")
+    if config.worker_lease_seconds <= config.worker_heartbeat_seconds * 2:
+        raise ValueError("RFB_WORKER_LEASE_SECONDS deve ser maior que o dobro do heartbeat.")
+    if config.worker_heartbeat_max_failures < 1 or config.job_max_attempts < 1:
+        raise ValueError("Limites de falha e tentativas devem ser positivos.")
+    return config

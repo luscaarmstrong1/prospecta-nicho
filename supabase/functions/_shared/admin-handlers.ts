@@ -92,36 +92,12 @@ export async function adminCreateJob(request: Request) {
 export async function adminCompleteJob(request: Request) {
   const denied = await requireAdmin(request, "job:update");
   if (denied) return denied;
-  const jobId = idFrom(request);
-  const body = await request.json().catch(() => ({})) as Record<string, unknown>;
-  const fileUrl = text(body.fileUrl || body.storagePath || body.storage_path, 1000);
-  if (!jobId || !fileUrl) return errorJson(request, "INVALID_EXPORT", "Informe job e arquivo privado.", 400);
-  const supabase = serviceClient();
-  const { data: job } = await supabase.from("rfb_processing_jobs").select("*").eq("id", jobId).maybeSingle();
-  if (!job) return errorJson(request, "JOB_NOT_FOUND", "Job nao encontrado.", 404);
-  const format = text(body.format || body.fileFormat || body.file_format, 20) || "xlsx";
-  const { data: existingExport } = await supabase
-    .from("exports")
-    .select("*")
-    .eq("job_id", jobId)
-    .eq("file_format", format)
-    .maybeSingle();
-  const { data, error } = existingExport
-    ? { data: existingExport, error: null }
-    : await supabase.from("exports").insert({
-    request_id: job.request_id,
-    job_id: jobId,
-    status: "ready",
-    signed_url: fileUrl.startsWith("http") ? fileUrl : null,
-    storage_path: fileUrl.startsWith("http") ? null : fileUrl,
-    row_count: numberValue(body.rowCount, 0),
-    file_format: format,
-  }).select("*").single();
-  if (error) return errorJson(request, "EXPORT_CREATE_FAILED", error.message, 500);
-  await supabase.from("rfb_processing_jobs").update({ status: "completed", progress: 100, completed_at: new Date().toISOString() }).eq("id", jobId);
-  await supabase.from("custom_requests").update({ status: "export_ready", export_id: data.id, updated_at: new Date().toISOString() }).eq("id", job.request_id);
-  await event(supabase, job.request_id, "export_ready", "Export XLSX registrado e pronto para link temporario.", { exportId: data.id });
-  return json(request, { ok: true, export: data });
+  return errorJson(
+    request,
+    "WORKER_FINALIZATION_REQUIRED",
+    "A conclusao manual foi desativada. O worker local registra o export validado de forma transacional.",
+    409,
+  );
 }
 
 export async function adminSignExport(request: Request) {

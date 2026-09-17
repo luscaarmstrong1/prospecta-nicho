@@ -6,7 +6,7 @@ import csv
 import json
 import os
 import sys
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from shutil import copyfile
 from pathlib import Path
 from typing import Any
@@ -16,6 +16,7 @@ from workers.rfb_cnpj.data_cli import handle_data_command
 from workers.rfb_cnpj.discover import expected_groups
 from workers.rfb_cnpj.job_runner import run_job
 from workers.rfb_cnpj.models import CnpjFilters, CnpjRecord
+from workers.rfb_cnpj.normalization import parse_decimal, tri_state_bool
 from workers.rfb_cnpj.parser import parse_sample_rows
 from workers.rfb_cnpj.privacy import allowed_export_fields, classify_privacy_risk
 from workers.rfb_cnpj.providers import get_company_search_provider
@@ -68,11 +69,28 @@ def _filters_from_dict(payload: dict[str, Any]) -> CnpjFilters:
             value = payload.get(key)
             if value in {None, ""}:
                 continue
-            try:
-                return Decimal(str(value).replace(".", "").replace(",", "."))
-            except (InvalidOperation, TypeError, ValueError):
-                continue
+            parsed = parse_decimal(value)
+            if parsed is not None:
+                return parsed
         return None
+
+    def boolean_value(default: bool, *keys: str) -> bool:
+        for key in keys:
+            if key not in payload:
+                continue
+            parsed = tri_state_bool(payload.get(key))
+            if parsed is not None:
+                return parsed
+        return default
+
+    def quantity_value() -> int:
+        raw_quantity = payload.get("quantity")
+        if raw_quantity in (None, ""):
+            return 500
+        try:
+            return min(max(int(raw_quantity), 1), 100_000)
+        except (TypeError, ValueError):
+            return 500
 
     return CnpjFilters(
         segment=str(payload.get("segment") or payload.get("segmento") or "Geral"),
@@ -89,12 +107,12 @@ def _filters_from_dict(payload: dict[str, Any]) -> CnpjFilters:
         registration_status=str(payload.get("registrationStatus") or payload.get("registration_status") or "ATIVA"),
         branch_type=str(payload.get("branchType") or payload.get("branch_type") or "QUALQUER"),
         cnaes=tuple_value("cnaes"),
-        include_secondary_cnaes=bool(payload.get("includeSecondaryCnaes", payload.get("include_secondary_cnaes", True))),
-        exclude_mei=bool(payload.get("excludeMei", payload.get("exclude_mei", True))),
-        only_headquarters=bool(payload.get("onlyHeadquarters", payload.get("only_headquarters", False))),
+        include_secondary_cnaes=boolean_value(True, "includeSecondaryCnaes", "include_secondary_cnaes"),
+        exclude_mei=boolean_value(True, "excludeMei", "exclude_mei"),
+        only_headquarters=boolean_value(False, "onlyHeadquarters", "only_headquarters"),
         min_capital_social=numeric_value("minCapital", "min_capital_social", "min_capital"),
         max_capital_social=numeric_value("maxCapital", "max_capital_social", "max_capital"),
-        quantity=int(payload.get("quantity") or 500),
+        quantity=quantity_value(),
         public_code=payload.get("publicCode") or payload.get("public_code"),
         fields=tuple_value("fields", "campos") or allowed_export_fields(),
         delivery_format=str(payload.get("deliveryFormat") or payload.get("delivery_format") or "xlsx"),

@@ -11,7 +11,7 @@ from typing import Any
 import httpx
 
 
-IBGE_MUNICIPIOS_URL = "https://servicodados.ibge.gov.br/api/v1/localidades/municipios"
+IBGE_MUNICIPIOS_URL = "https://servicodados.ibge.gov.br/api/v1/localidades/estados/{uf}/municipios"
 
 
 def normalize_municipality(value: str | None) -> str:
@@ -40,10 +40,12 @@ class MunicipalityResolver:
         cache_path: Path,
         *,
         timeout_seconds: float = 20,
+        cache_ttl_hours: int = 720,
         transport: httpx.AsyncBaseTransport | None = None,
     ) -> None:
         self.cache_path = cache_path
         self.timeout_seconds = timeout_seconds
+        self.cache_ttl_hours = max(cache_ttl_hours, 0)
         self.transport = transport
         self.cache_hits = 0
         self.cache_misses = 0
@@ -70,12 +72,13 @@ class MunicipalityResolver:
         with sqlite3.connect(self.cache_path) as conn:
             row = conn.execute(
                 """
-                select ibge_code, official_name from municipios_ibge
+                select ibge_code, official_name, resolved_at from municipios_ibge
                 where uf = ? and normalized_city = ?
                 """,
                 (uf.upper(), normalized),
             ).fetchone()
-        if not row:
+        cutoff = int(time.time()) - self.cache_ttl_hours * 3600
+        if not row or self.cache_ttl_hours == 0 or int(row[2]) < cutoff:
             self.cache_misses += 1
             return None
         self.cache_hits += 1
@@ -138,7 +141,7 @@ class MunicipalityResolver:
 
         normalized = normalize_municipality(city_text)
         async with httpx.AsyncClient(timeout=self.timeout_seconds, transport=self.transport) as client:
-            response = await client.get(IBGE_MUNICIPIOS_URL, params={"orderBy": "nome"})
+            response = await client.get(IBGE_MUNICIPIOS_URL.format(uf=uf_code), params={"orderBy": "nome"})
             response.raise_for_status()
             payload = response.json()
         municipalities = payload if isinstance(payload, list) else []
@@ -146,12 +149,7 @@ class MunicipalityResolver:
             if not isinstance(item, dict):
                 continue
             official_name = str(item.get("nome") or "")
-            item_uf = (
-                (((item.get("microrregiao") or {}).get("mesorregiao") or {}).get("UF") or {}).get("sigla")
-                if isinstance(item.get("microrregiao"), dict)
-                else None
-            )
-            if str(item_uf or "").upper() == uf_code and normalize_municipality(official_name) == normalized:
+            if normalize_municipality(official_name) == normalized:
                 resolved = ResolvedMunicipality(
                     uf=uf_code,
                     requested_name=city_text,

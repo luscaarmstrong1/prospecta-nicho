@@ -7,7 +7,8 @@ from workers.rfb_cnpj.city_mapping import cities_for_concessionaria
 from workers.rfb_cnpj.cnae_mapping import cnaes_for_segment
 from workers.rfb_cnpj.models import CnpjFilters
 from workers.rfb_cnpj.municipality_resolver import ResolvedMunicipality, only_digits
-from workers.rfb_cnpj.providers.models import QueryTooBroadError
+from workers.rfb_cnpj.normalization import normalize_cnae
+from workers.rfb_cnpj.providers.models import MunicipalityNotResolvedError, QueryTooBroadError
 
 
 @dataclass(frozen=True)
@@ -25,7 +26,7 @@ class QueryPlanner:
     def cnaes_for(filters: CnpjFilters) -> tuple[str, ...]:
         return tuple(
             code
-            for code in (only_digits(cnae) for cnae in (filters.cnaes or cnaes_for_segment(filters.segment)))
+            for code in (normalize_cnae(cnae) for cnae in (filters.cnaes or cnaes_for_segment(filters.segment)))
             if code
         )
 
@@ -52,11 +53,30 @@ class QueryPlanner:
         resolved: list[ResolvedMunicipality] = []
 
         if city_names:
+            if len(city_names) > 1 and filters.city_ibge_code:
+                raise MunicipalityNotResolvedError(
+                    "city_ibge_code so pode ser usado quando uma unica cidade foi solicitada."
+                )
+            if city_codes and len(city_codes) != len(city_names):
+                raise MunicipalityNotResolvedError(
+                    "A quantidade de codigos IBGE deve corresponder exatamente a quantidade de cidades."
+                )
+            unresolved: list[str] = []
             for index, city in enumerate(city_names):
-                known_code = filters.city_ibge_code if index == 0 and filters.city_ibge_code else (city_codes[index] if index < len(city_codes) else None)
+                known_code = None
+                if len(city_names) == 1 and filters.city_ibge_code:
+                    known_code = filters.city_ibge_code
+                elif city_codes:
+                    known_code = city_codes[index]
                 municipality = await resolver.resolve(city, filters.uf, known_code)
                 if municipality:
                     resolved.append(municipality)
+                else:
+                    unresolved.append(city)
+            if unresolved:
+                raise MunicipalityNotResolvedError(
+                    "Nao foi possivel resolver no IBGE: " + ", ".join(unresolved) + ". Corrija cidade/UF antes de processar."
+                )
         elif city_codes:
             for code in city_codes:
                 municipality = resolver.from_known_code("", filters.uf, code)

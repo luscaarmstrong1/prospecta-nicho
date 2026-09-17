@@ -6,6 +6,7 @@ from datetime import UTC, date, datetime, timedelta
 from workers.rfb_cnpj.city_mapping import cities_for_concessionaria, normalize_city
 from workers.rfb_cnpj.cnae_mapping import cnaes_for_segment
 from workers.rfb_cnpj.models import CnpjFilters, CnpjRecord
+from workers.rfb_cnpj.normalization import normalize_company_size, tri_state_bool
 
 
 def _same(value: str | None, expected: str | None) -> bool:
@@ -35,7 +36,7 @@ def _parse_date(value: str | None) -> date | None:
     text = str(value or "").strip()
     if not text:
         return None
-    for pattern in ("%Y-%m-%d", "%d/%m/%Y"):
+    for pattern in ("%Y-%m-%d", "%d/%m/%Y", "%Y%m%d"):
         try:
             return datetime.strptime(text, pattern).date()
         except ValueError:
@@ -113,9 +114,13 @@ def matches_filters(record: CnpjRecord, filters: CnpjFilters) -> bool:
         return False
     if filters.only_headquarters and not _same(record.matriz_filial, "MATRIZ"):
         return False
-    if filters.company_size and "QUALQUER" not in filters.company_size and record.porte not in filters.company_size:
+    expected_sizes = {normalize_company_size(size) for size in filters.company_size}
+    if expected_sizes and "QUALQUER" not in expected_sizes and normalize_company_size(record.porte) not in expected_sizes:
         return False
-    if filters.exclude_mei and str(record.porte or "").strip().casefold() == "mei":
+    if filters.exclude_mei and (
+        str(record.porte or "").strip().casefold() == "mei"
+        or tri_state_bool(record.extra.get("mei")) is True
+    ):
         return False
     if not _record_matches_cnae(record, cnaes, filters.include_secondary_cnaes):
         return False

@@ -20,8 +20,8 @@ test("CRM nao processa Receita dentro de API route", () => {
   assert.match(crmService, /worker: "rfb_cnpj"/);
   assert.match(crmService, /Job CNPJ criado/);
   assert.doesNotMatch(createJobRoute, /spawn|exec|python|duckdb|polars/i);
-  assert.match(completeJobRoute, /completeJobWithExport/);
-  assert.match(completeJobRoute, /fileUrl/);
+  assert.match(completeJobRoute, /WORKER_FINALIZATION_REQUIRED/);
+  assert.doesNotMatch(completeJobRoute, /fileUrl|completeJobWithExport/);
   assert.doesNotMatch(completeJobRoute, /spawn|exec|python|duckdb|polars/i);
 });
 
@@ -50,7 +50,7 @@ test("admin pages e APIs ficam protegidas por sessao ou bearer token", () => {
   assert.match(sessionRoute, /httpOnly: true/);
 });
 
-test("exports exigem URL assinada e rota publica por protocolo nao libera arquivo", () => {
+test("links assinados opcionais sao protegidos e a rota publica nao libera arquivo", () => {
   const crmService = readFileSync("src/server/services/crm.ts", "utf8");
   const exportRoute = readFileSync("app/api/internal/exports/[id]/route.ts", "utf8");
   const exportsPage = readFileSync("app/admin/exportacoes/page.tsx", "utf8");
@@ -69,14 +69,13 @@ test("admin expoe fluxo operacional real do pedido ate entrega", () => {
   const detailPage = readFileSync("app/admin/requests/[id]/page.tsx", "utf8");
   const jobsPage = readFileSync("app/admin/jobs/page.tsx", "utf8");
   const requestActions = readFileSync("components/admin/CrmRequestActions.tsx", "utf8");
-  const completeForm = readFileSync("components/admin/CnpjJobCompleteForm.tsx", "utf8");
 
   for (const endpoint of ["validate", "mark-paid", "create-job", "mark-delivered", "mark-enrichment-paid", "run-enrichment"]) {
     assert.match(requestActions, new RegExp(endpoint));
   }
   assert.match(detailPage, /CrmRequestActions/);
-  assert.match(jobsPage, /CnpjJobCompleteForm/);
-  assert.match(completeForm, /\/api\/admin\/jobs\/\$\{jobId\}\/complete/);
+  assert.match(jobsPage, /Aguardando worker local/);
+  assert.doesNotMatch(jobsPage, /CnpjJobCompleteForm/);
 });
 
 test("enriquecimento permanece bloqueado e exige pagamento manual", () => {

@@ -2,6 +2,9 @@ from __future__ import annotations
 
 PROHIBITED_EXPORT_FIELDS = {
     "cpf",
+    "cnpf",
+    "qsa",
+    "socios",
     "socio",
     "nome_socio",
     "representante_legal",
@@ -34,6 +37,12 @@ def classify_privacy_risk(record: dict[str, object]) -> bool:
 
 
 def assert_no_prohibited_fields(fields: list[str]) -> None:
-    blocked = PROHIBITED_EXPORT_FIELDS.intersection({field.lower() for field in fields})
+    normalized = {str(field).strip().lower() for field in fields}
+    blocked = {
+        field
+        for field in normalized
+        if field in PROHIBITED_EXPORT_FIELDS
+        or any(fragment in field for fragment in ("cpf", "qsa", "socio", "representante_legal"))
+    }
     if blocked:
         raise ValueError(f"Campos proibidos para exportação padrão: {', '.join(sorted(blocked))}")

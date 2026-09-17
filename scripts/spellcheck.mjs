@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { execFileSync } from "node:child_process";
 
@@ -36,7 +36,9 @@ let failures = [];
 for (const root of roots) {
   for (const file of listFiles(root)) {
     if (file.split(/[\\/]/).some((part) => ignored.has(part))) continue;
-    const text = readFileSync(join(process.cwd(), file), "utf8");
+    const absolutePath = join(process.cwd(), file);
+    if (!existsSync(absolutePath)) continue;
+    const text = readFileSync(absolutePath, "utf8");
     const searchable = text
       .split(/\r?\n/)
       .filter((line) =>

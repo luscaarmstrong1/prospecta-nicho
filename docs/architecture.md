@@ -1,33 +1,33 @@
 # Arquitetura ProspectaNicho
 
-## Objetivo
+## Componentes
 
-A aplicação combina site público, editor de recorte, painel administrativo, APIs comerciais, pagamentos e pipeline de dados empresariais. A refatoração atual preserva o `app/` do Next.js na raiz para reduzir risco, mas introduz uma camada modular em `src/` para regras novas e código de manutenção.
+- `app/` e `components/`: site público e painel Next.js.
+- `src/lib/api/client.ts`: roteamento das chamadas estáticas para Edge Functions.
+- `src/server/` e `lib/server/`: regras e integrações server-side.
+- `supabase/migrations/`: banco, RLS, RPCs e autorização.
+- `supabase/functions/`: APIs públicas e administrativas.
+- `workers/rfb_cnpj/`: busca, filtros, supressão, score e export local.
 
-## Camadas
+## Topologia atual
 
-- `app/`: rotas Next.js, páginas, route handlers e entrypoints.
-- `components/`: componentes visuais existentes, separados por domínio quando já há subpastas (`admin`, `editor`).
-- `src/config/`: validação de ambiente e configuração runtime.
-- `src/schemas/`: schemas Zod compartilhados por APIs, testes e services.
-- `src/server/repositories/`: acesso indireto a persistência, e-mail e auditoria.
-- `src/server/services/`: regras de negócio chamadas por APIs.
-- `src/lib/security/`: helpers transversais como logger redigido.
-- `lib/server/`: integrações server-side já existentes; service role permanece isolada do client.
-- `supabase/`: schema SQL, RLS, storage buckets e políticas.
-- `workers/` e `infra/`: pipeline Receita Federal, filas e infraestrutura auxiliar.
+```text
+GitHub Pages -> Supabase Edge Functions -> Supabase Postgres/Auth
+                                            ^
+                                            |
+Worker Python local -> Minha Receita + IBGE + cache SQLite
+Worker Python local -> CSV/XLSX local -> entrega manual
+```
 
-## Regras
+## Limites de confiança
 
-- Componentes client não acessam `SUPABASE_SERVICE_ROLE_KEY`.
-- APIs validam payload com Zod e chamam services quando houver regra de negócio.
-- Services sanitizam dados e chamam repositories.
-- Dados sensíveis não são logados sem mascaramento.
-- Preços e produtos ficam no catálogo central, não hardcoded em componentes.
-- GitHub Pages é apenas publicação estática; backend real exige Vercel/API runtime.
+- O navegador usa somente chaves públicas do Supabase.
+- A Edge Function valida sessão e papel antes de qualquer ação administrativa.
+- A service role fica somente no worker/ambiente seguro.
+- O worker faz claim atômico e usa `run_id`, lease e heartbeat para impedir finalização por execução antiga.
+- O público enxerga somente dados mínimos de acompanhamento.
+- Arquivos locais não são servidos por URL pública.
 
-## Fluxos
+## Evoluções opcionais
 
-- Solicitação rápida: página pública -> `/api/custom-requests` em runtime server -> service -> `custom_requests`, `leads`, e-mail e auditoria.
-- Exportação: pedido aprovado por webhook -> geração em worker -> storage privado -> URL assinada com expiração.
-- Admin: deve evoluir de token administrativo para Supabase Auth + roles + RLS em todas as ações.
+Storage privado, links temporários, domínio próprio e runtime Next.js server podem ser adicionados no futuro. Nenhum deles é requisito da arquitetura operacional gratuita atual.

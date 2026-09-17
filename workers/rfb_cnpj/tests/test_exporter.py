@@ -3,6 +3,9 @@ from decimal import Decimal
 
 from openpyxl import load_workbook
 
+import pytest
+
+import workers.rfb_cnpj.exporter as exporter
 from workers.rfb_cnpj.exporter import write_csv, write_xlsx
 from workers.rfb_cnpj.models import CnpjFilters, CnpjRecord
 
@@ -34,3 +37,31 @@ def test_write_xlsx_creates_required_operational_sheets(tmp_path: Path):
     assert workbook["Leads"]["A1"].value == "cnpj"
     assert workbook["Leads"]["B2"].value == "'+Empresa Teste"
     assert workbook["Leads"]["E2"].value == 1234.56
+    assert workbook["Resumo"]["A2"].value == "protocolo"
+    assert workbook["Filtros aplicados"]["A2"].value == "segmento"
+    workbook.close()
+
+
+@pytest.mark.parametrize("dangerous", [" =SUM(1,1)", "\t@cmd", "\r-HYPERLINK('x')", "+1+1"])
+def test_csv_neutralizes_formula_injection_after_whitespace(tmp_path: Path, dangerous: str):
+    output = tmp_path / "formula.csv"
+
+    write_csv([CnpjRecord(cnpj="00000000000191", razao_social=dangerous)], ("cnpj", "razao_social"), output)
+
+    content = output.read_text(encoding="utf-8-sig")
+    assert "00000000000191" in content
+    assert ";'" in content
+
+
+def test_csv_failure_removes_temporary_and_final_files(tmp_path: Path, monkeypatch):
+    output = tmp_path / "base.csv"
+
+    def fail_validation(*_args, **_kwargs):
+        raise RuntimeError("falha simulada")
+
+    monkeypatch.setattr(exporter, "_validate_csv", fail_validation)
+    with pytest.raises(RuntimeError, match="falha simulada"):
+        write_csv([CnpjRecord(cnpj="00000000000191", razao_social="Empresa")], ("cnpj", "razao_social"), output)
+
+    assert not output.exists()
+    assert list(tmp_path.iterdir()) == []

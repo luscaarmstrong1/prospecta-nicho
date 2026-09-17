@@ -55,6 +55,10 @@ alter table public.custom_requests add column if not exists enrichment_status te
 alter table public.custom_requests add column if not exists internal_notes text;
 alter table public.custom_requests add column if not exists updated_at timestamptz not null default now();
 alter table public.custom_requests add column if not exists delivered_at timestamptz;
+alter table public.custom_requests add column if not exists commercial_goal text;
+alter table public.custom_requests add column if not exists job_id uuid;
+alter table public.custom_requests add column if not exists export_id uuid;
+alter table public.custom_requests add column if not exists warning_message text;
 
 create unique index if not exists custom_requests_public_code_uidx
 on public.custom_requests(public_code)
@@ -128,6 +132,18 @@ create table if not exists public.rfb_processing_jobs (
   updated_at timestamptz not null default now(),
   delivery_mode text not null default 'local'
 );
+
+alter table public.rfb_processing_jobs add column if not exists filters_snapshot jsonb not null default '{}'::jsonb;
+alter table public.rfb_processing_jobs add column if not exists search_provider text not null default 'minha_receita';
+alter table public.rfb_processing_jobs add column if not exists search_stats jsonb not null default '{}'::jsonb;
+alter table public.rfb_processing_jobs add column if not exists rows_matched integer not null default 0;
+alter table public.rfb_processing_jobs add column if not exists rows_exported integer not null default 0;
+alter table public.rfb_processing_jobs add column if not exists heartbeat_at timestamptz;
+alter table public.rfb_processing_jobs add column if not exists lease_expires_at timestamptz;
+alter table public.rfb_processing_jobs add column if not exists cancel_requested_at timestamptz;
+alter table public.rfb_processing_jobs add column if not exists filter_hash text;
+alter table public.rfb_processing_jobs add column if not exists provider_error_code text;
+alter table public.rfb_processing_jobs add column if not exists warning_message text;
 
 create table if not exists public.rfb_job_logs (
   id uuid primary key default gen_random_uuid(),
@@ -233,6 +249,7 @@ alter table public.exports add column if not exists signed_url_expires_at timest
 alter table public.exports add column if not exists filters_snapshot jsonb not null default '{}'::jsonb;
 alter table public.exports add column if not exists fields_snapshot jsonb not null default '[]'::jsonb;
 alter table public.exports add column if not exists generated_by text default 'rfb_worker';
+alter table public.exports add column if not exists run_id uuid;
 
 create table if not exists public.export_files (
   id uuid primary key default gen_random_uuid(),
@@ -277,6 +294,10 @@ create table if not exists public.suppression_list (
   reason text not null,
   status text not null default 'active'
 );
+
+alter table public.suppression_list add column if not exists suppression_type text;
+alter table public.suppression_list add column if not exists suppression_value text;
+alter table public.suppression_list add column if not exists is_active boolean not null default true;
 
 create table if not exists public.admin_profiles (
   id uuid primary key references auth.users(id),
@@ -774,6 +795,9 @@ begin
        set status = 'queued',
            current_step = 'retry_scheduled',
            worker_id = null,
+           run_id = null,
+           claimed_at = null,
+           heartbeat_at = null,
            lease_expires_at = null,
            next_retry_at = now(),
            updated_at = now()
@@ -798,6 +822,9 @@ begin
            current_step = 'lease_expired',
            error_message = 'Lease expirado apos limite de tentativas.',
            worker_id = null,
+           run_id = null,
+           claimed_at = null,
+           heartbeat_at = null,
            lease_expires_at = null,
            finished_at = now(),
            updated_at = now()

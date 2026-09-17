@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { CnpjJobCompleteForm } from "@/components/admin/CnpjJobCompleteForm";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { listCnpjJobsForAdmin } from "@/src/server/services/crm";
 
@@ -23,7 +22,7 @@ export default async function AdminJobsPage() {
                 <span>{job.searchProvider || job.worker}</span>
                 <span>{job.progress ?? 0}%</span>
                 <span>{job.rowsExported} linhas exportadas</span>
-                {job.status === "queued" || job.status === "running" ? <CnpjJobCompleteForm jobId={job.id} /> : null}
+                <span>{job.status === "queued" ? "Aguardando worker local" : job.status === "running" ? "Processamento em andamento" : "Processamento encerrado"}</span>
               </div>
             ))
           ) : (

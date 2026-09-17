@@ -1,88 +1,59 @@
-# Checklist Operacional da Primeira Base Real
+# Checklist da primeira base real
 
-Use este checklist antes da primeira entrega comercial gerada pela plataforma ProspectaNicho.
+## Supabase
 
-## 1. Ambiente e segredos
+1. Aplicar todas as migrações, inclusive `20260917090000_finalize_rfb_worker_integrity.sql`.
+2. Confirmar RLS nas tabelas operacionais.
+3. Confirmar o usuário administrativo em `admin_profiles` com o papel correto.
+4. Revisar `segment_cnae_mappings`, `utilities` e `utility_cities`.
+5. Executar `npm run check:rls` e `npm run check:security`.
 
-1. Configurar `NEXT_PUBLIC_SITE_URL` com o dominio real de producao.
-2. Configurar `ADMIN_API_TOKEN` forte e exclusivo para o admin.
-3. Configurar `EXPORT_SIGNING_SECRET` forte e exclusivo para links temporarios.
-4. Configurar `SUPABASE_URL` somente no ambiente server-side.
-5. Configurar `SUPABASE_SERVICE_ROLE_KEY` somente no ambiente server-side.
-6. Configurar `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` quando o front precisar de recursos públicos do Supabase.
-7. Confirmar que `.env` nao esta versionado.
-8. Rodar `npm run check:env` e corrigir qualquer variavel critica ausente antes de producao.
-9. Ativar `CHECK_ENV_STRICT=1` ou usar `NODE_ENV=production` em deploy real.
+## Worker local
 
-## 2. Banco Supabase
+6. Criar `.env.worker` fora do Git com `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY`.
+7. Manter `EXPORT_DELIVERY_MODE=local`.
+8. Executar `python -m workers.rfb_cnpj provider health`.
+9. Iniciar `start-prospectanicho-worker.bat`.
+10. Confirmar que o diretório `%USERPROFILE%\ProspectaNicho\Exports` é gravável.
 
-10. Aplicar a migracao `supabase/migrations/20260914001000_crm_cnpj_required_tables.sql`.
-11. Confirmar que as tabelas canonicas existem: `custom_requests`, `request_filters`, `request_fields`, `request_status_events`, `rfb_processing_jobs`, `rfb_job_logs`, `exports`, `export_files`, `export_downloads`.
-12. Confirmar que RLS esta ativo nas tabelas operacionais.
-13. Confirmar que somente service role/admin consegue listar pedidos, jobs e exports.
-14. Conferir mapeamentos `segment_cnae_mappings`, `utilities` e `utility_cities`.
-15. Rodar `npm run check:rls`.
+`ADMIN_API_TOKEN`, storage e `RFB_CNPJ_DATA_DIR` não são requisitos deste fluxo.
 
-## 3. Storage e arquivos privados
+## Pedido e processamento
 
-16. Criar bucket privado de exports no Supabase Storage ou R2/S3.
-17. Confirmar que o bucket nao permite listagem publica.
-18. Configurar credenciais de storage no ambiente do worker.
-19. Gerar um link assinado de teste e validar expiracao.
-20. Confirmar que `/api/internal/exports/[id]` nao entrega arquivo sem token valido.
+11. Enviar uma solicitação pelo site.
+12. Confirmar pedido, filtros e timeline no CRM.
+13. Validar segmento, CNAEs, UF, municípios, período e quantidade.
+14. Criar o job e confirmar que ele passa de `queued` para `running`.
+15. Acompanhar heartbeat, progresso e logs reais.
+16. Confirmar que município não resolvido falha de forma explícita.
+17. Confirmar que a lista de supressão foi aplicada.
+18. Aguardar `Pronto para envio`.
 
-## 4. Dados da Receita Federal
+## Conferência dos arquivos
 
-21. Organizar os arquivos reais da Receita em `RFB_CNPJ_DATA_DIR`.
-22. Confirmar presenca de arquivos de empresas, estabelecimentos, simples, CNAEs e municipios.
-23. Rodar `python -m workers.rfb_cnpj validate-data-dir`.
-24. Corrigir nomes, codificacao ou layout dos arquivos caso o validador retorne `waiting_data` ou erro estrutural.
-25. Rodar um teste pequeno com filtros restritos antes de qualquer base grande.
+19. Abrir a pasta do protocolo.
+20. Conferir CSV UTF-8 BOM e XLSX.
+21. Conferir as abas `Leads`, `Resumo`, `Filtros aplicados` e `Leia-me`.
+22. Comparar quantidade, filtros, CNAEs, cidades e período com o pedido.
+23. Confirmar ausência de CPF, QSA, sócios e contatos pessoais.
+24. Conferir tamanho e checksum registrados no CRM.
+25. Enviar os arquivos pelo canal combinado.
+26. Marcar o pedido como entregue.
 
-## 5. Pedido real no CRM
+## Qualidade antes da operação
 
-26. Enviar um pedido pelo formulario público.
-27. Confirmar que o pedido aparece em `/admin/requests`.
-28. Conferir se contato, segmento, cidade/UF, periodo, quantidade e observacoes foram salvos corretamente.
-29. Confirmar que filtros normalizados foram gravados em `request_filters`.
-30. Confirmar que campos permitidos foram gravados em `request_fields`.
-31. Confirmar que a timeline foi gravada em `request_status_events`.
-32. Validar manualmente escopo e disponibilidade antes de gerar o job.
-33. Registrar pagamento quando aplicavel.
+```powershell
+npm run worker:test
+npm test
+npm run typecheck
+npm run lint
+npm run spellcheck
+npm run check:security
+npm run check:rls
+npm run build
+npm run build:github
+npm run test:e2e
+git diff --check
+```
 
-## 6. Worker e export
-
-34. Criar o job pelo admin.
-35. Confirmar que ele foi registrado em `rfb_processing_jobs`.
-36. Executar o worker fora do Next.js.
-37. Confirmar logs em `rfb_job_logs`.
-38. Gerar CSV com UTF-8 BOM.
-39. Gerar XLSX com abas `Leads`, `Resumo`, `Filtros aplicados` e `Leia-me`.
-40. Conferir que os filtros reais do pedido foram usados pelo worker.
-41. Conferir que CNAEs vieram do mapeamento de segmento.
-42. Conferir que cidades vieram do pedido ou do mapeamento de concessionaria quando aplicavel.
-43. Confirmar que nao ha CPF, socios, representantes legais, telefone particular, e-mail pessoal ou enriquecimento no export padrao.
-44. Aplicar lista de supressao antes da entrega.
-45. Conferir amostra visual da planilha antes de liberar ao cliente.
-
-## 7. Entrega
-
-46. Salvar o arquivo no storage privado ou diretorio controlado.
-47. Registrar `exports` e `export_files`.
-48. Gerar link assinado pelo admin.
-49. Testar o link em janela anonima.
-50. Confirmar que o link expira.
-51. Marcar o pedido como entregue somente depois da conferencia.
-52. Confirmar que `/pedido/[public_code]` mostra status seguro e nao mostra URL direta do arquivo.
-
-## 8. Validação final
-
-53. Rodar `npm run typecheck`.
-54. Rodar `npm run lint`.
-55. Rodar `npm run test`.
-56. Rodar `npm run test:e2e`.
-57. Rodar `npm run worker:test`.
-58. Rodar `npm run check:security`.
-59. Rodar `npm run check:links`.
-60. Rodar `npm run check:metadata`.
-61. Rodar `git diff --check`.
+Storage privado e links assinados são opções futuras. Se ativados, exigem uma rodada própria de segurança e testes; não devem ser presumidos como configurados.

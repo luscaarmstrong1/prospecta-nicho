@@ -7,9 +7,14 @@ from workers.rfb_cnpj.logs import log_line
 from workers.rfb_cnpj.models import CnpjFilters, CnpjRecord
 
 
-def run_job(records: list[CnpjRecord], filters: CnpjFilters, output_dir: Path) -> dict[str, object]:
+def run_job(
+    records: list[CnpjRecord],
+    filters: CnpjFilters,
+    output_dir: Path,
+    search_stats: dict[str, object] | None = None,
+) -> dict[str, object]:
     logs = [log_line("Job iniciado."), log_line("Filtros aplicados sem enriquecimento automatico.")]
-    export = generate_export(records, filters, output_dir)
+    export = generate_export(records, filters, output_dir, search_stats)
     logs.append(log_line(f"Export gerado: {export.path.name} com {export.row_count} linhas."))
     return {
         "ok": True,

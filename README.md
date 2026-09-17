@@ -1,114 +1,72 @@
-# Prospecta Nicho
+# ProspectaNicho
 
-## Objetivo do projeto
+Plataforma de inteligência comercial B2B para solicitar, processar e entregar bases segmentadas de empresas com dados públicos de CNPJ.
 
-Aplicação para prospecção B2B e organização estratégica de bases comerciais.
+## Arquitetura operacional
 
-## Problema que resolve
+- Site e painel: Next.js App Router publicado no GitHub Pages.
+- Banco, autenticação e APIs: Supabase Free (Postgres, Auth e Edge Functions).
+- Pesquisa empresarial: API pública Minha Receita.
+- Resolução de municípios: API do IBGE com cache local.
+- Processamento: worker Python executado na máquina do operador.
+- Entrega: CSV UTF-8 BOM e XLSX gravados localmente para conferência e envio manual.
 
-Apoia organização de nichos, leads e dados comerciais para captação e análise operacional.
+O fluxo principal não baixa nem processa a base nacional da Receita Federal. Supabase Storage e links assinados são extensões opcionais e não são requisito para a operação local.
 
-## Demonstração visual
+## Fluxo diário
 
-![Screenshot desktop](docs/screenshots/home-desktop.png)
+1. Inicie o worker com `start-prospectanicho-worker.bat`.
+2. Receba as solicitações criadas no site.
+3. Valide o pedido e crie o job no CRM.
+4. Aguarde o status `Pronto para envio`.
+5. Abra a pasta `%USERPROFILE%\ProspectaNicho\Exports\PN-XXXXXX\`.
+6. Confira e envie o CSV/XLSX ao cliente pelo canal combinado.
+7. Marque o pedido como entregue no CRM.
 
-![Screenshot mobile](docs/screenshots/home-mobile.png)
+## Configuração local
 
-## Tecnologias utilizadas
-
-- Next.js
-- React
-- TypeScript
-- Zod
-- React Hook Form
-- Framer Motion
-- Lucide React
-- Playwright
-- GitHub Actions
-- Preview estático opcional
-
-## Recursos principais
-
-- Editor de bases B2B
-- Validações de formulário
-- Componentes React
-- Testes e scripts de checagem
-- Publicação estática
-
-## Acesso público
-
-Produção canônica: configurar `NEXT_PUBLIC_SITE_URL=https://prospectanicho.com.br` em Vercel ou infraestrutura equivalente com suporte a rotas server-side do Next.js.
-
-Preview estático temporário: GitHub Pages pode ser usado apenas quando o export estático estiver explicitamente habilitado, sem tratar `github.io` como canonical de produção.
-
-## Como executar localmente
-
-Pré-requisitos: Node.js compatível com o projeto e o gerenciador indicado pelo lockfile (`package-lock.json` ou `pnpm-lock.yaml`).
-
-```bash
+```powershell
 npm install
-npm run build
-```
-
-Quando houver scripts específicos no `package.json`, use também `npm run dev`, `npm run test`, `npm run lint` ou os comandos equivalentes documentados no próprio arquivo.
-
-## Estrutura do projeto
-
-- `src/`, `app/` ou `apps/`: código da interface, conforme o framework do repositório.
-- `public/`: assets estáticos publicados com a aplicação.
-- `docs/screenshots/`: capturas reais da página publicada.
-- `.github/workflows/`: automações de build/deploy quando presentes.
-- `scripts/`: rotinas auxiliares de build, auditoria ou validação quando presentes.
-
-## Limitações e avisos técnicos
-
-Este repositório é uma demonstração técnica ou produto em evolução. O conteúdo não substitui projeto executivo, estudo de conexão, validação regulatória, parecer técnico, proposta comercial definitiva ou análise jurídica. Funcionalidades, cálculos e textos devem ser revisados antes de uso profissional.
-
-## Privacidade e segurança
-
-Não inclua tokens, chaves, credenciais, dados pessoais sensíveis ou arquivos `.env` em commits. Em demonstrações públicas, use dados fictícios ou anonimizados. Quando houver `.env.example`, trate-o apenas como referência de configuração.
-
-## Status
-
-Produto digital em evolução.
-
-
-## Operacao local gratuita do CRM CNPJ
-
-O CRM da ProspectaNicho foi mantido em arquitetura de custo zero controlado: frontend Next.js/GitHub Pages, backend Supabase Free e worker Python local para Dados Abertos do CNPJ. Nenhum `.env`, service role ou dado sensivel deve ser publicado.
-
-Comandos principais:
-
-```bash
-npm install
+Copy-Item .env.worker.example .env.worker
 setup-prospectanicho-local.bat
-setup-dados-receita.bat
-status-prospectanicho.bat
-start-prospectanicho-worker.bat <job-id>
+start-prospectanicho-worker.bat
 ```
 
-Se a fonte externa da Receita estiver indisponivel, o setup retorna `REMOTE_UNAVAILABLE` em JSON em vez de encerrar com traceback.
+Preencha somente no arquivo local `.env.worker`:
 
-### Hardening do worker CRM
-
-Antes de rodar jobs reais, aplique as migracoes Supabase, incluindo:
-
-```bash
-supabase/migrations/20260916103000_harden_rfb_worker_queue.sql
-```
-
-Essa migracao adiciona `claim_next_rfb_job` com `FOR UPDATE SKIP LOCKED`, lease, heartbeat, retry controlado, recuperacao de jobs travados e checksum SHA-256 por arquivo exportado.
-
-Variaveis principais do worker:
-
-```bash
-SUPABASE_URL=...
-SUPABASE_SERVICE_ROLE_KEY=...
-RFB_WORKER_ID=prospectanicho-local-worker
-RFB_WORKER_LEASE_SECONDS=300
-RFB_WORKER_HEARTBEAT_SECONDS=30
-RFB_JOB_MAX_ATTEMPTS=3
+```env
+SUPABASE_URL=https://SEU-PROJETO.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=SEGREDO_SOMENTE_DO_WORKER
 EXPORT_DELIVERY_MODE=local
 ```
 
-O fluxo principal usa Minha Receita + IBGE, gera CSV UTF-8 BOM com `;` e XLSX local, bloqueia QSA/CPF/dados sensiveis no export padrao e deixa a entrega manual sob controle do admin.
+O worker não exige `ADMIN_API_TOKEN`, storage ou `RFB_CNPJ_DATA_DIR`. A service role nunca deve ir para o navegador, GitHub Actions público ou repositório.
+
+## Endereços
+
+- Site público: `https://luscaarmstrong1.github.io/prospecta-nicho/`
+- Login administrativo: `https://luscaarmstrong1.github.io/prospecta-nicho/admin/login/`
+- Acompanhamento público: `/pedido/?codigo=PN-XXXXXX`
+
+O acesso administrativo usa Supabase Auth e perfis de `admin_profiles`. O token administrativo é apenas um mecanismo de emergência opcional e permanece desativado por padrão.
+
+## Qualidade
+
+```powershell
+npm run worker:test
+npm test
+npm run typecheck
+npm run lint
+npm run spellcheck
+npm run check:security
+npm run check:rls
+npm run build
+npm run build:github
+npm run test:e2e
+```
+
+## Privacidade
+
+O export padrão contém somente dados empresariais permitidos. QSA, CPF, sócios, representantes legais e enriquecimento pessoal permanecem bloqueados. A lista de supressão é aplicada antes da geração dos arquivos.
+
+Documentação operacional detalhada: [docs/operacao-worker.md](docs/operacao-worker.md).

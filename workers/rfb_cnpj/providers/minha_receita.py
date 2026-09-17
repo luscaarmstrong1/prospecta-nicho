@@ -9,7 +9,7 @@ import sqlite3
 import time
 from collections.abc import Awaitable
 from datetime import UTC, datetime
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +19,19 @@ from workers.rfb_cnpj.config import WorkerConfig
 from workers.rfb_cnpj.filters import matches_filters
 from workers.rfb_cnpj.models import CnpjFilters, CnpjRecord
 from workers.rfb_cnpj.municipality_resolver import MunicipalityResolver, normalize_municipality, only_digits
+from workers.rfb_cnpj.normalization import (
+    normalize_branch,
+    normalize_cnae,
+    normalize_cnpj,
+    normalize_company_size,
+    normalize_email,
+    normalize_phone,
+    normalize_registration_status,
+    normalize_text,
+    parse_date_iso,
+    parse_decimal,
+    tri_state_bool,
+)
 from workers.rfb_cnpj.providers.base import CancelCallback, ProgressCallback
 from workers.rfb_cnpj.providers.models import (
     ProviderHealth,
@@ -38,7 +51,7 @@ def _digits(value: Any) -> str:
 
 
 def _text(value: Any) -> str:
-    return str(value or "").strip()
+    return normalize_text(value)
 
 
 def _is_sensitive_key(key: Any) -> bool:
@@ -47,43 +60,41 @@ def _is_sensitive_key(key: Any) -> bool:
 
 
 def _decimal_or_none(value: Any) -> Decimal | None:
-    if value in {None, ""}:
-        return None
-    try:
-        return Decimal(str(value).replace(".", "").replace(",", "."))
-    except (InvalidOperation, TypeError, ValueError):
-        return None
+    return parse_decimal(value)
 
 
 def _date_iso(value: Any) -> str:
-    text = _text(value)
-    if not text:
-        return ""
-    if re.fullmatch(r"\d{4}-\d{2}-\d{2}", text):
-        return text
-    match = re.fullmatch(r"(\d{2})/(\d{2})/(\d{4})", text)
-    if match:
-        return f"{match.group(3)}-{match.group(2)}-{match.group(1)}"
-    return ""
+    return parse_date_iso(value)
 
 
-def _bool_label(value: Any) -> str:
-    text = _text(value).casefold()
-    if text in {"s", "sim", "true", "1"}:
-        return "SIM"
-    if text in {"n", "nao", "não", "false", "0"}:
-        return "NAO"
-    return "DESCONHECIDO"
+def _bool_label(value: Any) -> bool | None:
+    return tri_state_bool(value)
 
 
 def _normalized_status(value: Any) -> str:
-    text = _text(value).upper()
-    return text or "DESCONHECIDA"
+    return normalize_registration_status(value)
 
 
 def _normalized_branch(value: Any) -> str:
-    text = _text(value).upper()
-    return text or "DESCONHECIDO"
+    return normalize_branch(value)
+
+
+def _first_valid_email(payload: dict[str, Any]) -> str:
+    for key in ("email_comercial", "correio_eletronico", "email"):
+        email = normalize_email(payload.get(key))
+        if email:
+            return email
+    return ""
+
+
+def _first_valid_phone(payload: dict[str, Any], index: int) -> str:
+    for key in (f"ddd_telefone_{index}", f"telefone_{index}", f"telefone{index}", f"phone_{index}"):
+        phone = normalize_phone(payload.get(key))
+        if phone:
+            return phone
+    ddd = _digits(payload.get(f"ddd_{index}"))
+    number = _digits(payload.get(f"telefone_{index}") or payload.get(f"telefone{index}"))
+    return normalize_phone(f"{ddd}{number}") if ddd and number else ""
 
 
 def _safe_extra(payload: dict[str, Any]) -> dict[str, Any]:
@@ -123,14 +134,14 @@ def _safe_extra(payload: dict[str, Any]) -> dict[str, Any]:
     )
     if street:
         extra["endereco_comercial"] = street
-    email = _text(payload.get("correio_eletronico")).lower()
+    email = _first_valid_email(payload)
     if email:
         extra["email_comercial"] = email
-    phone = _digits(payload.get("ddd_telefone_1"))
+    phone = _first_valid_phone(payload, 1)
     if phone:
         extra["telefone_comercial"] = phone
         extra["phone_1"] = phone
-    phone_2 = _digits(payload.get("ddd_telefone_2"))
+    phone_2 = _first_valid_phone(payload, 2)
     if phone_2:
         extra["phone_2"] = phone_2
     extra["simples"] = _bool_label(payload.get("opcao_pelo_simples"))
@@ -145,11 +156,11 @@ def _safe_extra(payload: dict[str, Any]) -> dict[str, Any]:
     if isinstance(secondary, list):
         extra["cnaes_secundarios"] = [
             {
-                "codigo": _digits(item.get("codigo") if isinstance(item, dict) else item),
+                "codigo": normalize_cnae(item.get("codigo") if isinstance(item, dict) else item),
                 "descricao": _text(item.get("descricao") if isinstance(item, dict) else ""),
             }
             for item in secondary
-            if _digits(item.get("codigo") if isinstance(item, dict) else item)
+            if normalize_cnae(item.get("codigo") if isinstance(item, dict) else item)
         ]
     return extra
 
@@ -199,12 +210,15 @@ class MinhaReceitaProvider:
         self._transport = transport
         self._last_request_at = 0.0
         self._request_lock = asyncio.Lock()
+        self.provider_cache_hits = 0
+        self.provider_cache_misses = 0
         cache_dir = Path(config.minha_receita_cache_dir)
         cache_dir.mkdir(parents=True, exist_ok=True)
         self.cache_path = cache_dir / "minha_receita.sqlite"
         self.municipality_resolver = MunicipalityResolver(
             self.cache_path,
             timeout_seconds=config.ibge_timeout_seconds,
+            cache_ttl_hours=config.ibge_cache_ttl_hours,
             transport=transport,
         )
         self.query_planner = QueryPlanner(config.minha_receita_page_limit)
@@ -229,6 +243,7 @@ class MinhaReceitaProvider:
     def _cache_get(self, key: str) -> dict[str, Any] | None:
         ttl_seconds = max(self.config.minha_receita_cache_ttl_hours, 0) * 3600
         if ttl_seconds <= 0:
+            self.provider_cache_misses += 1
             return None
         cutoff = int(time.time()) - ttl_seconds
         with sqlite3.connect(self.cache_path) as conn:
@@ -237,9 +252,14 @@ class MinhaReceitaProvider:
                 (key,),
             ).fetchone()
         if not row or int(row[1]) < cutoff:
+            self.provider_cache_misses += 1
             return None
         payload = json.loads(str(row[0]))
-        return payload if isinstance(payload, dict) else None
+        if isinstance(payload, dict):
+            self.provider_cache_hits += 1
+            return payload
+        self.provider_cache_misses += 1
+        return None
 
     def _cache_set(self, key: str, payload: dict[str, Any]) -> None:
         with sqlite3.connect(self.cache_path) as conn:
@@ -317,20 +337,28 @@ class MinhaReceitaProvider:
 
     def normalize(self, raw_company: dict[str, Any]) -> CnpjRecord | None:
         clean = {key: value for key, value in raw_company.items() if not _is_sensitive_key(key)}
-        cnpj = _digits(clean.get("cnpj"))
-        if len(cnpj) != 14:
+        cnpj = normalize_cnpj(clean.get("cnpj"))
+        if not cnpj:
             return None
         return CnpjRecord(
             cnpj=cnpj,
             razao_social=_text(clean.get("razao_social")),
             nome_fantasia=_text(clean.get("nome_fantasia")),
-            cnae_principal=_digits(clean.get("cnae_fiscal")),
+            cnae_principal=normalize_cnae(clean.get("cnae_fiscal") or clean.get("cnae_principal")),
             municipio=_text(clean.get("municipio")),
             uf=_text(clean.get("uf")).upper(),
-            porte=_text(clean.get("porte")),
+            porte=normalize_company_size(clean.get("porte") or clean.get("codigo_porte")),
             data_abertura=_date_iso(clean.get("data_inicio_atividade") or clean.get("data_abertura")),
-            situacao_cadastral=_normalized_status(clean.get("descricao_situacao_cadastral") or clean.get("situacao_cadastral")),
-            matriz_filial=_normalized_branch(clean.get("descricao_identificador_matriz_filial") or clean.get("matriz_filial")),
+            situacao_cadastral=_normalized_status(
+                clean.get("descricao_situacao_cadastral")
+                or clean.get("situacao_cadastral")
+                or clean.get("codigo_situacao_cadastral")
+            ),
+            matriz_filial=_normalized_branch(
+                clean.get("descricao_identificador_matriz_filial")
+                or clean.get("matriz_filial")
+                or clean.get("identificador_matriz_filial")
+            ),
             capital_social=_decimal_or_none(clean.get("capital_social")),
             extra=_safe_extra(clean),
         )
@@ -358,6 +386,10 @@ class MinhaReceitaProvider:
         cancel_callback: CancelCallback | None = None,
     ) -> ProviderSearchResult:
         started_at = time.perf_counter()
+        provider_hits_before = self.provider_cache_hits
+        provider_misses_before = self.provider_cache_misses
+        ibge_hits_before = self.municipality_resolver.cache_hits
+        ibge_misses_before = self.municipality_resolver.cache_misses
         planned_queries = await self._planned_queries(filters)
         target = max(int(filters.quantity or 1), 1) * max(self.config.minha_receita_oversample_factor, 1)
         records: dict[str, CnpjRecord] = {}
@@ -370,26 +402,33 @@ class MinhaReceitaProvider:
         api_requests = 0
         warnings: list[str] = []
         stopped_reason = "cursor_ended"
+        terminal_reasons: set[str] = set()
 
         await _maybe_call(progress_callback, ProviderProgress(self.name, "resolving_municipalities", message="Municipios resolvidos para codigos IBGE."))
         await _maybe_call(progress_callback, ProviderProgress(self.name, "planning_queries", message=f"{len(planned_queries)} consulta(s) planejada(s)."))
-        for query_index, query in enumerate(planned_queries, start=1):
-            cursor: str | None = None
-            previous_cursor: str | None = None
-            query_pages = 0
-            while pages_read < max(self.config.minha_receita_max_pages_per_query, 1):
+        states = [
+            {"query": query, "index": index, "cursor": None, "previous_cursor": None, "pages": 0, "done": False}
+            for index, query in enumerate(planned_queries, start=1)
+        ]
+        page_limit = max(self.config.minha_receita_max_pages_per_query, 1)
+        while any(not bool(state["done"]) for state in states):
+            for state in states:
+                if state["done"]:
+                    continue
                 if await _maybe_cancel(cancel_callback):
                     stopped_reason = "cancelled"
                     break
+                query = state["query"]
+                query_index = int(state["index"])
                 page_params = dict(query.params)
-                if cursor:
-                    page_params["cursor"] = cursor
+                if state["cursor"]:
+                    page_params["cursor"] = state["cursor"]
                 payload = await self._paced_get("/", page_params)
                 api_requests += 1
                 raw_items = payload.get("data")
                 items = raw_items if isinstance(raw_items, list) else []
                 pages_read += 1
-                query_pages += 1
+                state["pages"] = int(state["pages"]) + 1
                 records_seen += len(items)
                 for item in items:
                     if not isinstance(item, dict):
@@ -420,31 +459,41 @@ class MinhaReceitaProvider:
                         metadata={
                             "query_index": query_index,
                             "queries_total": len(planned_queries),
+                            "queries_completed": queries_completed,
                             "current_city": query.municipality.official_name if query.municipality else None,
                             "current_city_code": query.municipality.ibge_code if query.municipality else None,
                             "params": query.params,
                         },
                     ),
                 )
-                if len(records) >= target:
-                    stopped_reason = "target_oversample_reached"
-                    break
-                next_cursor = payload.get("cursor")
+                next_cursor = payload.get("cursor") or payload.get("next_cursor")
                 cursor = str(next_cursor) if next_cursor not in {None, ""} else None
+                terminal_reason = ""
                 if not cursor:
-                    stopped_reason = "cursor_ended"
-                    break
-                if cursor == previous_cursor:
-                    warnings.append("Cursor repetido pela API; paginacao encerrada para evitar loop.")
-                    stopped_reason = "repeated_cursor"
-                    break
-                previous_cursor = cursor
-            queries_completed += 1
-            if stopped_reason in {"cancelled", "target_oversample_reached", "repeated_cursor"}:
+                    terminal_reason = "cursor_ended"
+                elif cursor == state["cursor"]:
+                    terminal_reason = "repeated_cursor"
+                    warnings.append(
+                        f"Cursor repetido na consulta {query_index}; paginacao encerrada para evitar loop."
+                    )
+                elif int(state["pages"]) >= page_limit:
+                    terminal_reason = "max_pages_reached"
+                if terminal_reason:
+                    state["done"] = True
+                    queries_completed += 1
+                    terminal_reasons.add(terminal_reason)
+                else:
+                    state["cursor"] = cursor
+            if stopped_reason == "cancelled":
                 break
-            if query_pages >= max(self.config.minha_receita_max_pages_per_query, 1):
+            if len(records) >= target:
+                stopped_reason = "target_oversample_reached"
+                break
+        else:
+            if "max_pages_reached" in terminal_reasons:
                 stopped_reason = "max_pages_reached"
-                break
+            elif "repeated_cursor" in terminal_reasons:
+                stopped_reason = "repeated_cursor"
 
         await _maybe_call(
             progress_callback,
@@ -463,8 +512,10 @@ class MinhaReceitaProvider:
                     "duplicates_removed": duplicate_count,
                     "geography_mismatch_count": geography_mismatch_count,
                     "target_records": filters.quantity,
-                    "cache_hits": self.municipality_resolver.cache_hits,
-                    "cache_misses": self.municipality_resolver.cache_misses,
+                    "provider_cache_hits": self.provider_cache_hits - provider_hits_before,
+                    "provider_cache_misses": self.provider_cache_misses - provider_misses_before,
+                    "ibge_cache_hits": self.municipality_resolver.cache_hits - ibge_hits_before,
+                    "ibge_cache_misses": self.municipality_resolver.cache_misses - ibge_misses_before,
                 },
             ),
         )
@@ -487,8 +538,11 @@ class MinhaReceitaProvider:
                 "filtered_records": max(records_seen - valid_records - geography_mismatch_count, 0),
                 "suppressed_records": 0,
                 "target_records": filters.quantity,
-                "cache_hits": self.municipality_resolver.cache_hits,
-                "cache_misses": self.municipality_resolver.cache_misses,
+                "provider_cache_hits": self.provider_cache_hits - provider_hits_before,
+                "provider_cache_misses": self.provider_cache_misses - provider_misses_before,
+                "ibge_cache_hits": self.municipality_resolver.cache_hits - ibge_hits_before,
+                "ibge_cache_misses": self.municipality_resolver.cache_misses - ibge_misses_before,
+                "per_query_pages": {str(state["index"]): int(state["pages"]) for state in states},
                 "elapsed_seconds": round(time.perf_counter() - started_at, 3),
             },
         )

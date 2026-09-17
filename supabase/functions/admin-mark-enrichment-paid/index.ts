@@ -6,7 +6,7 @@ import { json, errorJson } from "../_shared/responses.ts";
 Deno.serve(async (request) => {
   const cors = handleCors(request);
   if (cors) return cors;
-  const denied = await requireAdmin(request);
+  const denied = await requireAdmin(request, "enrichment:offer");
   if (denied) return denied;
   const requestId = request.headers.get("x-resource-id") || new URL(request.url).searchParams.get("id") || "";
   if (!requestId) return errorJson(request, "MISSING_REQUEST_ID", "Pedido nao informado.", 400);

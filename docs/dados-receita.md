@@ -1,48 +1,28 @@
-# Dados Receita
+# Fonte de dados empresariais
 
-O worker `workers/rfb_cnpj` foi preparado para operar sobre os Dados Abertos do CNPJ da Receita Federal em processamento externo ao Next.js.
+## Fluxo principal
 
-## Arquivos Mínimos
+O worker consulta dados públicos de CNPJ por meio da API Minha Receita. A API do IBGE resolve nomes e códigos de municípios por UF. Ambas usam cache SQLite local com TTL configurável.
 
-- `Empresas`;
-- `Estabelecimentos`;
-- `Simples`;
-- `Cnaes`;
-- `Municipios`.
+Não é necessário baixar a base nacional, manter `RFB_CNPJ_DATA_DIR`, provisionar ClickHouse ou processar arquivos da Receita em rotas do Next.js.
 
-## Responsabilidade do Worker
+## Controles
 
-- Descobrir arquivos disponíveis.
-- Validar diretório de dados.
-- Resolver segmentos para CNAEs.
-- Resolver concessionárias para cidades quando aplicável.
-- Aplicar filtros comerciais.
-- Gerar score operacional.
-- Exportar CSV e XLSX.
-- Bloquear campos pessoais/sensíveis no export padrão.
+- limite de páginas por consulta;
+- round-robin entre combinações de município e CNAE;
+- retry com backoff e respeito a erros do provider;
+- métricas de cache hit/miss, páginas e requisições;
+- deduplicação por CNPJ;
+- falha fechada quando um município não é resolvido;
+- normalização canônica antes dos filtros;
+- supressão antes do score e do export.
 
-## Responsabilidade do Next.js
+## Dados exportados
 
-- Receber pedidos públicos.
-- Validar payload e origem.
-- Salvar filtros no CRM.
-- Proteger admin.
-- Criar jobs.
-- Mostrar timeline.
-- Gerar links assinados para exports prontos.
+O export padrão contém dados cadastrais empresariais necessários à prospecção B2B. QSA, CPF, sócios, representantes e enriquecimento pessoal não são consultados nem exportados.
 
-## Limites
+A origem informada no arquivo é: `Dados públicos do CNPJ da Receita Federal, consultados por meio da API Minha Receita`.
 
-O processamento da base nacional não deve acontecer em API Route da Vercel. Downloads, validação, transformação e exports devem rodar em worker externo, máquina local controlada, job dedicado ou infraestrutura equivalente.
+## Fallback legado
 
-Campos sensíveis, dados pessoais de sócios e contatos pessoais ficam bloqueados no export padrão.
-
-
-
-## Setup operacional local
-
-Scripts adicionados na raiz: `setup-prospectanicho-local.bat`, `setup-dados-receita.bat`, `update-dados-receita.bat`, `status-prospectanicho.bat` e `start-prospectanicho-worker.bat <job-id>`.
-
-Variaveis principais: `RFB_CNPJ_DATA_DIR`, `RFB_CNPJ_OUTPUT_DIR`, `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` e `SUPABASE_STORAGE_BUCKET`. A service role e qualquer segredo devem ficar somente no ambiente servidor/worker.
-
-O downloader exige empresas, estabelecimentos e tabelas auxiliares. Arquivos de socios ficam fora do fluxo padrao para reduzir risco LGPD e evitar exportacao de dados pessoais.
+Os comandos de descoberta e processamento de snapshots locais continuam isolados para compatibilidade técnica. Eles não fazem parte da operação diária e não devem ser ativados sem revisão específica de capacidade, armazenamento, segurança e LGPD.

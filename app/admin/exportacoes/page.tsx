@@ -32,7 +32,7 @@ export default async function AdminExportsPage() {
           ) : (
             <div className="admin-table-row">
               <strong>Nenhum export pronto</strong>
-              <span>Finalize um job CNPJ e registre a URL privada/controlada do XLSX.</span>
+              <span>Inicie o worker local; o arquivo validado será registrado automaticamente ao final do job.</span>
             </div>
           )}
         </div>

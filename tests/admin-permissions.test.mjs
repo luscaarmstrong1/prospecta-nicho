@@ -16,6 +16,9 @@ test("limita permissoes por perfil administrativo", () => {
   assert.equal(roleHasPermission("operator", "job:create"), true);
   assert.equal(roleHasPermission("operator", "settings:write"), false);
   assert.equal(roleHasPermission("editor", "content:write"), true);
+  assert.equal(roleHasPermission("editor", "job:create"), false);
+  assert.equal(roleHasPermission("editor", "export:sign"), false);
+  assert.equal(roleHasPermission("operator", "export:sign"), false);
   assert.equal(roleHasPermission("editor", "enrichment:run"), false);
   assert.equal(roleHasPermission("admin", "enrichment:run"), true);
 });

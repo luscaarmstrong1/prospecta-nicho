@@ -54,3 +54,7 @@ class ProviderUnavailableError(RuntimeError):
 
 class QueryTooBroadError(ValueError):
     pass
+
+
+class MunicipalityNotResolvedError(ValueError):
+    pass

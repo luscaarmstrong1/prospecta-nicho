@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+from decimal import Decimal
 
 import httpx
 
@@ -93,6 +94,8 @@ def test_provider_uses_sqlite_cache(tmp_path):
     assert first.records_kept == 1
     assert second.records_kept == 1
     assert calls == 1
+    assert first.extra_stats["provider_cache_misses"] == 1
+    assert second.extra_stats["provider_cache_hits"] == 1
 
 
 def test_provider_resolves_concessionaria_to_municipio_batch(tmp_path, monkeypatch):
@@ -106,9 +109,10 @@ def test_provider_resolves_concessionaria_to_municipio_batch(tmp_path, monkeypat
         if "servicodados.ibge.gov.br" in str(request.url):
             return httpx.Response(
                 200,
-                json=[
-                    {"id": 2611606, "nome": "Recife", "microrregiao": {"mesorregiao": {"UF": {"sigla": "PE"}}}},
-                    {"id": 2609600, "nome": "Olinda", "microrregiao": {"mesorregiao": {"UF": {"sigla": "PE"}}}},
+                    json=[
+                        {"id": 2611606, "nome": "Recife", "microrregiao": {"mesorregiao": {"UF": {"sigla": "PE"}}}},
+                        {"id": 2609600, "nome": "Olinda", "microrregiao": {"mesorregiao": {"UF": {"sigla": "PE"}}}},
+                        {"id": 2607901, "nome": "Jaboatao dos Guararapes"},
                 ],
             )
         company = _company("00000000000110", cidade="RECIFE")
@@ -173,7 +177,7 @@ def test_provider_does_not_invent_missing_status_or_branch_and_preserves_decimal
     assert str(record.capital_social) == "1234.56"
     assert record.extra["email_comercial"] == "comercial@exemplo.com"
     assert record.extra["phone_1"] == "11999990000"
-    assert record.extra["mei"] == "DESCONHECIDO"
+    assert record.extra["mei"] is None
     assert "qsa" not in json.dumps(record.as_dict(), default=str).lower()
 
 
@@ -194,3 +198,33 @@ def test_provider_cache_strips_sensitive_nested_payload(tmp_path):
     assert calls == 1
     assert "cpf" not in cached
     assert "socios" not in cached
+
+
+def test_provider_normalizes_real_aliases_and_codes(tmp_path):
+    provider = MinhaReceitaProvider(_config(tmp_path), transport=httpx.MockTransport(lambda _request: httpx.Response(200, json={})))
+
+    record = provider.normalize(
+        {
+            "cnpj": "00.000.000/0001-91",
+            "razao_social": "Empresa Alias",
+            "cnae_principal": "62.09-1-00",
+            "codigo_porte": "03",
+            "codigo_situacao_cadastral": "02",
+            "identificador_matriz_filial": "1",
+            "capital_social": "1,234.56",
+            "email": "VENDAS@EXEMPLO.COM",
+            "telefone1": "(11) 98888-7777",
+            "data_abertura": "20260131",
+        }
+    )
+
+    assert record is not None
+    assert record.cnpj == "00000000000191"
+    assert record.cnae_principal == "6209100"
+    assert record.porte == "ME"
+    assert record.situacao_cadastral == "ATIVA"
+    assert record.matriz_filial == "MATRIZ"
+    assert record.capital_social == Decimal("1234.56")
+    assert record.data_abertura == "2026-01-31"
+    assert record.extra["email_comercial"] == "vendas@exemplo.com"
+    assert record.extra["telefone_comercial"] == "11988887777"

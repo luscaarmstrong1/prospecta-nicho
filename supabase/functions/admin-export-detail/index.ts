@@ -6,7 +6,7 @@ import { json, errorJson } from "../_shared/responses.ts";
 Deno.serve(async (request) => {
   const cors = handleCors(request);
   if (cors) return cors;
-  const denied = await requireAdmin(request);
+  const denied = await requireAdmin(request, "export:read");
   if (denied) return denied;
   const exportId = request.headers.get("x-resource-id") || new URL(request.url).searchParams.get("id") || "";
   const { data, error } = await serviceClient().from("exports").select("*").eq("id", exportId).maybeSingle();
