@@ -44,6 +44,7 @@ export type CrmRequest = {
   createdAt: string;
   updatedAt: string;
   source: string;
+  productSlug?: "gerador-planilhas-cnpj" | "amostra-gratuita";
   status: CrmRequestStatus;
   customer: {
     name: string;

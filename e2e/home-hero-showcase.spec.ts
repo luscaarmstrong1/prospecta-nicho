@@ -18,7 +18,7 @@ test("primeira dobra exibe showcase curado com busca, filtros e CTAs", async ({ 
   await expect(page.getByRole("link", { name: /Solicitar uma base/i })).toHaveAttribute("href", "/solicitar-planilha");
   await expect(page.getByRole("link", { name: /Receber amostra grátis/i })).toHaveAttribute(
     "href",
-    "/produtos/amostra-gratuita",
+    "/solicitar-planilha?source=hero-amostra",
   );
 
   await expect(page.locator(".showcase-card")).toHaveCount(6);
@@ -44,6 +44,6 @@ test("primeira dobra exibe showcase curado com busca, filtros e CTAs", async ({ 
   );
   await expect(page.getByRole("link", { name: "Montar base personalizada" })).toHaveAttribute(
     "href",
-    "/montar-minha-base",
+    "/solicitar-planilha?source=showcase-sem-resultado",
   );
 });

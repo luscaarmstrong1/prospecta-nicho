@@ -1,3 +1,4 @@
+// cspell:words publicos
 import type { Metadata } from "next";
 import { ButtonLink } from "@/components/ButtonLink";
 import { buildQuickRequestHref } from "@/lib/segments";
@@ -29,8 +30,8 @@ export default function ParaQuemEPage() {
             A ProspectaNicho ajuda a transformar esses critérios em uma base clara para prospecção.
           </p>
           <div className="btn-row">
-            <ButtonLink href="/montar-minha-base" variant="primary">Montar minha base</ButtonLink>
-            <ButtonLink href="/produtos/amostra-gratuita" variant="secondary">Receber 10 empresas de amostra</ButtonLink>
+            <ButtonLink href="/solicitar-planilha?source=publicos-base" variant="primary">Montar minha base</ButtonLink>
+            <ButtonLink href="/solicitar-planilha?source=publicos-amostra" variant="secondary">Receber 10 empresas de amostra</ButtonLink>
           </div>
         </div>
       </section>

@@ -43,6 +43,6 @@ test("whatsapp flutuante usa número padrão e não desaparece com scroll ou nav
   expect(new Set(samples.map((sample) => sample.top)).size).toBe(1);
 
   await page.goto("/produtos/amostra-gratuita");
-  await expect(page).toHaveURL(/\/produtos\/amostra-gratuita/);
+  await expect(page).toHaveURL(/\/solicitar-planilha/);
   await expect(whatsapp).toBeVisible();
 });

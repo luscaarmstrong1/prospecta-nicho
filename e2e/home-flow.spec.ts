@@ -41,6 +41,6 @@ test("demonstracao da entrega exibe planilha mascarada sem coluna de site", asyn
   await expect(preview).toContainText("Status");
   await expect(page.getByRole("link", { name: /Solicitar tabela gr.tis de teste/i })).toHaveAttribute(
     "href",
-    "/produtos/amostra-gratuita",
+    "/solicitar-planilha?source=home-demonstracao-amostra",
   );
 });

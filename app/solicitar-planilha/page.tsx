@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { QuickPlanilhaRequestForm } from "@/app/solicitar-planilha/QuickPlanilhaRequestForm";
+import { UnifiedRequestForm } from "@/components/requests/UnifiedRequestForm";
 
 export const metadata: Metadata = {
   title: "Solicitar planilha",
-  description: "Solicite rapidamente uma base B2B segmentada para validação da ProspectaNicho.",
+  description: "Solicite uma amostra grátis ou uma base B2B personalizada em uma única página.",
+  alternates: { canonical: "/solicitar-planilha/" },
 };
 
 export default function SolicitarPlanilhaPage() {
   return (
-    <Suspense fallback={null}>
-      <QuickPlanilhaRequestForm />
+    <Suspense fallback={<div className="section"><div className="container"><p>Carregando solicitação...</p></div></div>}>
+      <UnifiedRequestForm />
     </Suspense>
   );
 }

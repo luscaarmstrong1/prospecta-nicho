@@ -11,7 +11,7 @@ export function ShowcaseGrid({ items }: ShowcaseGridProps) {
     return (
       <div className="showcase-empty" role="status">
         <p>Nenhuma base encontrada para esse termo. Você ainda pode solicitar uma base personalizada.</p>
-        <Link className="button button--primary" href="/montar-minha-base">
+        <Link className="button button--primary" href="/solicitar-planilha?source=showcase-sem-resultado">
           Montar base personalizada
         </Link>
       </div>

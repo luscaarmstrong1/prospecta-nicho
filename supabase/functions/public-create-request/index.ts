@@ -5,6 +5,14 @@ import { numberValue, phone, publicCode, text } from "../_shared/validation.ts";
 
 const defaultFields = ["cnpj", "razao_social", "nome_fantasia", "cnae_principal", "cidade", "uf", "situacao_cadastral"];
 
+function requestedQuantity(value: unknown) {
+  const label = text(value, 80);
+  if (/mais/i.test(label)) return 2000;
+  const digits = label.replace(/\D/g, "");
+  if (digits) return Number(digits);
+  return numberValue(value, 500);
+}
+
 Deno.serve(async (request) => {
   const cors = handleCors(request);
   if (cors) return cors;
@@ -17,15 +25,15 @@ Deno.serve(async (request) => {
   const whatsapp = phone(body.whatsapp);
   const segment = text(body.segment || body.niche || body.audience, 160);
   const city = text(body.location || body.city || body.region, 160);
-  if (!name || !whatsapp || !segment || !city) {
-    return errorJson(request, "INVALID_REQUEST", "Informe nome, WhatsApp, segmento e regiao.", 400);
+  const uf = text(body.state || body.uf, 2).toUpperCase();
+  if (!name || !whatsapp || !segment || !city || uf.length !== 2 || body.consent !== true) {
+    return errorJson(request, "INVALID_REQUEST", "Informe nome, WhatsApp, segmento, cidade, UF e consentimento.", 400);
   }
 
   const supabase = serviceClient();
   const id = crypto.randomUUID();
   const code = publicCode();
-  const uf = text(body.state || body.uf, 2).toUpperCase();
-  const quantity = numberValue(body.quantity || body.desiredQuantity || body.quantityRange, 100);
+  const quantity = requestedQuantity(body.quantity || body.desiredQuantity || body.quantityRange);
   const now = new Date().toISOString();
 
   const { error: requestError } = await supabase.from("custom_requests").insert({
@@ -50,7 +58,7 @@ Deno.serve(async (request) => {
     created_at: now,
     updated_at: now,
   });
-  if (requestError) return errorJson(request, "REQUEST_INSERT_FAILED", requestError.message, 500);
+  if (requestError) return errorJson(request, "REQUEST_INSERT_FAILED", "Nao foi possivel registrar a solicitacao agora.", 500);
 
   await supabase.from("request_filters").insert({
     request_id: id,
@@ -85,18 +93,6 @@ Deno.serve(async (request) => {
     message: "Pedido recebido pelo site estatico e salvo no CRM.",
     metadata: { runtime: "github-pages", publicCode: code },
   });
-
-  const shouldQueueJob = Boolean(segment && (city || uf));
-  if (shouldQueueJob) {
-    await supabase.from("rfb_processing_jobs").insert({
-      request_id: id,
-      status: "queued",
-      source: "github-pages",
-      filters_snapshot: { segment, city, uf, quantity },
-      requested_fields: defaultFields,
-      progress: 0,
-    });
-  }
 
   return json(request, {
     ok: true,

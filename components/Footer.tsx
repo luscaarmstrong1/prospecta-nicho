@@ -18,7 +18,7 @@ export function Footer() {
           <h3>Bases</h3>
           {products.slice(0, 4).map((product) => (
             <p key={product.slug}>
-              <Link href={product.slug === "base-personalizada" ? "/montar-minha-base" : `/produtos/${product.slug}`}>
+              <Link href={`/produtos/${product.slug}`}>
                 {product.shortName}
               </Link>
             </p>

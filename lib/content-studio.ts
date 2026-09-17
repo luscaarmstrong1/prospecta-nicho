@@ -23,7 +23,7 @@ export const editorialLimits = {
 export const revalidationRoutes = [
   "/",
   "/produtos",
-  "/montar-minha-base",
+  "/solicitar-planilha",
   "/para-quem-e",
   "/como-funciona",
   "/faq",

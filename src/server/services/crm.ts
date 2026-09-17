@@ -81,7 +81,7 @@ export async function registerCrmRequest(request: CrmRequest) {
     requester_whatsapp: request.customer.whatsapp,
     segment_slug: request.filters.segment,
     segment_label: request.filters.segment,
-    product_slug: "gerador-planilhas-cnpj",
+    product_slug: request.productSlug || "gerador-planilhas-cnpj",
     source: request.source,
     status: request.status,
     commercial_goal: request.commercialGoal,

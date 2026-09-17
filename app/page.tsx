@@ -1,3 +1,4 @@
+// cspell:words demonstracao
 import { ArrowRight, BadgeCheck, MessageCircle, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { BrandWatermark } from "@/components/BrandWatermark";
@@ -43,11 +44,11 @@ export default function HomePage() {
               ))}
             </div>
             <div className="btn-row delivery-actions">
-              <ButtonLink href="/produtos/amostra-gratuita" variant="teal">
+              <ButtonLink href="/solicitar-planilha?source=home-demonstracao-amostra" variant="teal">
                 Solicitar tabela grátis de teste
                 <ArrowRight size={18} />
               </ButtonLink>
-              <ButtonLink href="/montar-minha-base" variant="secondary">
+              <ButtonLink href="/solicitar-planilha?source=home-demonstracao-base" variant="secondary">
                 Montar minha base
               </ButtonLink>
             </div>
@@ -136,7 +137,7 @@ export default function HomePage() {
               </Link>
             ))}
           </div>
-          <ButtonLink href="/montar-minha-base" variant="teal">
+          <ButtonLink href="/solicitar-planilha?source=home-bases-comerciais" variant="teal">
             Montar meu recorte
           </ButtonLink>
         </div>
@@ -152,7 +153,7 @@ export default function HomePage() {
             Transforme seu público ideal em uma base pronta para prospecção, com critérios claros e validação humana.
           </p>
           <div className="btn-row">
-            <ButtonLink href="/montar-minha-base" variant="teal">
+            <ButtonLink href="/solicitar-planilha?source=home-cta-final" variant="teal">
               Montar minha base
             </ButtonLink>
             {whatsappHref ? (

@@ -52,7 +52,7 @@ const copyBySlug: Record<string, { title: string; promise: string; audience: str
 
 export function ProductSignalCard({ product }: { product: Product }) {
   const Icon = visualIcons[product.slug as keyof typeof visualIcons] || Map;
-  const href = product.slug === "base-personalizada" ? "/montar-minha-base" : productPrimaryHref(product);
+  const href = productPrimaryHref(product);
   const copy = copyBySlug[product.slug] || {
     title: product.shortName,
     promise: product.description,

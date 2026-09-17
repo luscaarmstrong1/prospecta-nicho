@@ -13,9 +13,10 @@ const sampleRequestSchema = z.object({
   whatsapp: z.string().min(8).max(32),
   niche: z.string().min(2).max(160),
   city: z.string().min(2).max(160),
+  state: z.string().length(2),
   email: z.string().email().optional(),
   goal: z.string().optional(),
-  consent: z.boolean().optional(),
+  consent: z.literal(true),
   source: z.string().optional(),
   companySite: z.string().optional(),
   turnstileToken: z.string().optional(),
@@ -51,6 +52,7 @@ export async function POST(request: Request) {
     whatsapp: sanitizePhone(parsed.data.whatsapp),
     niche: sanitizeText(parsed.data.niche, 160),
     city: sanitizeText(parsed.data.city, 160),
+    state: sanitizeText(parsed.data.state, 2).toUpperCase(),
     email: sanitizeText(parsed.data.email, 180),
     maskedSampleOnly: true,
     createdAt: new Date().toISOString(),
@@ -61,6 +63,7 @@ export async function POST(request: Request) {
     createCrmRequest({
       id: persistence.id,
       source: payload.source,
+      productSlug: "amostra-gratuita",
       customer: {
         name: payload.name,
         company: payload.company || undefined,
@@ -71,7 +74,8 @@ export async function POST(request: Request) {
       filters: {
         segment: payload.niche,
         city: payload.city,
-        quantity: 50,
+        uf: payload.state,
+        quantity: 10,
       },
       notes: "Amostra gratuita: entrega demonstrativa e mascarada.",
     }),
@@ -83,6 +87,7 @@ export async function POST(request: Request) {
   return NextResponse.json({
     ok: true,
     id: persistence.id,
+    publicCode: crmRequest.publicCode,
     crm: {
       requestId: crmRequest.id,
       publicCode: crmRequest.publicCode,

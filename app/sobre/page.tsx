@@ -44,8 +44,8 @@ export default function SobrePage() {
           <h2 className="h2">Monte um recorte com mais contexto.</h2>
           <p className="lead">Defina público, região, período, porte e campos desejados para validar a melhor base.</p>
           <div className="btn-row">
-            <ButtonLink href="/montar-minha-base" variant="teal">Montar minha base</ButtonLink>
-            <ButtonLink href="/produtos/amostra-gratuita" variant="secondary">Receber amostra</ButtonLink>
+            <ButtonLink href="/solicitar-planilha?source=sobre-base" variant="teal">Montar minha base</ButtonLink>
+            <ButtonLink href="/solicitar-planilha?source=sobre-amostra" variant="secondary">Receber amostra</ButtonLink>
           </div>
         </div>
       </section>

@@ -16,7 +16,7 @@ Deno.serve(async (request) => {
     .select("id, public_code, status, product_slug, segment_label, segment_slug, updated_at")
     .eq("public_code", code)
     .maybeSingle();
-  if (error) return errorJson(request, "STATUS_LOOKUP_FAILED", error.message, 500);
+  if (error) return errorJson(request, "STATUS_LOOKUP_FAILED", "Nao foi possivel consultar o pedido agora.", 500);
   if (!requestRow) return errorJson(request, "REQUEST_NOT_FOUND", "Pedido nao encontrado para este protocolo.", 404);
 
   const [{ data: filterRow }, { data: events }] = await Promise.all([

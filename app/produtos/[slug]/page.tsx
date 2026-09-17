@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ArrowRight, MessageCircle, ShoppingCart } from "lucide-react";
+import { ArrowRight, Send } from "lucide-react";
 import { ButtonLink } from "@/components/ButtonLink";
 import { FAQAccordion } from "@/components/FAQAccordion";
 import { ProductCard } from "@/components/ProductCard";
-import { getProduct, isExternalHref, productPaymentLink, productPrimaryHref, products, site } from "@/lib/site";
+import { getProduct, productPrimaryHref, products } from "@/lib/site";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -27,10 +27,7 @@ export default async function ProductPage({ params }: Props) {
   const product = getProduct(slug);
   if (!product) notFound();
 
-  const payment = productPaymentLink(product);
   const buyHref = productPrimaryHref(product);
-  const buyExternal = isExternalHref(buyHref);
-  const actionLabel = payment ? "Escolher esta base" : site.whatsapp ? "Falar sobre meu público" : "Ver o que vem na base";
   const related = products.filter((item) => item.slug !== product.slug).slice(0, 3);
 
   return (
@@ -43,11 +40,11 @@ export default async function ProductPage({ params }: Props) {
             <p className="lead">{product.description}</p>
             <div className="price">{product.price}</div>
             <div className="btn-row" style={{ marginTop: 18 }}>
-              <ButtonLink href={buyHref} variant={payment ? "primary" : "teal"} external={buyExternal}>
-                {payment ? <ShoppingCart size={18} /> : <MessageCircle size={18} />}
-                {actionLabel}
+              <ButtonLink href={buyHref} variant="teal">
+                <Send size={18} />
+                Solicitar esta base
               </ButtonLink>
-              <ButtonLink href="/produtos/amostra-gratuita" variant="secondary">
+              <ButtonLink href={`/solicitar-planilha?source=produto-${product.slug}-amostra`} variant="secondary">
                 Solicitar amostra
                 <ArrowRight size={18} />
               </ButtonLink>

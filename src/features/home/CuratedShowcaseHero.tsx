@@ -37,7 +37,7 @@ export function CuratedShowcaseHero() {
               Solicitar uma base
               <ArrowRight size={18} />
             </ButtonLink>
-            <ButtonLink href="/produtos/amostra-gratuita" variant="secondary">
+            <ButtonLink href="/solicitar-planilha?source=hero-amostra" variant="secondary">
               Receber amostra grátis
             </ButtonLink>
           </div>

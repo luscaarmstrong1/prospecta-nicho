@@ -225,12 +225,7 @@ export function productHref(product: Product) {
 }
 
 export function productPrimaryHref(product: Product) {
-  if (product.slug === "base-personalizada") return "/montar-minha-base";
-  const payment = productPaymentLink(product);
-  if (payment) return payment;
-  const whatsapp = waLink(`Olá, conheci a ProspectaNicho e quero entender a base ${product.shortName}.`);
-  if (whatsapp) return whatsapp;
-  return productHref(product);
+  return `/solicitar-planilha?source=produto-${encodeURIComponent(product.slug)}`;
 }
 
 export const confidenceSections = [

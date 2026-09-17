@@ -56,6 +56,7 @@ function normalizeCompanySize(values?: string[]): NonNullable<CnpjRequestFilters
 export function createCrmRequest(input: {
   id?: string;
   source: string;
+  productSlug?: CrmRequest["productSlug"];
   customer: CrmRequest["customer"];
   commercialGoal?: string;
   filters: Partial<CnpjRequestFilters> & Pick<CnpjRequestFilters, "segment">;
@@ -78,6 +79,7 @@ export function createCrmRequest(input: {
     createdAt: date,
     updatedAt: date,
     source: input.source,
+    productSlug: input.productSlug || "gerador-planilhas-cnpj",
     status: "analysis",
     customer: input.customer,
     commercialGoal: input.commercialGoal,

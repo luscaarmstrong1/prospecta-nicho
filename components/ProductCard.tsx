@@ -1,14 +1,11 @@
-import { ArrowRight, DatabaseZap, Gift, MessageCircle, ShoppingCart } from "lucide-react";
+import { ArrowRight, DatabaseZap, Gift, Send } from "lucide-react";
 import { ButtonLink } from "@/components/ButtonLink";
 import { ProductVisual } from "@/components/ProductVisual";
 import type { Product } from "@/lib/site";
-import { isExternalHref, productHref, productPaymentLink, productPrimaryHref, site } from "@/lib/site";
+import { productHref, productPrimaryHref } from "@/lib/site";
 
 export function ProductCard({ product }: { product: Product }) {
-  const payment = productPaymentLink(product);
   const buyHref = productPrimaryHref(product);
-  const buyExternal = isExternalHref(buyHref);
-  const actionLabel = payment ? "Escolher esta base" : site.whatsapp ? "Falar sobre meu público" : "Ver o que vem na base";
   const VisualIcon = product.slug === "amostra-gratuita" ? Gift : DatabaseZap;
 
   return (
@@ -22,9 +19,9 @@ export function ProductCard({ product }: { product: Product }) {
       <div>
         <div className="price">{product.price}</div>
         <div className="btn-row" style={{ marginTop: 16 }}>
-          <ButtonLink href={buyHref} variant={payment ? "primary" : "teal"} external={buyExternal}>
-            {payment ? <ShoppingCart size={18} /> : <MessageCircle size={18} />}
-            {actionLabel}
+          <ButtonLink href={buyHref} variant="teal">
+            <Send size={18} />
+            Solicitar esta base
           </ButtonLink>
           <ButtonLink href={productHref(product)} variant="secondary">
             Ver o que vem na base

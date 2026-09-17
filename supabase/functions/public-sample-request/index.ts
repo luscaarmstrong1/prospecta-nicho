@@ -14,8 +14,9 @@ Deno.serve(async (request) => {
   const whatsapp = phone(body.whatsapp);
   const segment = text(body.niche || body.segment, 160);
   const city = text(body.city || body.location, 160);
-  if (!name || !whatsapp || !segment || !city) {
-    return errorJson(request, "INVALID_SAMPLE_REQUEST", "Informe nome, WhatsApp, nicho e regiao.", 400);
+  const uf = text(body.state || body.uf, 2).toUpperCase();
+  if (!name || !whatsapp || !segment || !city || uf.length !== 2 || body.consent !== true) {
+    return errorJson(request, "INVALID_SAMPLE_REQUEST", "Informe nome, WhatsApp, nicho, cidade, UF e consentimento.", 400);
   }
 
   const supabase = serviceClient();
@@ -44,10 +45,11 @@ Deno.serve(async (request) => {
     created_at: now,
     updated_at: now,
   });
-  if (error) return errorJson(request, "SAMPLE_INSERT_FAILED", error.message, 500);
+  if (error) return errorJson(request, "SAMPLE_INSERT_FAILED", "Nao foi possivel registrar a amostra agora.", 500);
 
   await supabase.from("request_filters").insert({
     request_id: id,
+    uf,
     city,
     cities: [city],
     desired_quantity: 10,

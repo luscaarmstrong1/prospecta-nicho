@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { HomeSampleForm } from "@/components/HomeSampleForm";
+import { ButtonLink } from "@/components/ButtonLink";
 import { assetPath } from "@/lib/asset-path";
 
 export function SampleConversionSection() {
@@ -13,7 +13,9 @@ export function SampleConversionSection() {
           <p className="lead">
             Receba até 10 empresas de amostra e avalie o formato da base antes de comprar.
           </p>
-          <HomeSampleForm />
+          <ButtonLink href="/solicitar-planilha?source=home-amostra" variant="teal">
+            Solicitar amostra gratuita
+          </ButtonLink>
         </div>
         <div className="mini-sheet sample-preview">
           <span className="badge">Amostra demonstrativa</span>

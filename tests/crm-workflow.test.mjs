@@ -3,13 +3,14 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 test("formularios publicos registram pedido no CRM", () => {
-  const quickService = readFileSync("src/server/services/custom-requests.ts", "utf8");
+  const sampleRoute = readFileSync("app/api/free-sample-request/route.ts", "utf8");
   const builderRoute = readFileSync("app/api/custom-base-request/route.ts", "utf8");
 
-  assert.match(quickService, /registerCrmRequest/);
-  assert.match(quickService, /createCrmRequestFromQuickRequest/);
-  assert.match(builderRoute, /createCrmRequestFromBuilder/);
+  assert.match(sampleRoute, /registerCrmRequest/);
+  assert.match(builderRoute, /registerCrmRequest/);
+  assert.match(builderRoute, /createCrmRequest/);
   assert.match(builderRoute, /locked_paid_addon/);
+  assert.doesNotMatch(builderRoute, /createCnpjJob/);
 });
 
 test("CRM nao processa Receita dentro de API route", () => {
@@ -54,14 +55,14 @@ test("links assinados opcionais sao protegidos e a rota publica nao libera arqui
   const crmService = readFileSync("src/server/services/crm.ts", "utf8");
   const exportRoute = readFileSync("app/api/internal/exports/[id]/route.ts", "utf8");
   const exportsPage = readFileSync("app/admin/exportacoes/page.tsx", "utf8");
-  const pedidoPage = readFileSync("app/pedido/[id]/page.tsx", "utf8");
+  const pedidoPage = readFileSync("app/pedido/RequestStatusClient.tsx", "utf8");
 
   assert.match(crmService, /createSignedExportUrl/);
   assert.match(crmService, /verifySignedExportToken/);
   assert.match(crmService, /exportRecord\.status !== "ready" \|\| !exportRecord\.fileUrl/);
   assert.match(exportRoute, /Link expirado ou inv/);
   assert.match(exportsPage, /CrmExportLinkActions/);
-  assert.match(pedidoPage, /getPublicRequestStatusForProtocol/);
+  assert.match(pedidoPage, /\/api\/public\/request-status/);
   assert.doesNotMatch(pedidoPage, /customer|fileUrl|filters\.fields/);
 });
 

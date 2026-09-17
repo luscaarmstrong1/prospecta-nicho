@@ -45,11 +45,8 @@ test("cliente estatico roteia chamadas publicas e admin para Supabase Functions"
 
 test("formularios publicos nao simulam sucesso em export estatico", () => {
   for (const file of [
-    "components/Forms.tsx",
-    "components/HomeSampleForm.tsx",
     "components/ContactForm.tsx",
-    "components/editor/BaseBuilder.tsx",
-    "app/solicitar-planilha/QuickPlanilhaRequestForm.tsx",
+    "components/requests/UnifiedRequestForm.tsx",
   ]) {
     const source = readFileSync(file, "utf8");
     assert.match(source, /apiFetch/);
@@ -63,6 +60,21 @@ test("rota estatica de pedido por protocolo existe para GitHub Pages", () => {
   assert.match(page, /force-static/);
   assert.match(client, /codigo/);
   assert.match(client, /public-request-status|\/api\/public\/request-status/);
+  assert.match(client, /AbortController/);
+  assert.match(client, /finally/);
+  assert.match(client, /Tente novamente/);
+});
+
+test("fluxo publico unificado nao preseleciona produto por query string", () => {
+  const form = readFileSync("components/requests/UnifiedRequestForm.tsx", "utf8");
+  const selector = readFileSync("components/requests/RequestTypeSelector.tsx", "utf8");
+  const createFunction = readFileSync("supabase/functions/public-create-request/index.ts", "utf8");
+
+  assert.match(form, /RequestTypeSelector/);
+  assert.match(selector, /Amostra grátis/);
+  assert.match(selector, /Base personalizada/);
+  assert.doesNotMatch(form, /searchParams\.get\("segment"\)/);
+  assert.doesNotMatch(createFunction, /rfb_processing_jobs/);
 });
 
 test("service role e token privado ficam fora do frontend", () => {

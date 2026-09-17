@@ -65,7 +65,7 @@ export function Header() {
               </Link>
             ))}
           </div>
-          <ButtonLink href="/produtos/amostra-gratuita" variant="teal">
+          <ButtonLink href="/solicitar-planilha?source=header-mobile-amostra" variant="teal">
             Receber amostra
           </ButtonLink>
           <button
@@ -92,10 +92,10 @@ export function Header() {
               {label}
             </Link>
           ))}
-          <ButtonLink href="/montar-minha-base" variant="primary">
+          <ButtonLink href="/solicitar-planilha?source=header-mobile-base" variant="primary">
             Montar minha base
           </ButtonLink>
-          <ButtonLink href="/produtos/amostra-gratuita" variant="teal">
+          <ButtonLink href="/solicitar-planilha?source=header-desktop" variant="teal">
             Receber amostra
           </ButtonLink>
           {whatsappHref ? (
