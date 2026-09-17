@@ -66,14 +66,17 @@ test("links assinados opcionais sao protegidos e a rota publica nao libera arqui
 });
 
 test("admin expoe fluxo operacional real do pedido ate entrega", () => {
-  const detailPage = readFileSync("app/admin/requests/[id]/page.tsx", "utf8");
+  const detailPage = readFileSync("app/admin/requests/detalhe/page.tsx", "utf8");
+  const detailClient = readFileSync("components/admin/CrmRequestRealtimeDetail.tsx", "utf8");
   const jobsPage = readFileSync("app/admin/jobs/page.tsx", "utf8");
   const requestActions = readFileSync("components/admin/CrmRequestActions.tsx", "utf8");
 
   for (const endpoint of ["validate", "mark-paid", "create-job", "mark-delivered", "mark-enrichment-paid", "run-enrichment"]) {
     assert.match(requestActions, new RegExp(endpoint));
   }
-  assert.match(detailPage, /CrmRequestActions/);
+  assert.match(detailPage, /CrmRequestRealtimeDetail/);
+  assert.match(detailClient, /CrmRequestActions/);
+  assert.match(detailClient, /onActionComplete=\{loadRequest\}/);
   assert.match(jobsPage, /Aguardando worker local/);
   assert.doesNotMatch(jobsPage, /CnpjJobCompleteForm/);
 });

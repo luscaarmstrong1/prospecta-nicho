@@ -59,6 +59,10 @@ export function resolveEdgeRoute(path: string): EdgeRoute | null {
   if (pathname === "/api/health") return { functionName: "health" };
   if (pathname === "/api/admin/session") return { functionName: "admin-login" };
   if (pathname === "/api/admin/publish") return { functionName: "admin-update-request", action: "publish-content" };
+  if (pathname === "/api/admin/requests") return { functionName: "admin-requests" };
+
+  const requestDetail = pathname.match(/^\/api\/admin\/requests\/([^/]+)$/);
+  if (requestDetail) return { functionName: "admin-request-detail", resourceId: requestDetail[1] };
 
   const requestAction = pathname.match(/^\/api\/admin\/requests\/([^/]+)\/([^/]+)$/);
   if (requestAction) {

@@ -26,6 +26,7 @@ test("admin de produtos exige login e expõe tabela após autenticação", async
 });
 
 test("admin opera pedido CNPJ real ate criacao do job", async ({ page }) => {
+  test.setTimeout(60_000);
   const response = await page.request.post("/api/custom-requests", {
     data: {
       segment: "agencias",
@@ -45,7 +46,7 @@ test("admin opera pedido CNPJ real ate criacao do job", async ({ page }) => {
   expect(body.crm?.requestId).toBeTruthy();
 
   await loginAsAdmin(page);
-  await page.goto(`/admin/requests/${body.crm?.requestId}`);
+  await page.goto(`/admin/requests/detalhe/?id=${body.crm?.requestId}`);
   await expect(page.locator(".lead", { hasText: body.crm?.publicCode || "" })).toBeVisible();
 
   for (const label of [/Validar filtros/i, /Marcar pagamento/i, /Criar job CNPJ/i]) {
@@ -55,8 +56,9 @@ test("admin opera pedido CNPJ real ate criacao do job", async ({ page }) => {
   }
 
   await page.goto("/admin/jobs");
-  await expect(page.getByText("rfb_cnpj").first()).toBeVisible();
-  await expect(page.getByText(/linhas exportadas/i).first()).toBeVisible();
+  const firstJob = page.locator(".admin-table-row").first();
+  await expect(firstJob).toContainText("rfb_cnpj");
+  await expect(firstJob).toContainText(/linhas exportadas/i);
 });
 
 test("admin de preços expõe campos de alteração e auditoria após login", async ({ page }) => {

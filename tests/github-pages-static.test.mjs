@@ -27,6 +27,8 @@ test("cliente estatico roteia chamadas publicas e admin para Supabase Functions"
     "public-sample-request",
     "public-request-status",
     "admin-login",
+    "admin-requests",
+    "admin-request-detail",
     "admin-create-job",
     "admin-sign-export",
     "health",
@@ -36,6 +38,9 @@ test("cliente estatico roteia chamadas publicas e admin para Supabase Functions"
   assert.match(`${runtime}\n${client}`, /NEXT_PUBLIC_SUPABASE_FUNCTIONS_URL/);
   assert.match(client, /x-resource-id/);
   assert.match(client, /authorization/);
+  assert.match(runtime, /pathname === "\/api\/admin\/requests"/);
+  assert.match(runtime, /admin-request-detail/);
+  assert.match(runtime, /create-job/);
 });
 
 test("formularios publicos nao simulam sucesso em export estatico", () => {
@@ -69,4 +74,31 @@ test("service role e token privado ficam fora do frontend", () => {
   assert.doesNotMatch(client, /SUPABASE_SERVICE_ROLE_KEY/);
   assert.doesNotMatch(client, /EXPORT_SIGNING_SECRET/);
   assert.doesNotMatch(client, /RFB_DATA_DIR/);
+});
+
+test("health informa configurado somente quando checks estao ok", () => {
+  const health = readFileSync("supabase/functions/health/index.ts", "utf8");
+
+  assert.match(health, /supabaseUrlConfigured \? "SUPABASE_URL configurado\." : "SUPABASE_URL ausente\."/);
+  assert.match(health, /serviceRoleConfigured \? "SUPABASE_SERVICE_ROLE_KEY configurado\." : "SUPABASE_SERVICE_ROLE_KEY ausente\."/);
+});
+
+test("CRM admin estatico lista e abre pedidos em runtime via Edge Functions", () => {
+  const requestsPage = readFileSync("app/admin/requests/page.tsx", "utf8");
+  const listClient = readFileSync("components/admin/CrmRequestsRealtimeList.tsx", "utf8");
+  const detailPage = readFileSync("app/admin/requests/detalhe/page.tsx", "utf8");
+  const detailClient = readFileSync("components/admin/CrmRequestRealtimeDetail.tsx", "utf8");
+  const compatPage = readFileSync("app/admin/requests/[id]/page.tsx", "utf8");
+
+  assert.match(requestsPage, /CrmRequestsRealtimeList/);
+  assert.doesNotMatch(requestsPage, /listCrmRequestsForAdmin/);
+  assert.match(listClient, /apiFetch\("\/api\/admin\/requests"\)/);
+  assert.match(listClient, /sessionStorage|apiFetch/);
+  assert.match(listClient, /admin\/requests\/detalhe\/\?id=/);
+  assert.match(detailPage, /CrmRequestRealtimeDetail/);
+  assert.match(detailClient, /useSearchParams/);
+  assert.match(detailClient, /apiFetch\(`\/api\/admin\/requests\/\$\{encodeURIComponent\(requestId\)\}`\)/);
+  assert.match(detailClient, /CrmRequestActions/);
+  assert.match(detailClient, /onActionComplete=\{loadRequest\}/);
+  assert.doesNotMatch(compatPage, /getCrmRequestForAdmin|listCrmTimelineForAdmin/);
 });

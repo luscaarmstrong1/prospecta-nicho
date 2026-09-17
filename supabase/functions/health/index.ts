@@ -9,9 +9,14 @@ Deno.serve(async (request) => {
   const breakGlassAdmin = env("ENABLE_BREAK_GLASS_ADMIN") === "true";
   const deliveryMode = env("EXPORT_DELIVERY_MODE") || "local";
   const storageConfigured = Boolean(env("EXPORTS_BUCKET") || env("SUPABASE_EXPORTS_BUCKET"));
+  const supabaseUrlConfigured = Boolean(env("SUPABASE_URL") || env("NEXT_PUBLIC_SUPABASE_URL"));
+  const serviceRoleConfigured = Boolean(env("SUPABASE_SERVICE_ROLE_KEY"));
   const checks = {
-    supabaseUrl: { ok: Boolean(env("SUPABASE_URL") || env("NEXT_PUBLIC_SUPABASE_URL")), message: "SUPABASE_URL ausente." },
-    serviceRole: { ok: Boolean(env("SUPABASE_SERVICE_ROLE_KEY")), message: "SUPABASE_SERVICE_ROLE_KEY ausente." },
+    supabaseUrl: { ok: supabaseUrlConfigured, message: supabaseUrlConfigured ? "SUPABASE_URL configurado." : "SUPABASE_URL ausente." },
+    serviceRole: {
+      ok: serviceRoleConfigured,
+      message: serviceRoleConfigured ? "SUPABASE_SERVICE_ROLE_KEY configurado." : "SUPABASE_SERVICE_ROLE_KEY ausente.",
+    },
     adminToken: { ok: !breakGlassAdmin || Boolean(env("ADMIN_API_TOKEN")), message: breakGlassAdmin ? "ADMIN_API_TOKEN ausente." : "Login por token administrativo desativado." },
     storage: {
       ok: deliveryMode === "local" || storageConfigured,

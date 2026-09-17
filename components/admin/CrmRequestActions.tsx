@@ -9,6 +9,7 @@ type CrmRequestActionsProps = {
   publicCode: string;
   exportId?: string;
   whatsapp?: string;
+  onActionComplete?: () => void | Promise<void>;
 };
 
 const actions = [
@@ -28,7 +29,7 @@ function whatsappUrl(phone: string | undefined, publicCode: string) {
   return `https://wa.me/${withCountry}?text=${encodeURIComponent(text)}`;
 }
 
-export function CrmRequestActions({ requestId, publicCode, exportId, whatsapp }: CrmRequestActionsProps) {
+export function CrmRequestActions({ requestId, publicCode, exportId, whatsapp, onActionComplete }: CrmRequestActionsProps) {
   const router = useRouter();
   const [pending, setPending] = useState<string | null>(null);
   const [message, setMessage] = useState("");
@@ -46,6 +47,7 @@ export function CrmRequestActions({ requestId, publicCode, exportId, whatsapp }:
     }
 
     setMessage("Ação executada com sucesso.");
+    await onActionComplete?.();
     router.refresh();
   }
 

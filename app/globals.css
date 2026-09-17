@@ -3140,6 +3140,19 @@ textarea {
   margin-top: 24px;
 }
 
+.admin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.admin-toolbar .h3,
+.admin-toolbar .lead {
+  margin: 0;
+}
+
 .admin-table {
   display: grid;
   gap: 8px;
