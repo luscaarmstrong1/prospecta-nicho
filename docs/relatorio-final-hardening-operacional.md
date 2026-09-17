@@ -197,7 +197,7 @@ runner executou as actions afetadas em Node.js 24 e não houve falha de seguran�
 
 Criar localmente `.env.worker` a partir de `.env.worker.example`, preencher
 `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` e iniciar o processo documentado em
-`docs/operacao-worker.md`. O arquivo não pode ser commitado.
+documentação operacional do worker. O arquivo não pode ser commitado.
 
 ### 2. Republicar as Edge Functions
 

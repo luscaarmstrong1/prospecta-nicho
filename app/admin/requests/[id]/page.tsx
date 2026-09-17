@@ -19,8 +19,8 @@ export default async function AdminRequestDetailCompatPage({ params }: Params) {
     <AdminShell title="Detalhe do pedido CRM" eyebrow="Controle operacional">
       <div className="admin-panel">
         <p>
-          Esta rota dinamica e mantida apenas por compatibilidade do build estatico. Para abrir pedidos reais criados
-          depois do deploy, use a pagina de detalhe em tempo real.
+          Esta rota dinâmica é mantida apenas por compatibilidade do build estático. Para abrir pedidos reais criados
+          depois do deploy, use a página de detalhe em tempo real.
         </p>
         <Link className="button button--secondary" href={detailHref}>
           Abrir detalhe em tempo real

@@ -34,7 +34,7 @@ function segmentName(item: RawRequest) {
 }
 
 function publicCode(item: RawRequest) {
-  return requestValue(item, "public_code", "publicCode", text(item.id, "sem codigo"));
+  return requestValue(item, "public_code", "publicCode", text(item.id, "sem código"));
 }
 
 function createdAt(item: RawRequest) {
@@ -64,7 +64,7 @@ export function CrmRequestsRealtimeList() {
 
       if (!response.ok || !body?.ok) {
         setRequests([]);
-        setError(body?.message || `Nao foi possivel carregar os pedidos. HTTP ${response.status}.`);
+        setError(body?.message || `Não foi possível carregar os pedidos. HTTP ${response.status}.`);
         return;
       }
 
@@ -92,7 +92,7 @@ export function CrmRequestsRealtimeList() {
       {error ? <p role="alert">{error}</p> : null}
       <div className="admin-table">
         <div className="admin-table-row">
-          <strong>Codigo publico</strong>
+          <strong>Código público</strong>
           <span>Cliente</span>
           <span>Segmento</span>
           <span>Produto</span>
@@ -122,7 +122,7 @@ export function CrmRequestsRealtimeList() {
         ) : (
           <div className="admin-table-row">
             <strong>Nenhum pedido encontrado no Supabase</strong>
-            <span>Quando um formulario publico criar um pedido, ele aparecera aqui sem novo build.</span>
+            <span>Quando um formulário público criar um pedido, ele aparecerá aqui sem novo build.</span>
           </div>
         )}
       </div>

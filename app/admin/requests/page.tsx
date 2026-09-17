@@ -6,20 +6,20 @@ export const metadata: Metadata = { title: "CRM CNPJ", robots: { index: false, f
 
 export default function AdminRequestsPage() {
   return (
-    <AdminShell title="CRM de solicitacoes CNPJ" eyebrow="Gerador de planilhas">
+    <AdminShell title="CRM de solicitações CNPJ" eyebrow="Gerador de planilhas">
       <p className="lead">
-        Cada pedido publico vira uma oportunidade operacional com filtros, pagamento, job externo, export e add-on de
+        Cada pedido público vira uma oportunidade operacional com filtros, pagamento, job externo, export e add-on de
         enriquecimento bloqueado.
       </p>
       <div className="admin-panel">
         <div className="admin-table">
           <div className="admin-table-row">
             <strong>Fluxo</strong>
-            <span>solicitacao - validacao - pagamento - job Python - export - entrega</span>
+            <span>solicitação - validação - pagamento - job Python - export - entrega</span>
           </div>
           <div className="admin-table-row">
             <strong>Enriquecimento</strong>
-            <span>bloqueado por padrao; liberacao manual somente apos pagamento do add-on</span>
+            <span>bloqueado por padrão; liberação manual somente após pagamento do add-on</span>
           </div>
         </div>
       </div>

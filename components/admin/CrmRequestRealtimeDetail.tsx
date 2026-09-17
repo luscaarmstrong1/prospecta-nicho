@@ -38,7 +38,7 @@ function formatDate(value: unknown) {
 }
 
 function publicCode(request: RawRow) {
-  return value(request, "public_code", "publicCode", text(request.id, "sem codigo"));
+  return value(request, "public_code", "publicCode", text(request.id, "sem código"));
 }
 
 function customerName(request: RawRow) {
@@ -71,7 +71,7 @@ export function CrmRequestRealtimeDetail() {
   const loadRequest = useCallback(async () => {
     if (!requestId) {
       setLoading(false);
-      setError("Pedido nao informado. Volte para a listagem e abra um pedido valido.");
+      setError("Pedido não informado. Volte para a listagem e abra um pedido válido.");
       return;
     }
 
@@ -88,7 +88,7 @@ export function CrmRequestRealtimeDetail() {
 
       if (!response.ok || !body?.ok) {
         setPayload(null);
-        setError(body?.message || `Nao foi possivel carregar o pedido. HTTP ${response.status}.`);
+        setError(body?.message || `Não foi possível carregar o pedido. HTTP ${response.status}.`);
         return;
       }
 
@@ -122,7 +122,7 @@ export function CrmRequestRealtimeDetail() {
   if (error || !request) {
     return (
       <div className="admin-panel">
-        <p role={error ? "alert" : undefined}>{error || "Pedido nao encontrado."}</p>
+        <p role={error ? "alert" : undefined}>{error || "Pedido não encontrado."}</p>
         <Link className="button button--secondary" href={withBasePath("/admin/requests/")}>
           Voltar para pedidos
         </Link>
@@ -188,7 +188,7 @@ export function CrmRequestRealtimeDetail() {
           ) : (
             <div className="admin-table-row">
               <strong>Nenhum job criado</strong>
-              <span>Use a acao Criar job CNPJ depois da validacao operacional.</span>
+              <span>Use a ação Criar job CNPJ depois da validação operacional.</span>
             </div>
           )}
           {exports.map((item) => (
