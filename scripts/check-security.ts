@@ -24,7 +24,7 @@ const leakedFrontendSecrets = publicFrontendFiles.flatMap((file) => {
 const workflow = readFileSync(".github/workflows/deploy-github-pages.yml", "utf8");
 const workflowOk =
   workflow.includes("contents: write") &&
-  workflow.includes("peaceiris/actions-gh-pages@v3") &&
+  /peaceiris\/actions-gh-pages@[0-9a-f]{40} # v4/.test(workflow) &&
   workflow.includes("publish_dir: ./out") &&
   workflow.includes("publish_branch: gh-pages") &&
   workflow.includes("NEXT_PUBLIC_SUPABASE_URL") &&

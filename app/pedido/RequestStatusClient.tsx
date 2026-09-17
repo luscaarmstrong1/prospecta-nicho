@@ -12,6 +12,7 @@ type PublicStatus = {
   request?: {
     publicCode?: string;
     status?: string;
+    statusLabel?: string;
     product?: string;
     segment?: string;
     city?: string;
@@ -38,6 +39,10 @@ export function RequestStatusClient() {
   const loadStatus = useCallback(async (nextCode: string) => {
     const normalizedCode = nextCode.trim().toUpperCase();
     if (!normalizedCode || activeRequest.current) return;
+    if (!/^PN-[A-Z0-9]{8}$/.test(normalizedCode)) {
+      setStatus({ ok: false, message: "Informe um protocolo válido no formato PN-XXXXXXXX." });
+      return;
+    }
 
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 12_000);
@@ -98,14 +103,14 @@ export function RequestStatusClient() {
             <div className="status-result" role={status.ok ? "status" : "alert"} aria-live="polite">
               {status.ok && status.request ? (
                 <>
-                  <h2 className="h3">Status atual: {status.request.status || "em validação"}</h2>
+                  <h2 className="h3">Status atual: {status.request.statusLabel || "Em análise"}</h2>
                   <p>Produto: {status.request.product || "Gerador de planilhas CNPJ"}. Segmento: {status.request.segment || "a validar"}. Região: {[status.request.city, status.request.uf].filter(Boolean).join("/") || "a validar"}.</p>
-                  <p>Os arquivos finais permanecem privados e são entregues por link temporário gerado pela equipe.</p>
+                  <p>Após a validação e o processamento, a equipe realiza a entrega pelos canais combinados.</p>
                   {status.events?.length ? (
                     <ul className="timeline-list">
                       {status.events.slice(0, 5).map((event, index) => (
                         <li key={`${event.createdAt}-${index}`}>
-                          <strong>{event.status || "atualização"}</strong>
+                          <strong>Atualização</strong>
                           <span>{event.message || "Pedido atualizado."}</span>
                         </li>
                       ))}

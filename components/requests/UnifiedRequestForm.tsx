@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, Send, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { RequestTypeSelector, type RequestType } from "@/components/requests/RequestTypeSelector";
 import { brazilianStates, createPublicRequestPayload, quantityOptions } from "@/lib/public-request";
@@ -14,6 +14,7 @@ import { segmentCards } from "@/lib/segments";
 import { createWhatsAppLink } from "@/lib/whatsapp";
 import { apiFetch } from "@/src/lib/api/client";
 import { withBasePath } from "@/src/lib/api/runtime";
+import { TurnstileWidget, turnstileEnabled } from "@/components/security/TurnstileWidget";
 
 type ApiResult = { ok?: boolean; publicCode?: string; message?: string; crm?: { publicCode?: string } };
 
@@ -29,6 +30,10 @@ export function UnifiedRequestForm() {
   const [submitError, setSubmitError] = useState("");
   const [success, setSuccess] = useState<ApiResult | null>(null);
   const submitting = useRef(false);
+  const idempotencyKey = useRef("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReset, setTurnstileReset] = useState(0);
+  const handleTurnstileToken = useCallback((token: string) => setTurnstileToken(token), []);
   const form = useForm<PublicRequestInput>({
     resolver: zodResolver(publicRequestSchema),
     defaultValues: {
@@ -62,6 +67,11 @@ export function UnifiedRequestForm() {
 
   async function submit(data: PublicRequestInput) {
     if (submitting.current || data.companySite) return;
+    if (turnstileEnabled && !turnstileToken) {
+      setSubmitError("Confirme a verificação de segurança antes de enviar.");
+      return;
+    }
+    if (!idempotencyKey.current) idempotencyKey.current = crypto.randomUUID();
     submitting.current = true;
     setSubmitError("");
     setSuccess(null);
@@ -71,11 +81,12 @@ export function UnifiedRequestForm() {
       const response = await apiFetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(createPublicRequestPayload(data, source)),
+        body: JSON.stringify(createPublicRequestPayload(data, source, idempotencyKey.current, turnstileToken)),
       });
       const payload = (await response.json().catch(() => null)) as ApiResult | null;
       if (!response.ok || !payload || payload.ok === false) {
         setSubmitError(safeSubmitError(response.status));
+        setTurnstileReset((value) => value + 1);
         return;
       }
 
@@ -92,6 +103,7 @@ export function UnifiedRequestForm() {
       }
     } catch {
       setSubmitError("Não foi possível conectar agora. Tente novamente.");
+      setTurnstileReset((value) => value + 1);
     } finally {
       submitting.current = false;
     }
@@ -189,6 +201,7 @@ export function UnifiedRequestForm() {
                 <span>Li e concordo com os <Link href="/termos-de-uso">Termos de Uso</Link> e a <Link href="/politica-de-privacidade">Política de Privacidade</Link>.</span>
               </label>
               {form.formState.errors.consent ? <span className="error field--full">{form.formState.errors.consent.message}</span> : null}
+              <TurnstileWidget onToken={handleTurnstileToken} resetSignal={turnstileReset} />
             </div>
 
             {submitError ? <p className="request-feedback request-feedback--error" role="alert">{submitError}</p> : null}

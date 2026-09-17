@@ -12,7 +12,7 @@ export function normalizePhone(value: string) {
   return value.replace(/\D/g, "").slice(0, 13);
 }
 
-export function createPublicRequestPayload(data: PublicRequestInput, source: string) {
+export function createPublicRequestPayload(data: PublicRequestInput, source: string, clientRequestId: string, turnstileToken = "") {
   const segment = data.segment === "outro" ? data.otherSegment?.trim() || "Outro segmento" : data.segment;
   const common = {
     name: data.name.trim(),
@@ -23,6 +23,9 @@ export function createPublicRequestPayload(data: PublicRequestInput, source: str
     consent: data.consent,
     source,
     companySite: data.companySite || "",
+    clientRequestId,
+    idempotencyKey: clientRequestId,
+    turnstileToken,
   };
 
   if (data.requestType === "sample") {

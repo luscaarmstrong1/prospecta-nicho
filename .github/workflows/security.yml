@@ -17,8 +17,8 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22
           cache: npm
@@ -29,8 +29,8 @@ jobs:
     if: ${{ github.event.repository.private == false }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
-      - uses: github/codeql-action/init@e8e8e51caba890f74f97e228d00b0b81b666ee4c
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: github/codeql-action/init@311b4ee155dcdab395044f00946f664bd51ff173 # v4
         with:
           languages: javascript-typescript
-      - uses: github/codeql-action/analyze@e8e8e51caba890f74f97e228d00b0b81b666ee4c
+      - uses: github/codeql-action/analyze@311b4ee155dcdab395044f00946f664bd51ff173 # v4

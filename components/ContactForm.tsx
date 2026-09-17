@@ -1,9 +1,10 @@
 "use client";
 
 import { Send } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { createWhatsAppLink, defaultWhatsAppMessage } from "@/lib/whatsapp";
 import { apiFetch } from "@/src/lib/api/client";
+import { TurnstileWidget, turnstileEnabled } from "@/components/security/TurnstileWidget";
 
 const subjects = [
   "Dúvida sobre uma base",
@@ -18,10 +19,18 @@ const subjects = [
 export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileReset, setTurnstileReset] = useState(0);
+  const handleTurnstileToken = useCallback((token: string) => setTurnstileToken(token), []);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (status === "loading") return;
+    if (turnstileEnabled && !turnstileToken) {
+      setStatus("error");
+      setMessage("Confirme a verificação de segurança antes de enviar.");
+      return;
+    }
 
     setStatus("loading");
     setMessage("");
@@ -32,17 +41,19 @@ export function ContactForm() {
       response = await apiFetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(Object.fromEntries(form.entries())),
+        body: JSON.stringify({ ...Object.fromEntries(form.entries()), turnstileToken }),
       });
     } catch {
       setStatus("error");
       setMessage("Não foi possível conectar agora. Tente novamente em instantes ou chame pelo WhatsApp.");
+      setTurnstileReset((value) => value + 1);
       return;
     }
 
     if (!response.ok) {
       setStatus("error");
       setMessage("Não foi possível enviar agora. Revise os campos e tente novamente.");
+      setTurnstileReset((value) => value + 1);
       return;
     }
 
@@ -101,6 +112,7 @@ export function ContactForm() {
           <input name="consent" type="checkbox" value="true" required />
           <span>Li e concordo com os Termos de Uso e a Política de Privacidade.</span>
         </label>
+        <TurnstileWidget onToken={handleTurnstileToken} resetSignal={turnstileReset} />
       </div>
       {message ? (
         <p className={status === "error" ? "error" : "muted"} role={status === "error" ? "alert" : "status"}>

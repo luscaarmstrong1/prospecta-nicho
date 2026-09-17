@@ -143,6 +143,14 @@ export function CrmRequestRealtimeDetail() {
         publicCode={publicCode(request)}
         exportId={latestExportId(request, exports)}
         whatsapp={customerWhatsapp(request)}
+        status={text(request.status, "analysis")}
+        productSlug={value(request, "product_slug", "productSlug")}
+        isPaid={request.is_paid === true || paymentStatus(request) === "paid" || text(request.status) === "paid"}
+        enrichmentRequested={request.enrichment_requested === true}
+        enrichmentPaid={request.enrichment_paid === true}
+        enrichmentEnabled={request.enrichment_enabled === true}
+        hasReadyExport={exports.some((item) => ["ready", "completed", "ready_for_delivery"].includes(text(item.status)))}
+        hasActiveJob={jobs.some((job) => ["queued", "running"].includes(text(job.status)))}
         onActionComplete={loadRequest}
       />
       <div className="admin-panel">

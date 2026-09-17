@@ -28,6 +28,7 @@ const securityHeaders = [
       "style-src 'self' 'unsafe-inline'",
       scriptSrc,
       "connect-src 'self' https://challenges.cloudflare.com https://*.supabase.co https://api.resend.com https://api.mercadopago.com https://api.asaas.com",
+      "frame-src https://challenges.cloudflare.com",
       "form-action 'self'",
     ].join("; "),
   },
@@ -39,10 +40,9 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
-  async headers() {
-    if (isStaticPreviewExport) return [];
-    return [{ source: "/:path*", headers: securityHeaders }];
-  },
+  ...(!isStaticPreviewExport
+    ? { async headers() { return [{ source: "/:path*", headers: securityHeaders }]; } }
+    : {}),
   ...(isStaticPreviewExport
     ? {
         output: "export" as const,

@@ -51,6 +51,7 @@ test("admin opera pedido CNPJ real ate criacao do job", async ({ page }) => {
 
   for (const label of [/Validar filtros/i, /Marcar pagamento/i, /Criar job CNPJ/i]) {
     const action = page.waitForResponse((res) => res.url().includes("/api/admin/requests/") && res.request().method() === "POST");
+    if (!label.test("Validar filtros")) page.once("dialog", (dialog) => dialog.accept());
     await page.getByRole("button", { name: label }).click();
     expect((await action).ok()).toBeTruthy();
   }

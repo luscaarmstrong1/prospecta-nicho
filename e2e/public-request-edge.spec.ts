@@ -7,12 +7,12 @@ test("solicitação unificada chama Supabase Function em vez de API local", asyn
     await route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify({ ok: true, publicCode: "PN-EDGE01", crm: { publicCode: "PN-EDGE01" } }),
+      body: JSON.stringify({ ok: true, publicCode: "PN-EDGE0001", crm: { publicCode: "PN-EDGE0001" } }),
     });
   });
   await page.goto("/prospecta-nicho/solicitar-planilha/?segment=agencias&source=e2e-static");
   await page.getByRole("button", { name: /Base personalizada/i }).click();
-  await page.getByRole("radio", { name: /Agências/i }).check();
+  await page.locator("label", { has: page.getByRole("radio", { name: /Agências/i }) }).click();
   await page.getByLabel(/Cidade ou região/i).fill("Campinas");
   await page.getByLabel("UF").selectOption("SP");
   await page.getByLabel("Nome").fill("Cliente Static");
@@ -20,6 +20,6 @@ test("solicitação unificada chama Supabase Function em vez de API local", asyn
   await page.getByLabel(/Quantidade aproximada/i).selectOption({ index: 1 });
   await page.getByLabel(/Li e concordo/i).check();
   await page.getByRole("button", { name: /Solicitar base personalizada/i }).click();
-  await page.waitForURL(/\/pedido\/?\?codigo=PN-EDGE01/);
+  await page.waitForURL(/\/pedido\/?\?codigo=PN-EDGE0001/);
   expect(page.url()).not.toContain("/api/");
 });

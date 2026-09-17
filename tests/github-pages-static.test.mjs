@@ -11,7 +11,7 @@ test("GitHub Pages build usa runtime estatico e basePath esperado", () => {
   assert.match(buildScript, /NEXT_PUBLIC_RUNTIME_TARGET:\s*"github-pages"/);
   assert.match(buildScript, /NEXT_PUBLIC_BASE_PATH.*\/prospecta-nicho/);
   assert.match(workflow, /contents:\s*write/);
-  assert.match(workflow, /peaceiris\/actions-gh-pages@v3/);
+  assert.match(workflow, /peaceiris\/actions-gh-pages@[0-9a-f]{40} # v4/);
   assert.match(workflow, /publish_dir:\s*\.\/out/);
   assert.match(workflow, /publish_branch:\s*gh-pages/);
   assert.doesNotMatch(workflow, /environment:\s*github-pages/);

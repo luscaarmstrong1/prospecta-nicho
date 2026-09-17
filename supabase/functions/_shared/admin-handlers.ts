@@ -12,6 +12,22 @@ async function event(supabase: ReturnType<typeof serviceClient>, requestId: stri
   await supabase.from("request_status_events").insert({ request_id: requestId, status, message, metadata });
 }
 
+function rpcError(request: Request, error: { message?: string } | null, fallbackCode: string) {
+  const message = error?.message || fallbackCode;
+  const known = ["INVALID_STATE_TRANSITION", "PAYMENT_REQUIRED", "REQUEST_NOT_VALIDATED", "EXPORT_NOT_READY", "REQUEST_NOT_FOUND"]
+    .find((code) => message.includes(code));
+  if (!known) return errorJson(request, fallbackCode, "Não foi possível concluir a operação.", 500);
+  const status = known === "REQUEST_NOT_FOUND" ? 404 : known === "PAYMENT_REQUIRED" || known === "REQUEST_NOT_VALIDATED" ? 422 : 409;
+  const messages: Record<string, string> = {
+    INVALID_STATE_TRANSITION: "Esta ação não é permitida no estado atual do pedido.",
+    PAYMENT_REQUIRED: "Confirme o pagamento antes de criar o job.",
+    REQUEST_NOT_VALIDATED: "Valide o pedido antes de continuar.",
+    EXPORT_NOT_READY: "O pedido ainda não possui um export pronto para entrega.",
+    REQUEST_NOT_FOUND: "Pedido não encontrado.",
+  };
+  return errorJson(request, known, messages[known], status);
+}
+
 export async function adminListRequests(request: Request) {
   const denied = await requireAdmin(request, "request:read");
   if (denied) return denied;
@@ -48,15 +64,21 @@ export async function adminUpdateRequest(request: Request, forcedStatus?: string
   const status = forcedStatus || text(body.status || (action === "validate" ? "validated" : ""), 60);
   if (!requestId && action !== "publish-content") return errorJson(request, "MISSING_REQUEST_ID", "Pedido nao informado.", 400);
   if (action === "publish-content") return json(request, { ok: true, message: "Publicacao registrada no backend estatico." });
+  const transitionAction = action === "validate" || status === "validated"
+    ? "validate"
+    : status === "paid" ? "mark-paid"
+    : status === "delivered" ? "mark-delivered"
+    : status === "enrichment_offered" ? "offer-enrichment"
+    : action;
   const supabase = serviceClient();
-  const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
-  if (status) patch.status = status;
-  if (body.internalNotes) patch.internal_notes = text(body.internalNotes, 1000);
-  const { data, error } = await supabase.from("custom_requests").update(patch).eq("id", requestId).select("*").maybeSingle();
-  if (error) return errorJson(request, "REQUEST_UPDATE_FAILED", error.message, 500);
-  if (!data) return errorJson(request, "REQUEST_NOT_FOUND", "Pedido nao encontrado.", 404);
-  await event(supabase, requestId, status || "updated", `Acao administrativa executada: ${action || status || "update"}.`, { action });
-  return json(request, { ok: true, request: data });
+  const { data, error } = await supabase.rpc("admin_transition_request", {
+    p_request_id: requestId,
+    p_action: transitionAction,
+    p_internal_notes: text(body.internalNotes, 1000) || null,
+  });
+  if (error || !data) return rpcError(request, error, "REQUEST_UPDATE_FAILED");
+  const result = data as { request?: Record<string, unknown>; idempotent?: boolean };
+  return json(request, { ok: true, request: result.request || {}, idempotent: Boolean(result.idempotent) });
 }
 
 export async function adminCreateJob(request: Request) {
@@ -65,28 +87,10 @@ export async function adminCreateJob(request: Request) {
   const requestId = idFrom(request);
   if (!requestId) return errorJson(request, "MISSING_REQUEST_ID", "Pedido nao informado.", 400);
   const supabase = serviceClient();
-  const { data: existingJob } = await supabase
-    .from("rfb_processing_jobs")
-    .select("*")
-    .eq("request_id", requestId)
-    .in("status", ["queued", "running"])
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (existingJob) return json(request, { ok: true, job: existingJob, idempotent: true });
-  const { data: filters } = await supabase.from("request_filters").select("*").eq("request_id", requestId).maybeSingle();
-  const { data, error } = await supabase.from("rfb_processing_jobs").insert({
-    request_id: requestId,
-    status: "queued",
-    source: "admin-edge",
-    filters_snapshot: filters || {},
-    requested_fields: ["cnpj", "razao_social", "nome_fantasia", "cnae_principal", "cidade", "uf"],
-    progress: 0,
-  }).select("*").single();
-  if (error) return errorJson(request, "JOB_CREATE_FAILED", error.message, 500);
-  await supabase.from("custom_requests").update({ status: "queued", job_id: data.id, updated_at: new Date().toISOString() }).eq("id", requestId);
-  await event(supabase, requestId, "queued", "Job CNPJ criado para processamento externo.", { jobId: data.id });
-  return json(request, { ok: true, job: data }, 201);
+  const { data, error } = await supabase.rpc("create_rfb_job_for_request", { p_request_id: requestId });
+  if (error || !data) return rpcError(request, error, "JOB_CREATE_FAILED");
+  const result = data as { job?: Record<string, unknown>; idempotent?: boolean };
+  return json(request, { ok: true, job: result.job || {}, idempotent: Boolean(result.idempotent) }, result.idempotent ? 200 : 201);
 }
 
 export async function adminCompleteJob(request: Request) {
