@@ -4,6 +4,7 @@ out
 dist
 .env
 .env.local
+.env.worker
 .env.*.local
 !.env.example
 !.env.worker.example
