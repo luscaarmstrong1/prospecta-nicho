@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("official home uses the approved v2 visual with real navigation", async ({ page }) => {
+test("official home uses the approved v2 visual with real navigation", async ({ page }, testInfo) => {
   await page.goto("/");
 
   await expect(page.getByRole("heading", { name: "Explore o mercado B2B em escala nacional." })).toBeVisible();
@@ -10,12 +10,21 @@ test("official home uses the approved v2 visual with real navigation", async ({ 
   await expect(page.getByTestId("preview-final-cta")).toBeVisible();
 
   await expect(page.getByText("Versão visual de teste", { exact: false })).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Abrir menu" })).toHaveAttribute("aria-expanded", "false");
 
-  await expect(page.getByRole("link", { name: /Solicitar planilha/ }).first()).toHaveAttribute(
-    "href",
-    /\/solicitar-planilha\?source=home-v2-header/,
-  );
+  if (testInfo.project.name.startsWith("mobile") || testInfo.project.name === "tablet") {
+    await expect(page.getByRole("button", { name: "Abrir menu" })).toHaveAttribute("aria-expanded", "false");
+    await page.getByRole("button", { name: "Abrir menu" }).click();
+    await expect(page.getByRole("link", { name: "Solicitar planilha" })).toHaveAttribute(
+      "href",
+      /\/solicitar-planilha\?source=home-v2-header-mobile/,
+    );
+  } else {
+    await expect(page.getByRole("link", { name: /Solicitar planilha/ }).first()).toHaveAttribute(
+      "href",
+      /\/solicitar-planilha\?source=home-v2-header/,
+    );
+  }
+
   await expect(page.getByRole("link", { name: /Montar minha base/ }).first()).toHaveAttribute(
     "href",
     /\/solicitar-planilha\?source=home-v2-hero/,
