@@ -4,24 +4,29 @@ test("home não cria scroll horizontal e mantém dez segmentos", async ({ page }
   await page.goto("/");
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
-  await expect(page.locator(".segment-labels a")).toHaveCount(10);
+  await expect(page.getByTestId("motion-segment-card")).toHaveCount(3);
 });
 
 test("cards de segmento apontam para solicitação rápida", async ({ page }) => {
   await page.goto("/");
-  const hrefs = await page.locator(".segment-labels a").evaluateAll((links) =>
+  const hrefs = await page.getByTestId("motion-segment-card").locator("a").evaluateAll((links) =>
     links.map((link) => link.getAttribute("href") || ""),
   );
-  expect(hrefs.every((href) => href.startsWith("/solicitar-planilha?segment="))).toBe(true);
+  expect(hrefs).toEqual([
+    "/solucoes/agencias-de-marketing",
+    "/solucoes/contabilidades",
+    "/solucoes/energia-solar",
+  ]);
 });
 
 test("showcase da primeira dobra filtra cards por segmento e busca", async ({ page }) => {
   await page.goto("/");
 
   await expect(page.getByTestId("preview-map")).toBeVisible();
-  await expect(page.getByTestId("preview-segments")).toBeVisible();
-  await expect(page.getByText("Base para agências")).toBeVisible();
-  await expect(page.getByText("Base para energia solar")).toBeVisible();
+  const segments = page.getByTestId("preview-segments");
+  await expect(segments).toBeVisible();
+  await expect(segments).toContainText("Agências");
+  await expect(segments).toContainText("Energia Solar");
   await expect(page.locator('a[href="/solucoes/agencias-de-marketing"]')).toHaveCount(1);
 });
 

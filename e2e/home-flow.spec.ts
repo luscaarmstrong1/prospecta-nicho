@@ -38,7 +38,7 @@ test("demonstracao da entrega exibe planilha mascarada sem coluna de site", asyn
   await expect(preview).toContainText(/Amostra de base/i);
   await expect(preview).toContainText(/Dados reais e atualizados/i);
   await expect(preview.locator("thead")).not.toContainText("Site");
-  await expect(preview).toContainText("Empresa");
+  await expect(preview).toContainText("Razão Social");
   await expect(preview).toContainText("Cidade");
   await expect(page.getByRole("link", { name: /Receber amostra/i })).toHaveAttribute(
     "href",

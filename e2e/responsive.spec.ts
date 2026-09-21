@@ -31,11 +31,12 @@ test("home preserva responsividade visual nos principais tamanhos", async ({ pag
 
 test("showcase adapta colunas e filtros sem quebrar largura", async ({ page }, testInfo) => {
   await page.goto("/");
-  await expect(page.getByTestId("preview-segments")).toBeVisible();
-  await expect(page.getByText("Base para agências")).toBeVisible();
-  await expect(page.getByText("Base para energia solar")).toBeVisible();
+  const segments = page.getByTestId("preview-segments");
+  await expect(segments).toBeVisible();
+  await expect(segments).toContainText("Agências");
+  await expect(segments).toContainText("Energia Solar");
 
-  const metrics = await page.getByTestId("preview-segments").locator("div").first().evaluate((element) => {
+  const metrics = await segments.locator("[data-testid='motion-segment-card']").first().evaluate((element) => {
     const style = window.getComputedStyle(element);
     return {
       columns: style.gridTemplateColumns.split(" ").filter(Boolean).length,

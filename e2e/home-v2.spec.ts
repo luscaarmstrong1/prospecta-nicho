@@ -10,7 +10,7 @@ test("official home uses the approved v2 visual with real navigation", async ({ 
   await expect(page.getByTestId("preview-final-cta")).toBeVisible();
 
   await expect(page.getByText("Versão visual de teste", { exact: false })).toHaveCount(0);
-  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Abrir menu" })).toHaveAttribute("aria-expanded", "false");
 
   await expect(page.getByRole("link", { name: /Solicitar planilha/ }).first()).toHaveAttribute(
     "href",
