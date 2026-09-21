@@ -3,21 +3,21 @@ import { expect, test } from "@playwright/test";
 test("home mantem ordem comercial final e remove FAQ da pagina inicial", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.locator('[data-test-id="curated-showcase-hero"]')).toBeVisible();
-  await expect(page.getByText(/INTELIG.NCIA COMERCIAL B2B/)).toBeVisible();
-  await expect(page.getByRole("heading", { name: /Escolha um nicho\. Receba uma base pronta para prospec..o\./ })).toBeVisible();
+  await expect(page.getByTestId("preview-hero-title")).toBeVisible();
+  await expect(page.getByText(/Oportunidades em todo o Brasil/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Explore o mercado B2B em escala nacional/i })).toBeVisible();
   await expect(page.getByText("Antes de comecar, voce talvez queira saber.")).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Ver todas as duvidas" })).toHaveCount(0);
 
   const sectionTops = await page.evaluate(() => {
     const selectors = [
-      ".curated-hero",
-      "section:has(.delivery-preview)",
-      "section:has(.product-signal-grid)",
-      ".conversion-system-section",
-      ".segment-band",
-      ".sample-section",
-      ".final-cta",
+      '[data-testid="preview-hero-title"]',
+      '[data-testid="preview-numbers"]',
+      '[data-testid="preview-sample"]',
+      '[data-testid="preview-segments"]',
+      '[data-testid="preview-plans"]',
+      '[data-testid="preview-testimonials"]',
+      '[data-testid="preview-final-cta"]',
     ];
 
     return selectors.map((selector) => {
@@ -33,14 +33,15 @@ test("home mantem ordem comercial final e remove FAQ da pagina inicial", async (
 test("demonstracao da entrega exibe planilha mascarada sem coluna de site", async ({ page }) => {
   await page.goto("/");
 
-  const preview = page.locator(".delivery-preview");
-  await expect(preview.getByText(/Pr.via da entrega/)).toBeVisible();
-  await expect(preview.getByText(/Dados fict.cios e mascarados/)).toBeVisible();
-  await expect(preview.locator(".delivery-row").nth(0)).not.toContainText("Site");
+  const preview = page.getByLabel("Demonstração de planilha comercial");
+  await expect(preview).toBeVisible();
+  await expect(preview).toContainText(/Amostra de base/i);
+  await expect(preview).toContainText(/Dados reais e atualizados/i);
+  await expect(preview.locator("thead")).not.toContainText("Site");
   await expect(preview).toContainText("Empresa");
-  await expect(preview).toContainText("Status");
-  await expect(page.getByRole("link", { name: /Solicitar tabela gr.tis de teste/i })).toHaveAttribute(
+  await expect(preview).toContainText("Cidade");
+  await expect(page.getByRole("link", { name: /Receber amostra/i })).toHaveAttribute(
     "href",
-    "/solicitar-planilha?source=home-demonstracao-amostra",
+    "/solicitar-planilha?source=home-v2-amostra",
   );
 });
