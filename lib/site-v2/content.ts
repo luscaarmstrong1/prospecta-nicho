@@ -1,6 +1,9 @@
 // Centralized content configuration for ProspectaNicho V2 Marketing Pages
 // Follows approved Drive mockups with 100% fidelity.
 
+import { getCatalogProduct } from "@/lib/products";
+import { createWhatsAppLink } from "@/lib/whatsapp";
+
 export interface SolutionItem {
   id: string;
   badge: string;
@@ -93,7 +96,9 @@ export const solucoesData = {
     },
     ctaSecondary: {
       label: "Falar com especialista",
-      href: "https://wa.me/5511999999999?text=Ol%C3%A1,%20gostaria%20de%20saber%20mais%20sobre%20as%20solu%C3%A7%C3%B5es%20da%20ProspectaNicho",
+      href: createWhatsAppLink(
+        "Olá, gostaria de saber mais sobre as soluções da ProspectaNicho.",
+      ),
     },
   },
   solutions: [
@@ -297,7 +302,7 @@ export const planosData = {
       badge: "Ideal para começar",
       title: "Empresas Recém-Abertas",
       subtitle: "Para quem quer chegar primeiro em novos negócios.",
-      price: "R$ 149",
+      price: getCatalogProduct("empresas-recem-abertas")?.price ?? "R$ 147,00",
       period: "por lista avulsa",
       description: "Receba empresas abertas nos últimos 30 a 90 dias no seu nicho e região para oferecer serviços essenciais.",
       features: [
@@ -316,7 +321,7 @@ export const planosData = {
       popular: true,
       title: "Base para Agências",
       subtitle: "Segmentação especializada para agências e consultores.",
-      price: "R$ 199",
+      price: getCatalogProduct("agencias-marketing")?.price ?? "R$ 197,00",
       period: "por lista avulsa",
       description: "Encontre empresas que necessitam de presença digital, tráfego pago, branding e desenvolvimento de sites.",
       features: [
@@ -333,7 +338,7 @@ export const planosData = {
       id: "contabilidades",
       title: "Base para Contabilidades",
       subtitle: "Empresas ativas para captação de clientes recorrentes.",
-      price: "R$ 199",
+      price: getCatalogProduct("contabilidades")?.price ?? "R$ 197,00",
       period: "por lista avulsa",
       description: "Empresas em expansão, comércios e prestadores de serviços precisando de assessoria fiscal e contábil.",
       features: [
@@ -351,7 +356,7 @@ export const planosData = {
       badge: "Corporativo",
       title: "Base Personalizada",
       subtitle: "Volume e filtros customizados para grandes equipes.",
-      price: "Sob consulta",
+      price: getCatalogProduct("base-personalizada")?.price ?? "A partir de R$ 497,00",
       period: "projetos sob medida",
       description: "Filtros avançados para operações enterprise, cruzamento de dados exclusivos e enriquecimento de carteira.",
       features: [

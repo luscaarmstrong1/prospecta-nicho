@@ -14,6 +14,10 @@ export const routes = {
   faq: "/faq",
   contact: "/contato",
   about: "/sobre",
+  solutions: "/solucoes",
+  segments: "/segmentos",
+  plans: "/planos",
+  content: "/conteudo",
   privacy: "/politica-de-privacidade",
   suppression: "/politica-de-supressao",
   cookies: "/politica-de-cookies",
@@ -41,6 +45,10 @@ export const publicRoutes = [
   routes.faq,
   routes.contact,
   routes.about,
+  routes.solutions,
+  routes.segments,
+  routes.plans,
+  routes.content,
   routes.privacy,
   routes.suppression,
   routes.cookies,
@@ -51,4 +59,4 @@ export const publicRoutes = [
   routes.orderStatus,
 ];
 
-export const legacyRedirects = ["/blog", "/conteudos", "/solucoes", "/insights"];
+export const legacyRedirects = ["/blog", "/conteudos", "/insights"];

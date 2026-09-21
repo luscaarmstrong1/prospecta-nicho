@@ -6,25 +6,38 @@ import { ArrowRight, CheckCircle2, ShieldCheck, Zap } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { assetPath } from "@/lib/asset-path";
+import { createWhatsAppLink } from "@/lib/whatsapp";
 import { Magnetic, Reveal, useHomeMotion } from "@/components/home-v2/motion/HomeMotion";
-import styles from "@/components/home-v2/home-v2.module.css";
+import styles from "@/components/shared-v2/site-pages.module.css";
 
 interface SharedCTAProps {
-  title?: React.ReactNode;
-  subtitle?: React.ReactNode;
+  titlePrimary?: React.ReactNode;
+  titleSecondary?: React.ReactNode;
+  titleTertiary?: React.ReactNode;
+  asideHeadline?: React.ReactNode;
   primaryCtaLabel?: string;
   primaryCtaHref?: string;
   secondaryCtaLabel?: string;
   secondaryCtaHref?: string;
+  badgeText1?: string;
+  badgeText2?: string;
+  badgeText3?: string;
 }
 
 export function SharedCTA({
-  title,
-  subtitle,
-  primaryCtaLabel = "Montar meu recorte",
-  primaryCtaHref = "/solicitar-planilha?source=site-v2-cta",
-  secondaryCtaLabel = "Falar com um especialista",
-  secondaryCtaHref = "https://wa.me/5511999999999?text=Ol%C3%A1,%20gostaria%20de%20falar%20com%20um%20especialista%20da%20ProspectaNicho",
+  titlePrimary = "Mais empresas.",
+  titleSecondary = "Mais oportunidades.",
+  titleTertiary = "Mais resultados.",
+  asideHeadline = "Pronto para acelerar sua prospecção?",
+  primaryCtaLabel = "Falar com um especialista",
+  primaryCtaHref = createWhatsAppLink(
+    "Olá, gostaria de falar com um especialista da ProspectaNicho.",
+  ),
+  secondaryCtaLabel = "Começar agora",
+  secondaryCtaHref = "/solicitar-planilha?source=site-v2-cta",
+  badgeText1 = "Sem cartão de crédito",
+  badgeText2 = "Amostra gratuita",
+  badgeText3 = "Ativação rápida",
 }: SharedCTAProps) {
   const ctaRef = useRef<HTMLElement>(null);
   const { reducedMotion } = useHomeMotion();
@@ -32,92 +45,76 @@ export function SharedCTA({
     target: ctaRef,
     offset: ["start end", "end start"],
   });
-  const imageY = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
+  const imageY = useTransform(scrollYProgress, [0, 1], ["-4%", "4%"]);
 
   return (
     <section
       ref={ctaRef}
-      className={styles.finalCta}
+      className={styles.ctaSection}
       aria-labelledby="cta-banner-title"
       data-testid="shared-v2-cta"
     >
       <motion.div
-        className={styles.finalCtaMedia}
+        className={styles.ctaMedia}
         style={{ y: reducedMotion ? 0 : imageY }}
       >
         <Image
-          src={assetPath("/preview-v2/assets/earth-network.webp")}
-          alt="Brasil visto do espaço com malha de conexões"
+          src={assetPath("/preview-v2/assets/earth-brazil-space.png")}
+          alt="Brasil iluminado visto do espaço com conexões"
           fill
           sizes="100vw"
+          priority={false}
           unoptimized
         />
       </motion.div>
 
-      <motion.div
-        className={styles.finalBloom}
-        initial={reducedMotion ? false : { opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, amount: 0.45 }}
-        transition={{ duration: 1.1 }}
-      />
-      <div className={styles.finalCtaShade} />
+      <div className={styles.ctaShade} />
+      <div className={styles.ctaBloom} />
 
-      <Reveal className={styles.finalCtaContent}>
-        <h2 id="cta-banner-title">
-          {title || (
-            <>
-              O Brasil é cheio de<br />
-              <span>oportunidades.</span>
-              <br />
-              O próximo cliente<br />
-              pode estar aqui.
-            </>
-          )}
-        </h2>
+      <div className={styles.ctaContent}>
+        <div className={styles.ctaLeft}>
+          <h2 id="cta-banner-title" className={styles.ctaBigHeading}>
+            {titlePrimary && <span>{titlePrimary}</span>}
+            {titleSecondary && <span>{titleSecondary}</span>}
+            {titleTertiary && <span className={styles.ctaCyanText}>{titleTertiary}</span>}
+          </h2>
+        </div>
 
-        <div className={styles.finalCtaAside}>
-          <p>
-            {subtitle || (
-              <>
-                Comece agora a explorar todo<br />
-                o potencial do mercado brasileiro.
-              </>
-            )}
-          </p>
+        <div className={styles.ctaRight}>
+          <p className={styles.ctaAsideHeadline}>{asideHeadline}</p>
 
-          <div className={styles.buttonRow}>
+          <div className={styles.ctaButtonGroup}>
             <Magnetic className={styles.magneticWrap}>
-              <Link className={styles.primaryButtonLarge} href={primaryCtaHref}>
-                {primaryCtaLabel} <ArrowRight aria-hidden="true" />
-              </Link>
+              <a
+                className={styles.ctaBtnSpecialist}
+                href={primaryCtaHref}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {primaryCtaLabel} <ArrowRight size={18} aria-hidden="true" />
+              </a>
             </Magnetic>
-            <a
-              className={styles.secondaryButtonLarge}
-              href={secondaryCtaHref}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {secondaryCtaLabel}
-            </a>
+            <Link className={styles.ctaBtnStart} href={secondaryCtaHref}>
+              {secondaryCtaLabel} <ArrowRight size={16} aria-hidden="true" />
+            </Link>
           </div>
 
-          <div className={styles.trustRow} data-testid="shared-v2-trust">
+          <div className={styles.ctaBadgeRow} data-testid="shared-v2-trust">
             <span>
-              <CheckCircle2 size={20} color="#20edf0" aria-hidden="true" />
-              Dados LGPD Auditados
+              <CheckCircle2 size={16} color="#20edf0" aria-hidden="true" />
+              {badgeText1}
             </span>
             <span>
-              <ShieldCheck size={20} color="#20edf0" aria-hidden="true" />
-              Garantia de Atualização
+              <ShieldCheck size={16} color="#20edf0" aria-hidden="true" />
+              {badgeText2}
             </span>
             <span>
-              <Zap size={20} color="#20edf0" aria-hidden="true" />
-              Entrega Ágil
+              <Zap size={16} color="#20edf0" aria-hidden="true" />
+              {badgeText3}
             </span>
           </div>
         </div>
-      </Reveal>
+      </div>
     </section>
   );
 }

@@ -26,19 +26,12 @@ export function AppShell({ children }: Readonly<{ children: React.ReactNode }>) 
     return <div className="shell shell--preview-v2">{children}</div>;
   }
 
-  // Home uses its own embedded HomeHeader and SiteFooter inside HomeSiteV2
-  if (pathname === "/") {
-    return (
-      <div className="shell shell--home-v2">
-        {children}
-        <WhatsAppFloatingButton />
-        <CookieBanner />
-      </div>
-    );
-  }
-
-  // V2 Internal Marketing Pages share the global SiteHeader and SiteFooter
-  if (v2MarketingRoutes.has(pathname) || Array.from(v2MarketingRoutes).some(r => pathname.startsWith(r))) {
+  // Home and V2 Internal Marketing Pages share the unified global SiteHeader and SiteFooter
+  if (
+    pathname === "/" ||
+    v2MarketingRoutes.has(pathname) ||
+    Array.from(v2MarketingRoutes).some((r) => pathname.startsWith(r))
+  ) {
     return (
       <div className="shell shell--home-v2">
         <SiteHeader currentPath={pathname} />

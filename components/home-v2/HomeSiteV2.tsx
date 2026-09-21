@@ -128,15 +128,15 @@ function getFooterHref(label: string) {
   return "/contato";
 }
 
-export function HomeSiteV2() {
+export function HomeSiteV2({ includeHeaderFooter = true }: { includeHeaderFooter?: boolean } = {}) {
   return (
     <HomeMotionProvider>
-      <HomeSiteV2Content />
+      <HomeSiteV2Content includeHeaderFooter={includeHeaderFooter} />
     </HomeMotionProvider>
   );
 }
 
-function HomeSiteV2Content() {
+function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [newsletterState, setNewsletterState] = useState<"idle" | "sending" | "success">("idle");
   const [showToast, setShowToast] = useState(false);
@@ -219,10 +219,12 @@ function HomeSiteV2Content() {
         aria-hidden="true"
       />
       <a className={styles.skipLink} href="#conteudo-principal">Pular para o conteúdo</a>
-      <HomeHeader
-        menuOpen={menuOpen}
-        onMenuToggle={() => setMenuOpen((open) => !open)}
-      />
+      {includeHeaderFooter && (
+        <HomeHeader
+          menuOpen={menuOpen}
+          onMenuToggle={() => setMenuOpen((open) => !open)}
+        />
+      )}
 
       <main id="conteudo-principal">
         <section ref={heroRef} className={styles.hero} id="inicio" aria-labelledby="preview-hero-title" data-testid="preview-hero">
@@ -547,59 +549,61 @@ function HomeSiteV2Content() {
         </section>
       </main>
 
-      <footer className={styles.footer} id="sobre" data-testid="preview-footer">
-        <Reveal className={styles.footerTop}>
-          <div className={styles.footerBrand}>
-            <Image src={assetPath("/preview-v2/assets/logo-official-transparent.png")} alt="ProspectaNicho" width={344} height={72} unoptimized />
-            <span>Dados que criam negócios.</span>
-            <p>Dados, tecnologia e inteligência de mercado para impulsionar o crescimento da sua empresa.</p>
-            <div className={styles.socials} aria-label="Canais de contato">
-              <a href="/contato" aria-label="LinkedIn"><Linkedin aria-hidden="true" /></a>
-              <a href="/contato" aria-label="Instagram"><Instagram aria-hidden="true" /></a>
-              <a href="/contato" aria-label="YouTube"><Youtube aria-hidden="true" /></a>
+      {includeHeaderFooter && (
+        <footer className={styles.footer} id="sobre" data-testid="preview-footer">
+          <Reveal className={styles.footerTop}>
+            <div className={styles.footerBrand}>
+              <Image src={assetPath("/preview-v2/assets/logo-official-transparent.png")} alt="ProspectaNicho" width={344} height={72} unoptimized />
+              <span>Dados que criam negócios.</span>
+              <p>Dados, tecnologia e inteligência de mercado para impulsionar o crescimento da sua empresa.</p>
+              <div className={styles.socials} aria-label="Canais de contato">
+                <a href="/contato" aria-label="LinkedIn"><Linkedin aria-hidden="true" /></a>
+                <a href="/contato" aria-label="Instagram"><Instagram aria-hidden="true" /></a>
+                <a href="/contato" aria-label="YouTube"><Youtube aria-hidden="true" /></a>
+              </div>
             </div>
-          </div>
-          {footerGroups.map((group) => (
-            <div className={styles.footerLinks} key={group.title}>
-              <h3>{group.title}</h3>
-              {group.links.map((link) => <a href={getFooterHref(link)} key={link}>{link}</a>)}
+            {footerGroups.map((group) => (
+              <div className={styles.footerLinks} key={group.title}>
+                <h3>{group.title}</h3>
+                {group.links.map((link) => <a href={getFooterHref(link)} key={link}>{link}</a>)}
+              </div>
+            ))}
+            <div className={styles.footerMap}>
+              <Image src={assetPath("/preview-v2/assets/hero-national.webp")} alt="Mapa digital do Brasil" width={190} height={170} unoptimized />
+              <strong>Mais negócios<br />para um Brasil<br />mais forte.</strong>
             </div>
-          ))}
-          <div className={styles.footerMap}>
-            <Image src={assetPath("/preview-v2/assets/hero-national.webp")} alt="Mapa digital do Brasil" width={190} height={170} unoptimized />
-            <strong>Mais negócios<br />para um Brasil<br />mais forte.</strong>
+          </Reveal>
+
+          <form className={styles.newsletter} onSubmit={submitNewsletter}>
+            <div><Mail aria-hidden="true" /><span>Receba insights e conteúdos<br />sobre o mercado B2B no Brasil.</span></div>
+            <label className="sr-only" htmlFor="preview-newsletter">Seu melhor e-mail</label>
+            <input id="preview-newsletter" type="email" required placeholder="Seu melhor e-mail" />
+            <button type="submit" disabled={newsletterState !== "idle"}>
+              {newsletterState === "sending" ? "Enviando..." : newsletterState === "success" ? "Inscrição simulada ✓" : "Quero receber"}
+              {newsletterState === "idle" ? <ArrowRight aria-hidden="true" /> : null}
+            </button>
+            <small>Conteúdo relevante.<br />Sem spam.<br />Apenas oportunidades.</small>
+          </form>
+          <AnimatePresence>
+            {showToast ? (
+              <motion.span
+                className={styles.newsletterSuccess}
+                role="status"
+                initial={reducedMotion ? false : { opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reducedMotion ? undefined : { opacity: 0, y: 8 }}
+              >
+                <CheckCircle2 size={16} aria-hidden="true" /> Inscrição registrada apenas nesta tela.
+              </motion.span>
+            ) : null}
+          </AnimatePresence>
+
+          <div className={styles.footerBottom}>
+            <span>© 2026 ProspectaNicho. Todos os direitos reservados.</span>
+            <span>Dados. Negócios. Um Brasil com mais oportunidades.</span>
           </div>
-        </Reveal>
-
-        <form className={styles.newsletter} onSubmit={submitNewsletter}>
-          <div><Mail aria-hidden="true" /><span>Receba insights e conteúdos<br />sobre o mercado B2B no Brasil.</span></div>
-          <label className="sr-only" htmlFor="preview-newsletter">Seu melhor e-mail</label>
-          <input id="preview-newsletter" type="email" required placeholder="Seu melhor e-mail" />
-          <button type="submit" disabled={newsletterState !== "idle"}>
-            {newsletterState === "sending" ? "Enviando..." : newsletterState === "success" ? "Inscrição simulada ✓" : "Quero receber"}
-            {newsletterState === "idle" ? <ArrowRight aria-hidden="true" /> : null}
-          </button>
-          <small>Conteúdo relevante.<br />Sem spam.<br />Apenas oportunidades.</small>
-        </form>
-        <AnimatePresence>
-          {showToast ? (
-            <motion.span
-              className={styles.newsletterSuccess}
-              role="status"
-              initial={reducedMotion ? false : { opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={reducedMotion ? undefined : { opacity: 0, y: 8 }}
-            >
-              <CheckCircle2 size={16} aria-hidden="true" /> Inscrição registrada apenas nesta tela.
-            </motion.span>
-          ) : null}
-        </AnimatePresence>
-
-        <div className={styles.footerBottom}>
-          <span>© 2026 ProspectaNicho. Todos os direitos reservados.</span>
-          <span>Dados. Negócios. Um Brasil com mais oportunidades.</span>
-        </div>
-      </footer>
+        </footer>
+      )}
     </div>
   );
 }

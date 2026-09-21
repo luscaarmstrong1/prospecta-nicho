@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return <HomeSiteV2 />;
+  return <HomeSiteV2 includeHeaderFooter={false} />;
 }

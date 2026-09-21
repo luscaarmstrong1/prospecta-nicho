@@ -1,4 +1,5 @@
 // cspell:ignore Ltda carlos rafael patricia
+import { getCatalogProduct } from "@/lib/products";
 export type PreviewIcon =
   | "building"
   | "calculator"
@@ -90,28 +91,28 @@ export const plans: Array<{
     icon: "calculator",
     title: "Empresas recém-abertas",
     description: "Seja o primeiro a chegar. Empresas recém-abertas, ideais para conhecer seus produtos e serviços.",
-    price: "R$ 149",
+    price: getCatalogProduct("empresas-recem-abertas")?.price ?? "R$ 147,00",
     suffix: "por lista",
   },
   {
     icon: "megaphone",
     title: "Base para agências",
     description: "Agências, estúdios, produtoras e empresas de marketing digital.",
-    price: "R$ 199",
+    price: getCatalogProduct("agencias-marketing")?.price ?? "R$ 197,00",
     suffix: "por lista",
   },
   {
     icon: "calculator",
     title: "Contabilidades",
     description: "Escritórios contábeis, consultorias e serviços financeiros.",
-    price: "R$ 199",
+    price: getCatalogProduct("contabilidades")?.price ?? "R$ 197,00",
     suffix: "por lista",
   },
   {
     icon: "settings",
     title: "Base personalizada",
     description: "Fale com nosso time e monte uma base sob medida para o seu nicho.",
-    price: "Sob consulta",
+    price: getCatalogProduct("base-personalizada")?.price ?? "A partir de R$ 497,00",
     suffix: "De acordo com o seu segmento",
     custom: true,
   },

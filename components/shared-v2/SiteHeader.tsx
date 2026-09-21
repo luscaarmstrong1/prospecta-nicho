@@ -80,7 +80,7 @@ export function SiteHeader({ currentPath }: SiteHeaderProps) {
               className={styles.primaryButton}
               href="/solicitar-planilha?source=header-v2"
             >
-              Solicitar planilha <ArrowRight size={18} aria-hidden="true" />
+              Criar minha conta <ArrowRight size={18} aria-hidden="true" />
             </Link>
           </Magnetic>
         </div>
@@ -120,7 +120,7 @@ export function SiteHeader({ currentPath }: SiteHeaderProps) {
               href="/solicitar-planilha?source=header-mobile-v2"
               onClick={() => setMenuOpen(false)}
             >
-              Solicitar planilha
+              Criar minha conta
             </Link>
           </motion.div>
         )}
