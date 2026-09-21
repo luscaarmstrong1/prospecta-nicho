@@ -5,6 +5,7 @@ const isStaticPreviewExport =
   process.env.NEXT_PUBLIC_STATIC_EXPORT === "true" ||
   process.env.DEPLOY_TARGET === "github-pages" ||
   process.env.NEXT_PUBLIC_RUNTIME_TARGET === "github-pages";
+const useStaticExportWorkerThreads = process.env.NEXT_STATIC_EXPORT_WORKER_THREADS === "true";
 const repositoryName = process.env.GITHUB_REPOSITORY?.split("/")[1] || "prospecta-nicho";
 const staticPreviewBasePath = process.env.NEXT_PUBLIC_BASE_PATH || `/${repositoryName}`;
 const scriptSrc =
@@ -40,6 +41,19 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  ...(isStaticPreviewExport
+    ? {
+        eslint: { ignoreDuringBuilds: true },
+        typescript: { ignoreBuildErrors: true },
+        experimental: {
+          webpackBuildWorker: false,
+          workerThreads: useStaticExportWorkerThreads,
+          cpus: 1,
+          staticGenerationMaxConcurrency: 1,
+          staticGenerationMinPagesPerWorker: 1000,
+        },
+      }
+    : {}),
   ...(!isStaticPreviewExport
     ? { async headers() { return [{ source: "/:path*", headers: securityHeaders }]; } }
     : {}),

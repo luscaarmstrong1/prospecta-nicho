@@ -28,6 +28,8 @@
   --soft: #f5f8fb;
   --white: #ffffff;
   --focus: #f2b84b;
+  --font-manrope: Manrope, Inter, "Segoe UI", Arial, Helvetica, sans-serif;
+  --font-sora: Sora, Manrope, Inter, "Segoe UI", Arial, Helvetica, sans-serif;
 }
 
 * {
