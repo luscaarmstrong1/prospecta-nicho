@@ -45,14 +45,15 @@ test.describe("ProspectaNicho V2 Marketing Pages - Visual & Quality QA", () => {
   test("Segmentos search filter functions accurately", async ({ page }) => {
     await page.goto("/segmentos", { waitUntil: "networkidle" });
     const searchInput = page.getByRole("searchbox", { name: "Buscar segmento" });
+    const segmentGrid = page.getByTestId("segmentos-grid");
     await expect(searchInput).toBeVisible();
 
     await searchInput.fill("Solar");
-    await expect(page.getByRole("heading", { name: "Energia Solar", exact: true })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Contabilidades", exact: true })).not.toBeVisible();
+    await expect(segmentGrid.getByRole("heading", { name: "Energia Solar", exact: true })).toBeVisible();
+    await expect(segmentGrid.getByRole("heading", { name: "Contabilidades", exact: true })).not.toBeVisible();
 
     await searchInput.fill("");
-    await expect(page.getByRole("heading", { name: "Contabilidades", exact: true })).toBeVisible();
+    await expect(segmentGrid.getByRole("heading", { name: "Contabilidades", exact: true })).toBeVisible();
   });
 
   test("Planos FAQ accordion expands and collapses cleanly", async ({ page }) => {
