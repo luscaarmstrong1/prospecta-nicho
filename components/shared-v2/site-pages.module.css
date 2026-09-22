@@ -464,6 +464,12 @@
   gap: 1.75rem;
 }
 
+.segmentEmptyState {
+  margin: 2rem 0 0;
+  color: #94a3b8;
+  font-size: 0.95rem;
+}
+
 .segmentPhotoCard {
   background: rgba(6, 22, 38, 0.9);
   border: 1px solid rgba(32, 237, 240, 0.18);

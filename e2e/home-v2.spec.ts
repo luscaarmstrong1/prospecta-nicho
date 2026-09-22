@@ -15,11 +15,11 @@ test("official home uses the approved v2 visual with real navigation", async ({ 
   if ((await menuButton.count()) > 0) {
     await expect(menuButton).toHaveAttribute("aria-expanded", "false");
     await menuButton.click();
-    await expect(page.locator('a[href="/solicitar-planilha?source=home-v2-header-mobile"]')).toBeVisible();
+    await expect(page.locator('a[href="/solicitar-planilha?source=header-mobile-v2"]')).toBeVisible();
   } else {
-    await expect(page.getByRole("link", { name: /Solicitar planilha/ }).first()).toHaveAttribute(
+    await expect(page.getByRole("link", { name: /Criar minha conta/ }).first()).toHaveAttribute(
       "href",
-      /\/solicitar-planilha\?source=home-v2-header/,
+      /\/solicitar-planilha\?source=header-v2/,
     );
   }
 
@@ -37,7 +37,7 @@ test("official home remains usable on mobile without horizontal overflow", async
 
   await expect(page.getByRole("heading", { name: "Explore o mercado B2B em escala nacional." })).toBeVisible();
   await page.getByRole("button", { name: "Abrir menu" }).click();
-  await expect(page.getByRole("link", { name: "Solicitar planilha" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Criar minha conta" })).toBeVisible();
 
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
   expect(overflow).toBe(false);

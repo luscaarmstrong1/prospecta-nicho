@@ -2,9 +2,10 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Calculator, ChevronDown, Cpu, Factory, Heart, Megaphone, Play, Search, Sun, Zap } from "lucide-react";
+import { ArrowRight, Calculator, Cpu, Factory, Heart, Megaphone, Play, Sun } from "lucide-react";
 import { assetPath } from "@/lib/asset-path";
 import { createWhatsAppLink } from "@/lib/whatsapp";
+import { SegmentosExplorer } from "@/components/shared-v2/SegmentosExplorer";
 import { SharedCTA } from "@/components/shared-v2/SharedCTA";
 import styles from "@/components/shared-v2/site-pages.module.css";
 
@@ -21,57 +22,6 @@ const segmentHeroPills = [
   { icon: Factory, title: "Indústria", count: "+ 376 mil empresas" },
   { icon: Cpu, title: "Tecnologia", count: "+ 267 mil empresas" },
   { icon: Heart, title: "Saúde", count: "+ 315 mil empresas" },
-];
-
-const segmentCardsList = [
-  {
-    id: "agencias",
-    icon: Megaphone,
-    title: "Agências",
-    description: "Marketing, publicidade e comunicação digital.",
-    image: "/preview-v2/assets/segment-agencias.webp",
-    href: "/solicitar-planilha?segmento=agencias",
-  },
-  {
-    id: "contabilidades",
-    icon: Calculator,
-    title: "Contabilidades",
-    description: "Escritórios contábeis e serviços financeiros.",
-    image: "/preview-v2/assets/finance-accounting.png",
-    href: "/solicitar-planilha?segmento=contabilidades",
-  },
-  {
-    id: "energia-solar",
-    icon: Sun,
-    title: "Energia Solar",
-    description: "Empresas de energia solar e soluções sustentáveis.",
-    image: "/preview-v2/assets/solar-energy.png",
-    href: "/solicitar-planilha?segmento=energia-solar",
-  },
-  {
-    id: "industria",
-    icon: Factory,
-    title: "Indústria",
-    description: "Indústrias, equipamentos e setor manufatureiro.",
-    image: "/preview-v2/assets/industry-factory.png",
-    href: "/solicitar-planilha?segmento=industria",
-  },
-  {
-    id: "tecnologia",
-    icon: Cpu,
-    title: "Tecnologia",
-    description: "Software, TI e soluções tecnológicas.",
-    image: "/preview-v2/assets/server-datacenter.png",
-    href: "/solicitar-planilha?segmento=tecnologia",
-  },
-  {
-    id: "saude",
-    icon: Heart,
-    title: "Saúde",
-    description: "Clínicas, hospitais e serviços de saúde.",
-    image: "/preview-v2/assets/healthcare-hospital.png",
-    href: "/solicitar-planilha?segmento=saude",
-  },
 ];
 
 const growthMarkets = [
@@ -166,58 +116,7 @@ export default function SegmentosPage() {
               </p>
             </div>
 
-            {/* SEARCH & FILTER CLUSTER */}
-            <div className={styles.segmentSearchFilterCluster}>
-              <div className={styles.searchBoxWide}>
-                <Search size={18} color="#20edf0" />
-                <input
-                  type="text"
-                  placeholder="Buscar segmento (ex.: contabilidade, saúde, indústria...)"
-                  aria-label="Buscar segmento"
-                />
-              </div>
-
-              <div className={styles.filterSelectBtn}>
-                <span>Todas as regiões</span>
-                <ChevronDown size={16} />
-              </div>
-
-              <div className={styles.filterSelectBtn}>
-                <span>Ordenar por relevância</span>
-                <ChevronDown size={16} />
-              </div>
-            </div>
-
-            {/* 6 SEGMENT PHOTO CARDS (2 LINHAS X 3 COLUNAS) */}
-            <div className={styles.segmentPhotosGrid}>
-              {segmentCardsList.map((card) => {
-                const IconComp = card.icon;
-                return (
-                  <article key={card.id} className={styles.segmentPhotoCard}>
-                    <div className={styles.segmentPhotoThumb}>
-                      <Image
-                        src={assetPath(card.image)}
-                        alt={card.title}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 400px"
-                        style={{ objectFit: "cover" }}
-                        unoptimized
-                      />
-                    </div>
-                    <div className={styles.segmentPhotoContent}>
-                      <div className={styles.segmentCardIconRow}>
-                        <IconComp size={18} />
-                        <h3 className={styles.segmentCardHeading}>{card.title}</h3>
-                      </div>
-                      <p className={styles.segmentCardParagraph}>{card.description}</p>
-                      <Link className={styles.linkCardDetails} href={card.href}>
-                        Ver empresas <ArrowRight size={14} aria-hidden="true" />
-                      </Link>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
+            <SegmentosExplorer />
           </div>
         </section>
 

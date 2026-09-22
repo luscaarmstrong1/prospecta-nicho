@@ -44,25 +44,25 @@ test.describe("ProspectaNicho V2 Marketing Pages - Visual & Quality QA", () => {
 
   test("Segmentos search filter functions accurately", async ({ page }) => {
     await page.goto("/segmentos", { waitUntil: "networkidle" });
-    const searchInput = page.getByPlaceholder("Buscar por segmento");
+    const searchInput = page.getByRole("searchbox", { name: "Buscar segmento" });
     await expect(searchInput).toBeVisible();
 
     await searchInput.fill("Solar");
-    await expect(page.getByText("Energia Solar & Renovável")).toBeVisible();
-    await expect(page.getByText("Contabilidades & Finanças")).not.toBeVisible();
+    await expect(page.getByRole("heading", { name: "Energia Solar", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Contabilidades", exact: true })).not.toBeVisible();
 
     await searchInput.fill("");
-    await expect(page.getByText("Contabilidades & Finanças")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Contabilidades", exact: true })).toBeVisible();
   });
 
   test("Planos FAQ accordion expands and collapses cleanly", async ({ page }) => {
     await page.goto("/planos", { waitUntil: "networkidle" });
-    const firstFaqQuestion = page.getByText("Qual é o formato de entrega das planilhas?");
+    const firstFaqQuestion = page.getByRole("button", { name: "Posso testar antes de contratar?" });
     await expect(firstFaqQuestion).toBeVisible();
 
     // Verify answers can toggle
-    const secondFaqQuestion = page.getByText("Os dados cumprem as diretrizes da LGPD?");
+    const secondFaqQuestion = page.getByRole("button", { name: "Em quais formatos recebo a base?" });
     await secondFaqQuestion.click();
-    await expect(page.getByText("Sim. Todas as informações comercializadas pela ProspectaNicho")).toBeVisible();
+    await expect(page.getByText("Você recebe os arquivos prontos em .XLSX", { exact: false })).toBeVisible();
   });
 });
