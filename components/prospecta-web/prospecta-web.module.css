@@ -1,0 +1,933 @@
+/* ==========================================================================
+   PROSPECTANICHO - PROSPECTA WEB | SITES & LANDING PAGES (DESIGN SYSTEM)
+   Paleta Oficial:
+   #000A17 — fundo principal
+   #001326 — fundo secundário
+   #01295A — azul institucional
+   #0165CD — azul elétrico
+   #09E2E8 — ciano de destaque
+   #E7EFF4 — branco gelo
+   #A8D2E1 — texto secundário
+   ========================================================================== */
+
+.pageWrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #000a17;
+  color: #e7eff4;
+  font-family: var(--font-manrope, 'Manrope', sans-serif);
+  overflow-x: clip;
+}
+
+.mainContent {
+  flex: 1;
+  position: relative;
+}
+
+/* --------------------------------------------------------------------------
+   SHARED TOKENS & ATOMS
+   -------------------------------------------------------------------------- */
+.container {
+  width: min(calc(100% - 48px), 1260px);
+  margin: 0 auto;
+}
+
+.sectionBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.95rem;
+  border-radius: 9999px;
+  background: rgba(1, 41, 90, 0.35);
+  border: 1px solid rgba(9, 226, 232, 0.38);
+  color: #09e2e8;
+  font-family: var(--font-sora, 'Sora', sans-serif);
+  font-size: 0.76rem;
+  font-weight: 750;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  margin-bottom: 1.1rem;
+  box-shadow: 0 0 16px rgba(9, 226, 232, 0.08);
+}
+
+.cyanHighlight {
+  color: #09e2e8;
+}
+
+.primaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.88rem 1.85rem;
+  border-radius: 9999px;
+  background: #09e2e8;
+  color: #000a17;
+  font-family: var(--font-sora, 'Sora', sans-serif);
+  font-weight: 750;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid #09e2e8;
+  box-shadow: 0 4px 20px rgba(9, 226, 232, 0.28);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.primaryButton:hover {
+  background: #39eaf0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 26px rgba(9, 226, 232, 0.4);
+}
+
+.secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.88rem 1.75rem;
+  border-radius: 9999px;
+  background: rgba(0, 19, 38, 0.75);
+  color: #e7eff4;
+  font-family: var(--font-sora, 'Sora', sans-serif);
+  font-weight: 650;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid rgba(9, 226, 232, 0.38);
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+}
+
+.secondaryButton:hover {
+  background: rgba(1, 41, 90, 0.6);
+  border-color: #09e2e8;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 18px rgba(9, 226, 232, 0.18);
+}
+
+.secondaryButtonPlayIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid #09e2e8;
+  color: #09e2e8;
+}
+
+/* --------------------------------------------------------------------------
+   DOBRA 01: HERO SECTION
+   -------------------------------------------------------------------------- */
+.heroSection {
+  position: relative;
+  min-height: calc(100vh - 80px);
+  max-min-height: 840px;
+  display: flex;
+  align-items: center;
+  padding: clamp(3rem, 6vw, 5.5rem) 0 clamp(3.5rem, 6vw, 5rem);
+  background: radial-gradient(circle at 78% 28%, rgba(1, 101, 205, 0.22) 0%, rgba(0, 10, 23, 0) 65%),
+              radial-gradient(circle at 20% 80%, rgba(9, 226, 232, 0.08) 0%, rgba(0, 10, 23, 0) 55%),
+              linear-gradient(180deg, #000a17 0%, #001326 100%);
+  overflow: hidden;
+  border-bottom: 1px solid rgba(9, 226, 232, 0.12);
+}
+
+.heroGlowBackdrop {
+  position: absolute;
+  top: 15%;
+  right: 8%;
+  width: 520px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(1, 101, 205, 0.28) 0%, rgba(9, 226, 232, 0.12) 40%, rgba(0, 10, 23, 0) 70%);
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: 1.1fr 1.05fr;
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.heroTitle {
+  font-family: var(--font-sora, 'Sora', sans-serif);
+  font-size: clamp(2.35rem, 4.4vw, 3.85rem);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+  color: #ffffff;
+  margin: 0 0 1.35rem;
+}
+
+.heroSubtitle {
+  font-size: clamp(1rem, 1.25vw, 1.12rem);
+  line-height: 1.68;
+  color: #a8d2e1;
+  max-width: 540px;
+  margin: 0 0 2.2rem;
+}
+
+.heroActions {
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.5rem;
+}
+
+.heroTrustRow {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.2rem, 2.5vw, 2.4rem);
+  flex-wrap: wrap;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(168, 210, 225, 0.12);
+}
+
+.heroTrustItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #e7eff4;
+}
+
+.heroTrustItem svg {
+  color: #09e2e8;
+  flex-shrink: 0;
+}
+
+.heroVisual {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.heroDeviceImageWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  aspect-ratio: 417 / 350;
+  filter: drop-shadow(0 20px 35px rgba(0, 0, 0, 0.55));
+}
+
+.heroDeviceImage {
+  object-fit: contain;
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* --------------------------------------------------------------------------
+   DOBRA 02: PRINCIPAIS BENEFÍCIOS (4 CARDS)
+   -------------------------------------------------------------------------- */
+.benefitsSection {
+  padding: clamp(3.5rem, 6vw, 5.5rem) 0;
+  background-color: #000a17;
+  position: relative;
+}
+
+.benefitsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.4rem;
+}
+
+.benefitCard {
+  background: linear-gradient(180deg, rgba(1, 41, 90, 0.28) 0%, rgba(0, 19, 38, 0.72) 100%);
+  border: 1px solid rgba(9, 226, 232, 0.22);
+  border-radius: 18px;
+  padding: 2.2rem 1.6rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.benefitCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(9, 226, 232, 0.5), transparent);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.benefitCard:hover {
+  transform: translateY(-5px);
+  border-color: rgba(9, 226, 232, 0.55);
+  box-shadow: 0 16px 36px rgba(0, 10, 23, 0.6), 0 0 24px rgba(9, 226, 232, 0.12);
+}
+
+.benefitCard:hover::before {
+  opacity: 1;
+}
+
+.benefitIconCircle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1.5px solid #09e2e8;
+  background: rgba(9, 226, 232, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #09e2e8;
+  margin-bottom: 1.4rem;
+  box-shadow: 0 0 16px rgba(9, 226, 232, 0.18);
+}
+
+.benefitTitle {
+  font-family: var(--font-sora, 'Sora', sans-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.75rem;
+}
+
+.benefitDescription {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #a8d2e1;
+  margin: 0;
+}
+
+/* --------------------------------------------------------------------------
+   DOBRA 03: SERVIÇO COMPLETO (O QUE ESTÁ INCLUSO)
+   -------------------------------------------------------------------------- */
+.servicesSection {
+  padding: clamp(4rem, 7vw, 6.5rem) 0;
+  background: radial-gradient(circle at 15% 50%, rgba(1, 41, 90, 0.25) 0%, rgba(0, 10, 23, 0) 65%),
+              linear-gradient(180deg, #001326 0%, #000a17 100%);
+  position: relative;
+  border-top: 1px solid rgba(9, 226, 232, 0.08);
+  border-bottom: 1px solid rgba(9, 226, 232, 0.08);
+}
+
+.servicesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: center;
+}
+
+.servicesTextCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.servicesTitle {
+  font-family: var(--font-sora, 'Sora', sans-serif);
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.15;
+  color: #ffffff;
+  margin: 0 0 1.1rem;
+}
+
+.servicesSubtitle {
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: #a8d2e1;
+  margin: 0 0 2.2rem;
+  max-width: 500px;
+}
+
+.servicesList {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.4rem 1.6rem;
+}
+
+.serviceItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.serviceIconWrap {
+  color: #09e2e8;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+.serviceInfo h4 {
+  font-family: var(--font-sora, 'Sora', sans-serif);
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.25rem;
+}
+
+.serviceInfo p {
+  font-size: 0.83rem;
+  line-height: 1.48;
+  color: #a8d2e1;
+  margin: 0;
+}
+
+.servicesVisualCol {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.servicesPreviewCard {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  filter: drop-shadow(0 24px 44px rgba(0, 5, 15, 0.7));
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.servicesPreviewCard img {
+  width: 100% !important;
+  height: auto !important;
+  display: block;
+}
+
+/* --------------------------------------------------------------------------
+   DOBRA 04: COMO FUNCIONA (TIMELINE / PROCESSO)
+   -------------------------------------------------------------------------- */
+.processSection {
+  padding: clamp(3.5rem, 6vw, 5.5rem) 0;
+  background-color: #000a17;
+  position: relative;
+}
+
+.processHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2rem;
+  margin-bottom: 2.8rem;
+  flex-wrap: wrap;
+}
+
+.processHeaderLeft {
+  max-width: 620px;
+}
+
+.processTitle {
+  font-family: var(--font-sora, 'Sora', sans-serif);
+  font-size: clamp(1.9rem, 3.2vw, 2.75rem);
+  font-weight: 800;
+  line-height: 1.18;
+  color: #ffffff;
+  margin: 0;
+}
+
+.processSubtext {
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: #a8d2e1;
+  max-width: 420px;
+  margin: 0;
+}
+
+.processCardContainer {
+  background: linear-gradient(180deg, rgba(1, 41, 90, 0.24) 0%, rgba(0, 19, 38, 0.58) 100%);
+  border: 1px solid rgba(9, 226, 232, 0.22);
+  border-radius: 20px;
+  padding: clamp(2rem, 3.5vw, 3rem) clamp(1.5rem, 3vw, 2.8rem);
+}
+
+.processStepsRow {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.processStep {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.processStepTop {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.processStepNumber {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #09e2e8;
+  color: #000a17;
+  font-family: var(--font-sora, 'Sora', sans-serif);
+  font-weight: 800;
+  font-size: 0.98rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 16px rgba(9, 226, 232, 0.35);
+}
+
+.processStepIcon {
+  color: #09e2e8;
+}
+
+.processStepTitle {
+  font-family: var(--font-sora, 'Sora', sans-serif);
+  font-size: 1.2rem;
+  font-weight: 750;
+  color: #ffffff;
+  margin: 0 0 0.65rem;
+}
+
+.processStepDesc {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: #a8d2e1;
+  margin: 0;
+}
+
+.processStepDivider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #09e2e8;
+  font-size: 1.6rem;
+  font-weight: 300;
+  opacity: 0.65;
+  padding: 0 0.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   DOBRA 05: PORTFÓLIO / CASES
+   -------------------------------------------------------------------------- */
+.casesSection {
+  padding: clamp(4rem, 7vw, 6rem) 0;
+  background: radial-gradient(circle at 85% 60%, rgba(1, 101, 205, 0.18) 0%, rgba(0, 10, 23, 0) 60%),
+              linear-gradient(180deg, #001326 0%, #000a17 100%);
+  position: relative;
+  border-top: 1px solid rgba(9, 226, 232, 0.08);
+  border-bottom: 1px solid rgba(9, 226, 232, 0.08);
+}
+
+.casesHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2rem;
+  margin-bottom: 2.8rem;
+  flex-wrap: wrap;
+}
+
+.casesHeaderLeft {
+  max-width: 600px;
+}
+
+.casesTitle {
+  font-family: var(--font-sora, 'Sora', sans-serif);
+  font-size: clamp(1.9rem, 3.2vw, 2.75rem);
+  font-weight: 800;
+  line-height: 1.18;
+  color: #ffffff;
+  margin: 0;
+}
+
+.casesHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 1.8rem;
+}
+
+.casesSubtext {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: #a8d2e1;
+  max-width: 380px;
+  margin: 0;
+}
+
+.casesNavControls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.casesNavBtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(9, 226, 232, 0.35);
+  background: rgba(0, 19, 38, 0.65);
+  color: #e7eff4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.casesNavBtn:hover {
+  background: #09e2e8;
+  border-color: #09e2e8;
+  color: #000a17;
+  transform: scale(1.05);
+}
+
+.casesNavBtnPrimary {
+  background: #09e2e8;
+  border-color: #09e2e8;
+  color: #000a17;
+}
+
+.casesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.8rem;
+}
+
+.caseCard {
+  background: linear-gradient(180deg, rgba(1, 41, 90, 0.28) 0%, rgba(0, 19, 38, 0.75) 100%);
+  border: 1px solid rgba(9, 226, 232, 0.2);
+  border-radius: 16px;
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  overflow: hidden;
+}
+
+.caseCard:hover {
+  transform: translateY(-6px);
+  border-color: rgba(9, 226, 232, 0.55);
+  box-shadow: 0 16px 36px rgba(0, 10, 23, 0.7), 0 0 22px rgba(9, 226, 232, 0.15);
+}
+
+.caseImageFrame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: #001326;
+  margin-bottom: 1.15rem;
+}
+
+.caseImageFrame img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.caseCard:hover .caseImageFrame img {
+  transform: scale(1.03);
+}
+
+.caseBadgeRow {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+}
+
+.caseExampleTag {
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  background: rgba(0, 10, 23, 0.85);
+  color: #09e2e8;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: 1px solid rgba(9, 226, 232, 0.3);
+  backdrop-filter: blur(4px);
+}
+
+.caseCardTitle {
+  font-family: var(--font-sora, 'Sora', sans-serif);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.95rem;
+}
+
+.caseTagsList {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.caseTagPill {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  background: rgba(1, 41, 90, 0.3);
+  border: 1px solid rgba(9, 226, 232, 0.3);
+  color: #a8d2e1;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   DOBRA 06: CTA FINAL (VAMOS CONVERSAR?)
+   -------------------------------------------------------------------------- */
+.ctaFinalSection {
+  position: relative;
+  padding: clamp(4.5rem, 8vw, 7rem) 0;
+  background: radial-gradient(circle at 75% 50%, rgba(1, 101, 205, 0.24) 0%, rgba(0, 10, 23, 0) 65%),
+              linear-gradient(180deg, #000a17 0%, #001326 100%);
+  overflow: hidden;
+  border-top: 1px solid rgba(9, 226, 232, 0.12);
+}
+
+.ctaFinalGrid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.95fr;
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.ctaFinalTextCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.ctaFinalTitle {
+  font-family: var(--font-sora, 'Sora', sans-serif);
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  font-weight: 800;
+  line-height: 1.14;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  margin: 0 0 1.25rem;
+}
+
+.ctaFinalLead {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: #a8d2e1;
+  max-width: 520px;
+  margin: 0 0 2.2rem;
+}
+
+.ctaFinalActions {
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.2rem;
+}
+
+.ctaFinalTrustRow {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2vw, 2rem);
+  flex-wrap: wrap;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(168, 210, 225, 0.12);
+}
+
+.ctaFinalTrustItem {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #e7eff4;
+}
+
+.ctaFinalTrustItem svg {
+  color: #09e2e8;
+  flex-shrink: 0;
+}
+
+.ctaFinalVisualCol {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ctaLaptopWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  aspect-ratio: 382 / 235;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.6));
+}
+
+.ctaLaptopImage {
+  object-fit: contain;
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* --------------------------------------------------------------------------
+   INTERLIGAÇÃO ENTRE AS PÁGINAS (BRIDGE CARD)
+   -------------------------------------------------------------------------- */
+.bridgeSection {
+  padding: 3rem 0 clamp(3.5rem, 5vw, 4.5rem);
+  background-color: #000a17;
+}
+
+.bridgeCard {
+  background: linear-gradient(90deg, rgba(1, 41, 90, 0.35) 0%, rgba(0, 19, 38, 0.75) 100%);
+  border: 1px solid rgba(9, 226, 232, 0.25);
+  border-radius: 18px;
+  padding: 2.2rem 2.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.bridgeContent {
+  max-width: 680px;
+}
+
+.bridgeEyebrow {
+  display: inline-block;
+  color: #09e2e8;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.bridgeTitle {
+  font-family: var(--font-sora, 'Sora', sans-serif);
+  font-size: 1.35rem;
+  font-weight: 750;
+  color: #ffffff;
+  margin: 0 0 0.5rem;
+}
+
+.bridgeText {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: #a8d2e1;
+  margin: 0;
+}
+
+.bridgeCta {
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVIDADE (MOBILE & TABLET)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1080px) {
+  .benefitsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .processStepsRow {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .processStepDivider {
+    display: none;
+  }
+
+  .casesGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 860px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+
+  .heroVisual {
+    margin-top: 1.5rem;
+    width: 100%;
+  }
+
+  .servicesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .servicesList {
+    grid-template-columns: 1fr;
+  }
+
+  .servicesVisualCol {
+    order: -1;
+    margin-bottom: 2rem;
+  }
+
+  .ctaFinalGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .ctaFinalVisualCol {
+    order: -1;
+    margin-bottom: 2rem;
+  }
+
+  .bridgeCard {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.8rem;
+  }
+
+  .casesGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .benefitsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heroTitle {
+    font-size: 2.2rem;
+  }
+
+  .heroActions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .ctaFinalActions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+}

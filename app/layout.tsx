@@ -1,13 +1,9 @@
 import type { Metadata } from "next";
-import { Manrope, Sora } from "next/font/google";
 import { AppShell } from "@/components/AppShell";
 import { assetPath } from "@/lib/asset-path";
 import { site } from "@/lib/site";
 import { serializeJsonLd } from "@/lib/structured-data";
 import "./globals.css";
-
-const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope", display: "swap" });
-const sora = Sora({ subsets: ["latin"], variable: "--font-sora", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -42,11 +38,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     name: site.name,
     url: site.url,
     contactPoint: [{ "@type": "ContactPoint", contactType: "sales", email: site.email }],
-    logo: `${site.url}/assets/brand/logo-horizontal.png`,
+    logo: `${site.url}/assets/brand/logo-pn-final-dark.png`,
   };
 
   return (
-    <html lang="pt-BR" className={`${manrope.variable} ${sora.variable}`}>
+    <html lang="pt-BR">
       <body>
         <script
           type="application/ld+json"

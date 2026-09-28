@@ -24,6 +24,13 @@ export const routes = {
   orderStatus: "/pedido/",
   order: "/pedido/[id]",
   admin: "/admin",
+  solucoes: "/solucoes",
+  sitesLandingPages: "/solucoes/sites-landing-pages",
+  prospectaWeb: "/prospecta-web",
+  segmentos: "/segmentos",
+  planos: "/planos",
+  conteudo: "/conteudo",
+  amostra: "/amostra",
 } as const;
 
 export const publicRoutes = [
@@ -49,6 +56,13 @@ export const publicRoutes = [
   routes.checkoutPending,
   routes.checkoutError,
   routes.orderStatus,
+  routes.solucoes,
+  routes.sitesLandingPages,
+  routes.prospectaWeb,
+  routes.segmentos,
+  routes.planos,
+  routes.conteudo,
+  routes.amostra,
 ];
 
 export const legacyRedirects = ["/blog", "/conteudos", "/solucoes", "/insights"];

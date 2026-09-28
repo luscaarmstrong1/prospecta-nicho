@@ -9,17 +9,17 @@ type BrandLogoProps = {
 };
 
 const logoByVariant = {
-  header: "/assets/brand/logo-horizontal.png",
-  footer: "/assets/brand/logo-horizontal-dark-bg.png",
-  compact: "/assets/brand/logo-horizontal.png",
-  symbol: "/assets/brand/logo-symbol.png",
+  header: "/assets/brand/logo-pn-final-dark.png",
+  footer: "/assets/brand/logo-pn-final-light.png",
+  compact: "/assets/brand/logo-pn-final-dark.png",
+  symbol: "/assets/brand/logo-pn-final-symbol.png",
 };
 
 const imageSizeByVariant = {
-  header: { width: 1375, height: 264, sizes: "(max-width: 720px) 178px, 250px" },
-  footer: { width: 1455, height: 344, sizes: "230px" },
-  compact: { width: 1375, height: 264, sizes: "178px" },
-  symbol: { width: 295, height: 305, sizes: "44px" },
+  header: { width: 2172, height: 724, sizes: "(max-width: 720px) 178px, 250px" },
+  footer: { width: 2172, height: 724, sizes: "230px" },
+  compact: { width: 2172, height: 724, sizes: "178px" },
+  symbol: { width: 1280, height: 1280, sizes: "44px" },
 };
 
 export function BrandLogo({ variant = "header", priority = variant === "header", linked = true }: BrandLogoProps) {

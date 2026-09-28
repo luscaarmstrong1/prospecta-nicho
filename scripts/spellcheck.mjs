@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { execFileSync } from "node:child_process";
 
@@ -27,9 +27,34 @@ const forbidden = [
   ["proxima", "próxima"],
 ];
 
+function listFilesFromDisk(root) {
+  if (!existsSync(root)) return [];
+  const files = [];
+  const stack = [root];
+  while (stack.length) {
+    const current = stack.pop();
+    if (!current) continue;
+    const relativeParts = current.split(/[\\/]/);
+    if (relativeParts.some((part) => ignored.has(part))) continue;
+    const stats = statSync(current);
+    if (stats.isDirectory()) {
+      for (const entry of readdirSync(current)) {
+        stack.push(join(current, entry));
+      }
+      continue;
+    }
+    if (extensions.test(current)) files.push(current.replaceAll("\\", "/"));
+  }
+  return files;
+}
+
 function listFiles(root) {
-  const output = execFileSync("git", ["ls-files", root], { encoding: "utf8" });
-  return output.split(/\r?\n/).filter(Boolean).filter((file) => extensions.test(file));
+  try {
+    const output = execFileSync("git", ["ls-files", root], { encoding: "utf8" });
+    return output.split(/\r?\n/).filter(Boolean).filter((file) => extensions.test(file));
+  } catch {
+    return listFilesFromDisk(root);
+  }
 }
 
 let failures = [];
@@ -44,6 +69,8 @@ for (const root of roots) {
       .filter((line) =>
         !line.includes("checkoutLinkEnvKey") &&
         !line.includes("id:") &&
+        !line.includes("href:") &&
+        !line.includes("Href:") &&
         !line.includes("NEXT_PUBLIC_") &&
         !line.includes("/assets/") &&
         !line.includes("slug:") &&

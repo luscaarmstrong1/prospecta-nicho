@@ -35,11 +35,38 @@ export default defineConfig({
   projects: [
     {
       name: "desktop",
-      use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 1000 } },
+      use: { ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } },
     },
     {
-      name: "mobile",
-      use: { ...devices["Pixel 5"] },
+      name: "desktop-wide",
+      use: { ...devices["Desktop Chrome"], viewport: { width: 1920, height: 1080 } },
+    },
+    {
+      name: "mobile-390",
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 390, height: 844 },
+        isMobile: true,
+        hasTouch: true,
+      },
+    },
+    {
+      name: "mobile-430",
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 430, height: 932 },
+        isMobile: true,
+        hasTouch: true,
+      },
+    },
+    {
+      name: "tablet",
+      use: {
+        ...devices["Desktop Chrome"],
+        viewport: { width: 1024, height: 1366 },
+        isMobile: true,
+        hasTouch: true,
+      },
     },
   ],
 });

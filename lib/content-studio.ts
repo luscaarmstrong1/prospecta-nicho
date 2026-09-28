@@ -103,8 +103,8 @@ export const adminFaq = homeFaq.map((item, index) => ({
 
 const rawMediaAssets = [
   { name: "Logo matriz", path: "/assets/brand/logo-master-reference.png", type: "brand" },
-  { name: "Logo principal", path: "/assets/brand/logo-horizontal.png", type: "brand" },
-  { name: "Logo fundo escuro", path: "/assets/brand/logo-horizontal-dark-bg.png", type: "brand" },
+  { name: "Logo principal", path: "/assets/brand/logo-pn-final-light.png", type: "brand" },
+  { name: "Logo fundo escuro", path: "/assets/brand/logo-pn-final-dark.png", type: "brand" },
   { name: "Símbolo", path: "/assets/brand/logo-symbol.png", type: "brand" },
   { name: "Favicon", path: "/assets/brand/favicon.png", type: "icon" },
   { name: "Open Graph", path: "/assets/brand/og-image.png", type: "social" },

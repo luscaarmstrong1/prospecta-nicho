@@ -20,11 +20,11 @@
     "check:rls": "node --experimental-strip-types scripts/check-rls.ts",
     "check:security": "node --experimental-strip-types scripts/check-security.ts",
     "seed:demo": "node --experimental-strip-types scripts/seed-demo.ts",
-    "worker:test": "python -m pytest tests/test_rfb_privacy.py workers/rfb_cnpj/tests",
+    "worker:test": "python scripts/run-worker-tests.py",
     "worker:sample": "python -m workers.rfb_cnpj run --sample",
     "worker:export-sample": "python -m workers.rfb_cnpj export --sample",
     "worker:validate": "python -m workers.rfb_cnpj validate",
-    "test:editor": "node --experimental-strip-types --test tests/*.test.mjs",
+    "test:editor": "node --experimental-strip-types --test --test-isolation=none tests/*.test.mjs",
     "test:e2e": "playwright test",
     "test:e2e:github-pages": "node scripts/test-github-pages-runtime.mjs",
     "test": "npm run test:editor"
