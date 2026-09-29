@@ -1,4 +1,4 @@
 User-Agent: *
 Allow: /
 
-Sitemap: https://luscaarmstrong1.github.io/prospecta-nicho/sitemap.xml
+Sitemap: https://prospectanicho.app/sitemap.xml
