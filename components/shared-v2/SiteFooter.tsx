@@ -35,10 +35,10 @@ export function SiteFooter() {
       <Reveal className={styles.footerTop}>
         <div className={styles.footerBrand}>
           <Image
-            src={assetPath("/preview-v2/assets/logo-official-transparent.png")}
+            src={assetPath("/assets/brand/logo-pn-final-dark.png")}
             alt="ProspectaNicho"
-            width={344}
-            height={72}
+            width={2172}
+            height={724}
             unoptimized
           />
           <span>Dados que criam negócios.</span>

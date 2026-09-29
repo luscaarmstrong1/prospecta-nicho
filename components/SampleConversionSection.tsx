@@ -5,7 +5,7 @@ import { assetPath } from "@/lib/asset-path";
 export function SampleConversionSection() {
   return (
     <section className="section sample-section" id="amostra">
-      <Image className="sample-shield" src={assetPath("/assets/brand/logo-symbol.png")} alt="" width={295} height={305} aria-hidden="true" />
+      <Image className="sample-shield" src={assetPath("/assets/brand/logo-pn-final-symbol.png")} alt="" width={1280} height={1280} aria-hidden="true" />
       <div className="container-wide sample-grid">
         <div className="sample-copy">
           <p className="eyebrow">Amostra gratuita</p>

@@ -66,10 +66,10 @@ export function HomeHeader({ menuOpen, onMenuToggle }: HomeHeaderProps) {
       <div className={styles.headerInner}>
         <a className={styles.logoLink} href="#inicio" aria-label="ProspectaNicho, início da página">
           <Image
-            src={assetPath("/preview-v2/assets/logo-official-transparent.png")}
+            src={assetPath("/assets/brand/logo-pn-final-light.png")}
             alt="ProspectaNicho"
-            width={344}
-            height={72}
+            width={2172}
+            height={724}
             priority
             unoptimized
           />

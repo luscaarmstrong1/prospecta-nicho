@@ -47,10 +47,10 @@ export function SiteHeader({ currentPath }: SiteHeaderProps) {
       <div className={styles.headerInner}>
         <Link className={styles.logoLink} href="/" aria-label="ProspectaNicho, início">
           <Image
-            src={assetPath("/preview-v2/assets/logo-official-transparent.png")}
+            src={assetPath("/assets/brand/logo-pn-final-light.png")}
             alt="ProspectaNicho"
-            width={344}
-            height={72}
+            width={2172}
+            height={724}
             priority
             unoptimized
           />
