@@ -1,10 +1,10 @@
 "use client";
 
-// cspell:ignore construcao integracoes Linkedin saude testid Youtube
-import { type FormEvent, type PointerEvent as ReactPointerEvent, useEffect, useRef, useState } from "react";
+// cspell:ignore construcao integracoes Linkedin saude servico testid Youtube
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { AnimatePresence, motion, useMotionValue, useScroll, useSpring, useTransform } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
   ArrowRight,
@@ -27,6 +27,7 @@ import {
   Settings,
   ShieldCheck,
   Sparkles,
+  UserRound,
   Youtube,
   Zap,
 } from "lucide-react";
@@ -46,9 +47,9 @@ import {
   type PreviewIcon,
 } from "@/lib/home-v2/mock-data";
 import { HomeHeader } from "./HomeHeader";
+import { PnFinalLogo } from "@/components/shared-v2/PnFinalLogo";
 import {
   ClipReveal,
-  CountUp,
   InteractiveCard,
   Magnetic,
   HomeMotionProvider,
@@ -89,6 +90,10 @@ function normalizeRouteKey(value: string) {
 
 function getSegmentHref(segment: { title: string; image: string }) {
   const key = normalizeRouteKey(`${segment.title} ${segment.image}`);
+  if (key.includes("industria")) return "/solicitar-planilha?segment=industria&source=home-v2-segmento";
+  if (key.includes("comercio")) return "/solicitar-planilha?segment=comercio&source=home-v2-segmento";
+  if (key.includes("servico")) return "/solicitar-planilha?segment=servicos&source=home-v2-segmento";
+  if (key.includes("tecnologia")) return "/solicitar-planilha?segment=tecnologia&source=home-v2-segmento";
   if (key.includes("agencia")) return "/solucoes/agencias-de-marketing";
   if (key.includes("contabilidade")) return "/solucoes/contabilidades";
   if (key.includes("energia")) return "/solucoes/energia-solar";
@@ -107,7 +112,8 @@ function getPlanHref(plan: { title: string; custom?: boolean }, whatsappHref: st
 function getFooterHref(label: string) {
   const key = normalizeRouteKey(label);
   if (key.includes("bases b2b")) return "/produtos";
-  if (key.includes("recorte")) return "/produtos/base-personalizada";
+  if (key.includes("recorte") || key.includes("base personalizada")) return "/produtos/base-personalizada";
+  if (key === "segmentos") return "/segmentos";
   if (key.includes("integracoes")) return "/contato";
   if (key.includes("planos")) return "/produtos";
   if (key.includes("industria")) return "/solicitar-planilha?segment=industria&source=home-v2-footer";
@@ -141,25 +147,9 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
   const [newsletterState, setNewsletterState] = useState<"idle" | "sending" | "success">("idle");
   const [showToast, setShowToast] = useState(false);
   const [testimonialIndex, setTestimonialIndex] = useState(0);
-  const heroRef = useRef<HTMLElement>(null);
-  const finalCtaRef = useRef<HTMLElement>(null);
   const newsletterSubmitTimer = useRef<number>(0);
   const newsletterToastTimer = useRef<number>(0);
-  const { motionOff, reducedMotion, pointerFine } = useHomeMotion();
-  const mapDepthX = useSpring(useMotionValue(0), { stiffness: 150, damping: 24 });
-  const mapDepthY = useSpring(useMotionValue(0), { stiffness: 150, damping: 24 });
-  const { scrollYProgress } = useScroll();
-  const { scrollYProgress: heroProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  });
-  const { scrollYProgress: finalProgress } = useScroll({
-    target: finalCtaRef,
-    offset: ["start end", "end start"],
-  });
-  const heroBackgroundY = useTransform(heroProgress, [0, 1], ["0%", reducedMotion ? "0%" : "10%"]);
-  const heroMapY = useTransform(heroProgress, [0, 1], [0, reducedMotion ? 0 : 34]);
-  const finalImageY = useTransform(finalProgress, [0, 1], [reducedMotion ? "0%" : "-5%", reducedMotion ? "0%" : "5%"]);
+  const { motionOff, reducedMotion } = useHomeMotion();
   const whatsappHref = createWhatsAppLink(defaultWhatsAppMessage);
 
   function submitNewsletter(event: FormEvent<HTMLFormElement>) {
@@ -194,30 +184,12 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
     setTestimonialIndex((current) => (current + direction + testimonials.length) % testimonials.length);
   };
 
-  const moveHeroMap = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (reducedMotion || !pointerFine) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    mapDepthX.set(((event.clientX - rect.left) / rect.width - 0.5) * 10);
-    mapDepthY.set(((event.clientY - rect.top) / rect.height - 0.5) * 8);
-  };
-
-  const resetHeroMap = () => {
-    mapDepthX.set(0);
-    mapDepthY.set(0);
-  };
-
   return (
     <div
       className={styles.previewRoot}
       data-motion={motionOff ? "off" : "on"}
       data-reduced-motion={reducedMotion ? "true" : "false"}
     >
-      <motion.div
-        className={styles.scrollProgress}
-        style={{ scaleX: scrollYProgress }}
-        data-testid="motion-scroll-progress"
-        aria-hidden="true"
-      />
       <a className={styles.skipLink} href="#conteudo-principal">Pular para o conteúdo</a>
       {includeHeaderFooter && (
         <HomeHeader
@@ -227,8 +199,8 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
       )}
 
       <main id="conteudo-principal">
-        <section ref={heroRef} className={styles.hero} id="inicio" aria-labelledby="preview-hero-title" data-testid="preview-hero">
-          <motion.div className={styles.heroBackgroundLayer} style={{ y: heroBackgroundY }}>
+        <section className={styles.hero} id="inicio" aria-labelledby="preview-hero-title" data-testid="preview-hero">
+          <div className={styles.heroBackgroundLayer}>
             <Image
               className={styles.heroBackground}
               src={assetPath("/preview-v2/assets/hero-national.webp")}
@@ -238,7 +210,7 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
               priority
               unoptimized
             />
-          </motion.div>
+          </div>
           <div className={styles.heroOverlay} />
 
           <div className={styles.heroMain}>
@@ -248,19 +220,19 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
               animate="visible"
               variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
             >
-              <motion.p className={styles.eyebrow} variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}>Oportunidades em todo o Brasil</motion.p>
+              <motion.p className={styles.heroEyebrow} variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}>Bases B2B segmentadas</motion.p>
               <motion.h1 id="preview-hero-title" data-testid="preview-hero-title">
-                <motion.span className={styles.heroLine} variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}>Explore o</motion.span>
-                <motion.span className={styles.heroLine} variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}>mercado B2B</motion.span>
-                <motion.span className={`${styles.heroLine} ${styles.heroFinalLine}`} variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}>em escala nacional.</motion.span>
+                <motion.span className={styles.heroLine} variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}>Encontre novas</motion.span>
+                <motion.span className={`${styles.heroLine} ${styles.heroHighlightLine}`} variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}>oportunidades B2B</motion.span>
+                <motion.span className={styles.heroLine} variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}>em todo o Brasil.</motion.span>
               </motion.h1>
               <p className={styles.heroLead}>
-                Dados atualizados, segmentação precisa e empresas prontas para prospectar. Descubra o potencial de cada região e encontre as melhores oportunidades para o seu negócio.
+                Acesse bases de empresas segmentadas, atualizadas e prontas para prospecção. Dados confiáveis para você atrair mais clientes e acelerar o crescimento do seu negócio.
               </p>
               <div className={styles.buttonRow} data-testid="preview-hero-actions">
                 <Magnetic className={styles.magneticWrap}>
                   <a className={styles.primaryButtonLarge} href="/solicitar-planilha?source=home-v2-hero">
-                    Montar minha base <ArrowRight size={22} aria-hidden="true" />
+                    Ver planos e bases <ArrowRight size={22} aria-hidden="true" />
                   </a>
                 </Magnetic>
                 <a className={styles.secondaryButtonLarge} href="#amostra">
@@ -269,41 +241,33 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
               </div>
             </motion.div>
 
-            <motion.div
+            <div
               className={styles.heroMap}
-              style={{ y: heroMapY }}
               aria-label="Cobertura comercial por região do Brasil"
               data-testid="preview-map"
-              onPointerMove={moveHeroMap}
-              onPointerLeave={resetHeroMap}
             >
-              <motion.div className={styles.heroMapDepth} style={{ x: mapDepthX, y: mapDepthY }}>
-              <span className={styles.mapAmbientGlow} aria-hidden="true" />
-              {["18% 34%", "29% 57%", "48% 42%", "61% 64%", "71% 37%", "79% 72%"].map((position, index) => {
-                const [left, top] = position.split(" ");
-                return <span className={styles.networkPulse} style={{ left, top, animationDelay: `${index * 0.35}s` }} key={position} aria-hidden="true" />;
-              })}
+              <div className={styles.heroMapDepth}>
               {regionalReach.map((item) => {
                 const regionSlug = item.region.toLowerCase().replace(/[^a-z0-9]/g, "");
                 return (
                   <div
                     className={`${styles.regionTag} ${styles[`tag_${regionSlug}`] || ""}`}
                     key={item.region}
-                    style={{ left: item.left, top: item.top, animationDelay: `${regionalReach.indexOf(item) * -0.45}s` }}
+                    style={{ left: item.left, top: item.top }}
                   >
+                    <span className={styles.regionAnchorDot} aria-hidden="true" />
                     <span>{item.region}</span>
                     <strong>{item.total}</strong>
                     <small>empresas</small>
                   </div>
                 );
               })}
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
 
             <aside className={styles.heroRail} aria-hidden="true">
               <strong>Brasil em oportunidades</strong>
-              <span>Dados que impulsionam negócios</span>
-              <em>Mais oportunidades para um Brasil mais forte.</em>
+              <span>Dados que impulsionam o seu negócio.</span>
             </aside>
           </div>
 
@@ -320,18 +284,18 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
             <div className={styles.numbersContent}>
               <p className={styles.eyebrow}>Números que impulsionam negócios</p>
               <div className={styles.metricRow}>
-                {scaleMetrics.map((metric) => (
+                {scaleMetrics.slice(0, 3).map((metric) => (
                   <div key={metric.label}>
-                    <strong><CountUp value={metric.value} /></strong>
+                    <strong>{metric.value}</strong>
                     <span>{metric.label}</span>
                   </div>
                 ))}
               </div>
             </div>
-            <motion.div className={styles.numbersGraphic} whileInView={reducedMotion ? undefined : { scale: [1, 1.02, 1] }} viewport={{ once: true }}>
-              <span>Empresas impulsionam grandes negócios</span>
+            <div className={styles.numbersGraphic}>
               <BarChart3 aria-hidden="true" />
-            </motion.div>
+              <span>Dados atualizados<br />mensalmente</span>
+            </div>
             <ClipReveal className={styles.numbersImage} data-testid="preview-numbers-image">
               <Image
                 src={assetPath("/preview-v2/assets/office-intelligence.webp")}
@@ -340,7 +304,10 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
                 sizes="(max-width: 900px) 100vw, 46vw"
                 unoptimized
               />
-              <span>Do dado ao crescimento real</span>
+              <span>
+                <strong>Empresas reais.<br />Oportunidades reais.</strong>
+                <small>Bases segmentadas<br />para o seu mercado.</small>
+              </span>
             </ClipReveal>
           </div>
         </section>
@@ -349,7 +316,7 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
           <div className={styles.sampleGlow} />
           <Reveal className={styles.sampleCopy}>
             <p className={styles.eyebrow}>Amostra real</p>
-            <h2 id="sample-title">Veja a qualidade<br /><span>antes de decidir.</span></h2>
+            <h2 id="sample-title">Veja a qualidade<br /><span>dos nossos dados</span><br />antes de decidir.</h2>
             <p className={styles.sampleLead}>
               Receba uma amostra gratuita e confira o padrão dos dados. Empresas reais, com CNPJ, segmento, cidade, porte e muito mais.
             </p>
@@ -368,14 +335,6 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
 
           <Reveal className={styles.excelFrame} aria-label="Demonstração de planilha comercial" delay={0.08}>
             <div className={styles.excelWindow}>
-              <motion.span
-                className={styles.tableScan}
-                initial={reducedMotion ? false : { x: "-120%", opacity: 0 }}
-                whileInView={reducedMotion ? undefined : { x: "720%", opacity: [0, 0.65, 0] }}
-                viewport={{ once: true, amount: 0.6 }}
-                transition={{ duration: 1.45, delay: 0.28 }}
-                aria-hidden="true"
-              />
               <div className={styles.excelHeader}>
                 <span className={styles.excelIcon}>X</span>
                 <strong>Amostra de base - indústrias em SP</strong>
@@ -408,16 +367,16 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
           <Reveal className={styles.sectionHeadingLight}>
             <div>
               <p className={styles.eyebrow}>Segmentos em destaque</p>
-              <h2 id="segments-title">Segmentos em destaque</h2>
+              <h2 id="segments-title">Segmentos que geram oportunidades.</h2>
               <p>Escolha um segmento e receba uma base pronta para prospecção.</p>
             </div>
-            <Link className={styles.linkButtonDark} href="/produtos">
+            <Link className={styles.linkButtonDark} href="/segmentos">
               Ver todos os segmentos <ArrowRight aria-hidden="true" />
             </Link>
           </Reveal>
           <div className={styles.segmentGrid}>
             {featuredSegments.map((segment) => (
-              <InteractiveCard className={styles.segmentCard} key={segment.title} tilt data-testid="motion-segment-card">
+              <InteractiveCard className={styles.segmentCard} key={segment.title} data-testid="motion-segment-card">
                 <Image src={assetPath(segment.image)} alt="" fill sizes="(max-width: 800px) 100vw, 33vw" unoptimized />
                 <div className={styles.segmentShade} />
                 <div className={styles.segmentContent}>
@@ -438,7 +397,7 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
         <section className={styles.plansSection} id="planos" aria-labelledby="plans-title" data-testid="preview-plans">
           <Reveal className={styles.plansHeading}>
             <div>
-              <span className={styles.shortLine} />
+              <p className={styles.plansLabel}>Planos e bases</p>
               <h2 id="plans-title">Nossas bases e planos</h2>
               <p>Dados segmentados para diferentes objetivos. Escolha o plano ideal para o seu negócio.</p>
             </div>
@@ -447,11 +406,11 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
           <div className={styles.planGrid}>
             {plans.map((plan) => (
               <InteractiveCard className={styles.planCard} key={plan.title} data-custom={plan.custom ? "true" : "false"}>
-                <span className={`${styles.planIcon} ${plan.custom ? styles.planIconPulse : ""}`}><PreviewIconView name={plan.icon} size={42} /></span>
+                <span className={styles.planIcon}><PreviewIconView name={plan.icon} size={42} /></span>
                 <h3>{plan.title}</h3>
                 <p>{plan.description}</p>
                 <div className={`${styles.planPrice} ${plan.custom ? styles.customPrice : ""}`}>
-                  {plan.custom ? null : <small>A partir de</small>}
+                  <small>A partir de</small>
                   <strong>{plan.price}</strong>
                   <span>{plan.suffix}</span>
                 </div>
@@ -460,6 +419,20 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
                 </a>
               </InteractiveCard>
             ))}
+          </div>
+        </section>
+
+        {/* Bridge contextual: Prospecta Web */}
+        <section className={styles.webBridgeSection} aria-label="Soluções de Presença Digital">
+          <div className={styles.webBridgeInner}>
+            <div className={styles.webBridgeContent}>
+              <span className={styles.webBridgeBadge}>PROSPECTA WEB</span>
+              <h3>Precisa também fortalecer sua presença digital?</h3>
+              <p>Desenvolvemos sites e landing pages profissionais, responsivos e pensados para conversão, ajudando sua empresa a atrair mais clientes e gerar mais resultados.</p>
+            </div>
+            <Link className={styles.webBridgeBtn} href="/solucoes/sites-landing-pages">
+              Conheça o Prospecta Web <ArrowRight size={18} aria-hidden="true" />
+            </Link>
           </div>
         </section>
 
@@ -475,16 +448,16 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
           <div className={styles.testimonialOverlay} />
           <Reveal className={styles.testimonialHeading}>
             <div>
-              <p className={styles.eyebrow}>Demonstração visual</p>
+              <p className={styles.eyebrow}>Depoimentos</p>
               <h2 id="testimonials-title">Quem usa, <span>recomenda.</span></h2>
-              <p>Depoimentos ilustrativos para validação desta experiência visual.</p>
+               <p>Empresas de diferentes segmentos já aceleraram seus resultados com nossas bases.</p>
             </div>
-            <div className={styles.testimonialArrows} aria-label="Controles demonstrativos">
-              <button type="button" aria-label="Depoimento anterior" onClick={() => changeTestimonial(-1)}><ArrowLeft aria-hidden="true" /></button>
-              <button type="button" aria-label="Próximo depoimento" onClick={() => changeTestimonial(1)}><ArrowRight aria-hidden="true" /></button>
+            <div className={styles.testimonialArrows} aria-label="Navegar pelos depoimentos">
+              <button type="button" aria-label="Depoimento anterior" onClick={() => changeTestimonial(-1)} disabled={testimonials.length === 0}><ArrowLeft aria-hidden="true" /></button>
+              <button type="button" aria-label="Próximo depoimento" onClick={() => changeTestimonial(1)} disabled={testimonials.length === 0}><ArrowRight aria-hidden="true" /></button>
             </div>
           </Reveal>
-          <AnimatePresence mode="wait" initial={false}>
+          {testimonials.length > 0 ? <AnimatePresence mode="wait" initial={false}>
             <motion.div
               className={styles.testimonialGrid}
               key={testimonialIndex}
@@ -510,11 +483,24 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
                 </figure>
               ))}
             </motion.div>
-          </AnimatePresence>
+          </AnimatePresence> : (
+            <div className={styles.testimonialGrid} data-testid="testimonial-demo-grid">
+              {[1, 2, 3].map((item) => (
+                <article className={styles.testimonialDemoCard} key={item}>
+                  <span className={styles.testimonialQuote} aria-hidden="true">“</span>
+                  <p>Conteúdo reservado até a autorização e conferência de um cliente real.</p>
+                  <div className={styles.testimonialIdentity}>
+                    <span className={styles.testimonialAvatar}><UserRound aria-hidden="true" /></span>
+                    <span><strong>Depoimento em validação</strong><small>Cliente verificado</small></span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </section>
 
-        <section ref={finalCtaRef} className={styles.finalCta} aria-labelledby="final-cta-title" data-testid="preview-final-cta">
-          <motion.div className={styles.finalCtaMedia} style={{ y: finalImageY }}>
+        <section className={styles.finalCta} aria-labelledby="final-cta-title" data-testid="preview-final-cta">
+          <div className={styles.finalCtaMedia}>
             <Image
               src={assetPath("/preview-v2/assets/earth-network.webp")}
               alt="Brasil visto do espaço com cidades conectadas"
@@ -522,8 +508,7 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
               sizes="100vw"
               unoptimized
             />
-          </motion.div>
-          <motion.div className={styles.finalBloom} initial={reducedMotion ? false : { opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true, amount: 0.45 }} transition={{ duration: 1.1 }} />
+          </div>
           <div className={styles.finalCtaShade} />
           <Reveal className={styles.finalCtaContent}>
             <h2 id="final-cta-title">O Brasil é cheio de<br /><span>oportunidades.</span><br />O próximo cliente<br />pode estar aqui.</h2>
@@ -532,7 +517,7 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
               <div className={styles.buttonRow}>
                 <Magnetic className={styles.magneticWrap}>
                   <a className={styles.primaryButtonLarge} href="/solicitar-planilha?source=home-v2-final">
-                    Montar meu recorte <ArrowRight aria-hidden="true" />
+                    Ver planos e bases <ArrowRight aria-hidden="true" />
                   </a>
                 </Magnetic>
                 <a className={styles.secondaryButtonLarge} href={whatsappHref}>
@@ -553,8 +538,8 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
         <footer className={styles.footer} id="sobre" data-testid="preview-footer">
           <Reveal className={styles.footerTop}>
             <div className={styles.footerBrand}>
-              <Image src={assetPath("/assets/brand/logo-pn-final-dark.png")} alt="ProspectaNicho" width={2172} height={724} unoptimized />
-              <span>Dados que criam negócios.</span>
+              <PnFinalLogo />
+              <span>Dados que geram negócios.</span>
               <p>Dados, tecnologia e inteligência de mercado para impulsionar o crescimento da sua empresa.</p>
               <div className={styles.socials} aria-label="Canais de contato">
                 <a href="/contato" aria-label="LinkedIn"><Linkedin aria-hidden="true" /></a>

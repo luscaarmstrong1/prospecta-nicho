@@ -1,5 +1,5 @@
-// cspell:ignore Ltda carlos rafael patricia
-import { getCatalogProduct } from "@/lib/products";
+// cspell:ignore comercios Ltda
+// Conteúdo comercial centralizado para manter números e ofertas auditáveis.
 export type PreviewIcon =
   | "building"
   | "calculator"
@@ -15,32 +15,35 @@ export type PreviewIcon =
   | "zap";
 
 export const previewNavigation = [
-  { label: "Soluções", href: "#solucoes" },
+  { label: "Início", href: "#inicio" },
+  { label: "Soluções", href: "#solucoes", dropdown: true },
   { label: "Segmentos", href: "#segmentos" },
   { label: "Planos", href: "#planos" },
-  { label: "Conteúdo", href: "#amostra" },
+  { label: "Conteúdo", href: "#amostra", dropdown: true },
   { label: "Sobre", href: "#sobre" },
+  { label: "Contato", href: "/contato" },
 ];
 
 export const regionalReach = [
-  { region: "Norte", total: "+ 125 mil", left: "28%", top: "22%" },
-  { region: "Nordeste", total: "+ 298 mil", left: "73%", top: "29%" },
-  { region: "Centro-Oeste", total: "+ 210 mil", left: "38%", top: "54%" },
-  { region: "Sudeste", total: "+ 1,2 milhão", left: "71%", top: "64%" },
-  { region: "Sul", total: "+ 420 mil", left: "50%", top: "82%" },
+  { region: "Norte", total: "+ 125 mil", left: "24%", top: "18%" },
+  { region: "Nordeste", total: "+ 298 mil", left: "70%", top: "24%" },
+  { region: "Centro-Oeste", total: "+ 210 mil", left: "34%", top: "50%" },
+  { region: "Sudeste", total: "+ 1,2 milhão", left: "70%", top: "60%" },
+  { region: "Sul", total: "+ 420 mil", left: "48%", top: "80%" },
 ];
 
 export const heroBenefits: Array<{ icon: PreviewIcon; label: string }> = [
   { icon: "shield", label: "Dados confiáveis e atualizados" },
-  { icon: "settings", label: "Segmentação por região e setor" },
+  { icon: "settings", label: "Segmentação por setor e região" },
   { icon: "zap", label: "Mais agilidade na prospecção" },
-  { icon: "database", label: "Resultados reais para o seu time" },
+  { icon: "database", label: "Suporte especializado" },
 ];
 
 export const scaleMetrics = [
-  { value: "5,8M", label: "empresas cadastradas" },
+  { value: "5.8M", label: "empresas cadastradas" },
   { value: "+600", label: "segmentos mapeados" },
   { value: "5.570", label: "cidades cobertas" },
+  { value: "", label: "Dados atualizados mensalmente" },
 ];
 
 export const sampleColumns = ["CNPJ", "Razão Social", "Segmento", "Cidade", "Porte", "Telefone"];
@@ -60,22 +63,28 @@ export const featuredSegments: Array<{
   icon: PreviewIcon;
 }> = [
   {
-    title: "Agências",
-    description: "Agências de marketing, publicidade, digital e comunicação.",
-    image: "/preview-v2/assets/segment-agencias.webp",
-    icon: "megaphone",
+    title: "Indústrias",
+    description: "Indústrias de diversos portes e segmentos em todo o Brasil.",
+    image: "/preview-v2/assets/segment-industria.png",
+    icon: "building",
   },
   {
-    title: "Contabilidades",
-    description: "Escritórios contábeis e empresas de consultoria financeira.",
-    image: "/preview-v2/assets/segment-contabilidades.webp",
-    icon: "calculator",
+    title: "Comércios",
+    description: "Lojas, redes e comércios segmentados por região.",
+    image: "/preview-v2/assets/segment-comercios-v2.png",
+    icon: "search",
   },
   {
-    title: "Energia Solar",
-    description: "Empresas de energia solar, instaladoras e integradores.",
-    image: "/preview-v2/assets/segment-energia-solar.webp",
-    icon: "zap",
+    title: "Serviços",
+    description: "Empresas de serviços B2B e serviços especializados.",
+    image: "/preview-v2/assets/office-meeting-team.png",
+    icon: "settings",
+  },
+  {
+    title: "Tecnologia",
+    description: "Startups, software houses e empresas de tecnologia.",
+    image: "/preview-v2/assets/segment-tecnologia.png",
+    icon: "layers",
   },
 ];
 
@@ -91,56 +100,34 @@ export const plans: Array<{
     icon: "calculator",
     title: "Empresas recém-abertas",
     description: "Seja o primeiro a chegar. Empresas recém-abertas, ideais para conhecer seus produtos e serviços.",
-    price: getCatalogProduct("empresas-recem-abertas")?.price ?? "R$ 147,00",
+    price: "R$ 147,00",
     suffix: "por lista",
   },
   {
     icon: "megaphone",
     title: "Base para agências",
     description: "Agências, estúdios, produtoras e empresas de marketing digital.",
-    price: getCatalogProduct("agencias-marketing")?.price ?? "R$ 197,00",
+    price: "R$ 197,00",
     suffix: "por lista",
   },
   {
     icon: "calculator",
     title: "Contabilidades",
     description: "Escritórios contábeis, consultorias e serviços financeiros.",
-    price: getCatalogProduct("contabilidades")?.price ?? "R$ 197,00",
+    price: "R$ 197,00",
     suffix: "por lista",
   },
   {
     icon: "settings",
     title: "Base personalizada",
     description: "Fale com nosso time e monte uma base sob medida para o seu nicho.",
-    price: getCatalogProduct("base-personalizada")?.price ?? "A partir de R$ 497,00",
-    suffix: "De acordo com o seu segmento",
+    price: "R$ 497,00",
+    suffix: "por projeto",
     custom: true,
   },
 ];
 
-export const testimonials = [
-  {
-    quote: "Com o Radar Nacional, nosso time comercial aumentou em 40% o número de reuniões em apenas 3 meses.",
-    name: "Carlos Mendes",
-    role: "Gerente Comercial",
-    company: "Agência de Marketing",
-    avatar: "/preview-v2/assets/avatar-carlos.webp",
-  },
-  {
-    quote: "A qualidade dos dados é impressionante. Conseguimos encontrar empresas que realmente têm fit com a nossa solução.",
-    name: "Rafael Costa",
-    role: "Diretor de Vendas",
-    company: "Software ERP",
-    avatar: "/preview-v2/assets/avatar-rafael.webp",
-  },
-  {
-    quote: "A plataforma é intuitiva, rápida e o suporte é excelente. Hoje é parte essencial da nossa operação comercial.",
-    name: "Patrícia Lima",
-    role: "Head de Prospecção",
-    company: "Consultoria Empresarial",
-    avatar: "/preview-v2/assets/avatar-patricia.webp",
-  },
-];
+export const testimonials: Array<{ quote: string; name: string; role: string; company: string; avatar: string }> = [];
 
 export const finalTrustPoints = [
   { icon: "shield" as const, label: "Sem cartão de crédito" },
@@ -149,8 +136,7 @@ export const finalTrustPoints = [
 ];
 
 export const footerGroups = [
-  { title: "Soluções", links: ["Bases B2B", "Recorte personalizado", "Integrações", "Planos"] },
-  { title: "Segmentos", links: ["Indústria", "Comércio", "Serviços", "Saúde", "Construção", "Tecnologia", "Ver todos →"] },
-  { title: "Conteúdo", links: ["Blog", "Materiais gratuitos", "Cases", "Perguntas frequentes"] },
-  { title: "Institucional", links: ["Sobre nós", "Contato", "Política de privacidade", "Termos de uso"] },
+  { title: "Soluções", links: ["Bases B2B", "Base personalizada", "Segmentos", "Planos"] },
+  { title: "Conteúdo", links: ["Blog", "Cases", "Perguntas frequentes", "Materiais gratuitos"] },
+  { title: "Sobre", links: ["Sobre nós", "Contato", "Política de privacidade", "Termos de uso"] },
 ];
