@@ -7,7 +7,7 @@ const isStaticPreviewExport =
   process.env.NEXT_PUBLIC_RUNTIME_TARGET === "github-pages";
 const useStaticExportWorkerThreads = process.env.NEXT_STATIC_EXPORT_WORKER_THREADS === "true";
 const repositoryName = process.env.GITHUB_REPOSITORY?.split("/")[1] || "prospecta-nicho";
-const staticPreviewBasePath = process.env.NEXT_PUBLIC_BASE_PATH || `/${repositoryName}`;
+const staticPreviewBasePath = process.env.NEXT_PUBLIC_BASE_PATH ?? `/${repositoryName}`;
 const scriptSrc =
   process.env.NODE_ENV === "development"
     ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com"
@@ -60,8 +60,12 @@ const nextConfig: NextConfig = {
   ...(isStaticPreviewExport
     ? {
         output: "export" as const,
-        basePath: staticPreviewBasePath,
-        assetPrefix: `${staticPreviewBasePath}/`,
+        ...(staticPreviewBasePath
+          ? {
+              basePath: staticPreviewBasePath,
+              assetPrefix: `${staticPreviewBasePath}/`,
+            }
+          : {}),
         images: { unoptimized: true },
         trailingSlash: true,
       }

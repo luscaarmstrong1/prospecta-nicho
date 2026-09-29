@@ -75,9 +75,9 @@ const env = {
   NEXT_STATIC_EXPORT_WORKER_THREADS:
     process.platform === "win32" && process.env.CI !== "true" ? "true" : "false",
   NEXT_PUBLIC_ALLOW_GITHUB_PAGES: "true",
-  NEXT_PUBLIC_BASE_PATH: process.env.NEXT_PUBLIC_BASE_PATH || "/prospecta-nicho",
+  NEXT_PUBLIC_BASE_PATH: process.env.NEXT_PUBLIC_BASE_PATH ?? "/prospecta-nicho",
   NEXT_PUBLIC_SITE_URL:
-    process.env.NEXT_PUBLIC_SITE_URL || "https://luscaarmstrong1.github.io/prospecta-nicho",
+    process.env.NEXT_PUBLIC_SITE_URL || "https://prospectanicho.app",
   NEXT_PUBLIC_SUPABASE_URL: publicUrlForStaticExport(
     "NEXT_PUBLIC_SUPABASE_URL",
     "https://static-export.supabase.co",

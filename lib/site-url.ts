@@ -1,4 +1,4 @@
-const productionUrl = "https://prospectanicho.com.br";
+const productionUrl = "https://prospectanicho.app";
 // cspell:ignore luscaarmstrong
 const blockedPublicHosts = /localhost|127\.0\.0\.1|:3000|:3001|github\.io|luscaarmstrong1/i;
 const allowStaticPreviewUrl =
