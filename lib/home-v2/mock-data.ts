@@ -12,6 +12,9 @@ export type PreviewIcon =
   | "settings"
   | "shield"
   | "sparkles"
+  | "target"
+  | "trendingUp"
+  | "users"
   | "zap";
 
 export const previewNavigation = [
@@ -25,18 +28,18 @@ export const previewNavigation = [
 ];
 
 export const regionalReach = [
-  { region: "Norte", total: "+ 125 mil", left: "24%", top: "18%" },
-  { region: "Nordeste", total: "+ 298 mil", left: "70%", top: "24%" },
-  { region: "Centro-Oeste", total: "+ 210 mil", left: "34%", top: "50%" },
-  { region: "Sudeste", total: "+ 1,2 milhão", left: "70%", top: "60%" },
-  { region: "Sul", total: "+ 420 mil", left: "48%", top: "80%" },
+  { region: "Norte", total: "+ 125 mil", left: "13%", top: "18%" },
+  { region: "Nordeste", total: "+ 298 mil", left: "58%", top: "22%" },
+  { region: "Centro-Oeste", total: "+ 210 mil", left: "12%", top: "45%" },
+  { region: "Sudeste", total: "+ 1,2 milhão", left: "51%", top: "54%" },
+  { region: "Sul", total: "+ 420 mil", left: "25%", top: "75%" },
 ];
 
-export const heroBenefits: Array<{ icon: PreviewIcon; label: string }> = [
-  { icon: "shield", label: "Dados confiáveis e atualizados" },
-  { icon: "settings", label: "Segmentação por setor e região" },
-  { icon: "zap", label: "Mais agilidade na prospecção" },
-  { icon: "database", label: "Suporte especializado" },
+export const heroBenefits: Array<{ icon: PreviewIcon; label: string; line2?: string }> = [
+  { icon: "shield", label: "Dados confiáveis", line2: "e atualizados" },
+  { icon: "trendingUp", label: "Segmentação", line2: "por setor e região" },
+  { icon: "target", label: "Mais agilidade", line2: "na prospecção" },
+  { icon: "users", label: "Suporte", line2: "especializado" },
 ];
 
 export const scaleMetrics = [

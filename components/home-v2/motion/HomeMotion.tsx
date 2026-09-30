@@ -21,7 +21,6 @@ import {
 } from "react";
 import {
   previewMotion,
-  previewViewport,
   revealVariants,
   staggerVariants,
 } from "@/lib/home-v2/motion";
@@ -83,33 +82,10 @@ type RevealProps = PropsWithChildren<
 function useSafeReveal() {
   const ref = useRef<HTMLElement>(null);
   const controls = useAnimationControls();
-  const inView = useInView(ref, previewViewport);
-  const { reducedMotion } = useHomeMotion();
 
   useEffect(() => {
-    if (reducedMotion) {
-      controls.set("visible");
-      return;
-    }
-
-    if (inView) {
-      void controls.start("visible");
-      return;
-    }
-
-    controls.set("hidden");
-    let fallback = 0;
-    const ensureFinalState = () => {
-      const box = ref.current?.getBoundingClientRect();
-      if (!box || box.top <= window.innerHeight * 1.1 || box.bottom < 0) {
-        void controls.start("visible");
-        return;
-      }
-      fallback = window.setTimeout(ensureFinalState, 400);
-    };
-    fallback = window.setTimeout(ensureFinalState, 700);
-    return () => window.clearTimeout(fallback);
-  }, [controls, inView, reducedMotion]);
+    controls.set("visible");
+  }, [controls]);
 
   return { controls, ref };
 }
@@ -202,8 +178,8 @@ export function Magnetic({ children, className }: MagneticProps) {
     (event: React.PointerEvent<HTMLSpanElement>) => {
       if (reducedMotion || !pointerFine) return;
       const rect = event.currentTarget.getBoundingClientRect();
-      x.set(((event.clientX - rect.left) / rect.width - 0.5) * 8);
-      y.set(((event.clientY - rect.top) / rect.height - 0.5) * 8);
+      x.set(((event.clientX - rect.left) / rect.width - 0.5) * 4);
+      y.set(((event.clientY - rect.top) / rect.height - 0.5) * 4);
     },
     [pointerFine, reducedMotion, x, y],
   );
@@ -267,7 +243,7 @@ export function InteractiveCard({ children, tilt = false, style, ...props }: Int
       initial={false}
       animate={controls}
       variants={revealVariants}
-      whileHover={reducedMotion || !pointerFine ? undefined : { y: -3 }}
+      whileHover={reducedMotion || !pointerFine ? undefined : { y: -2 }}
       transition={previewMotion.spring}
       style={{
         ...style,

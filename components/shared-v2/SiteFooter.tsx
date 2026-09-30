@@ -1,10 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, CheckCircle2, Instagram, Linkedin, Mail, Youtube } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { type FormEvent, useState } from "react";
+import { PnFinalLogo } from "@/components/shared-v2/PnFinalLogo";
 import { assetPath } from "@/lib/asset-path";
 import { footerGroups } from "@/lib/site-v2/config";
 import { Reveal, useHomeMotion } from "@/components/home-v2/motion/HomeMotion";
@@ -34,14 +35,8 @@ export function SiteFooter() {
     <footer className={styles.footer} id="site-footer" data-testid="site-v2-footer">
       <Reveal className={styles.footerTop}>
         <div className={styles.footerBrand}>
-          <Image
-            src={assetPath("/assets/brand/logo-pn-final-dark.png")}
-            alt="ProspectaNicho"
-            width={2172}
-            height={724}
-            unoptimized
-          />
-          <span>Dados que criam negócios.</span>
+          <PnFinalLogo />
+          <span>Dados que geram negócios.</span>
           <p>
             Dados, tecnologia e inteligência de mercado para impulsionar o
             crescimento da sua empresa.
@@ -72,14 +67,14 @@ export function SiteFooter() {
 
         <div className={styles.footerMap}>
           <Image
-            src={assetPath("/preview-v2/assets/hero-national.webp")}
-            alt="Mapa digital do Brasil"
-            width={190}
-            height={170}
+            src={assetPath("/assets/prospecta-web/footer-globe-hd.png")}
+            alt="Globo digital da ProspectaNicho"
+            width={135}
+            height={135}
             unoptimized
           />
           <strong>
-            Mais negócios<br />para um Brasil<br />mais forte.
+            Mais negócios<br />para um Brasil<br />mais digital.
           </strong>
         </div>
       </Reveal>
@@ -128,9 +123,14 @@ export function SiteFooter() {
       </AnimatePresence>
 
       <div className={styles.footerBottom}>
-        <span>© 2026 ProspectaNicho. Todos os direitos reservados.</span>
-        <span>Dados. Negócios. Um Brasil com mais oportunidades.</span>
+        <span>© {new Date().getFullYear()} ProspectaNicho. Todos os direitos reservados.</span>
+        <div style={{ display: "flex", gap: "1rem" }}>
+          <Link href="/termos-de-uso">Termos de Uso</Link>
+          <span aria-hidden="true">|</span>
+          <Link href="/politica-de-privacidade">Política de Privacidade</Link>
+        </div>
       </div>
+      <div className={styles.footerNetworkStrip} aria-hidden="true" />
     </footer>
   );
 }

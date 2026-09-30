@@ -27,7 +27,10 @@ import {
   Settings,
   ShieldCheck,
   Sparkles,
+  Target,
+  TrendingUp,
   UserRound,
+  Users,
   Youtube,
   Zap,
 } from "lucide-react";
@@ -73,6 +76,9 @@ const iconMap = {
   settings: Settings,
   shield: ShieldCheck,
   sparkles: Sparkles,
+  target: Target,
+  trendingUp: TrendingUp,
+  users: Users,
   zap: Zap,
 } satisfies Record<PreviewIcon, typeof Search>;
 
@@ -203,7 +209,7 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
           <div className={styles.heroBackgroundLayer}>
             <Image
               className={styles.heroBackground}
-              src={assetPath("/preview-v2/assets/hero-national.webp")}
+              src={assetPath("/assets/brand/hero-golden-master.png")}
               alt=""
               fill
               sizes="100vw"
@@ -218,7 +224,7 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
               className={styles.heroCopy}
               initial={reducedMotion ? false : "hidden"}
               animate="visible"
-              variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
+              variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
             >
               <motion.p className={styles.heroEyebrow} variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}>Bases B2B segmentadas</motion.p>
               <motion.h1 id="preview-hero-title" data-testid="preview-hero-title">
@@ -236,7 +242,7 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
                   </a>
                 </Magnetic>
                 <a className={styles.secondaryButtonLarge} href="#amostra">
-                  <Play size={19} fill="currentColor" aria-hidden="true" /> Ver como funciona
+                  <span className={styles.playIconCircle}><Play size={15} fill="currentColor" aria-hidden="true" /></span> Ver como funciona
                 </a>
               </div>
             </motion.div>
@@ -246,6 +252,16 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
               aria-label="Cobertura comercial por região do Brasil"
               data-testid="preview-map"
             >
+              <div className={styles.heroMapVisual}>
+                <Image
+                  src={assetPath("/assets/brand/hero-map-brazil-tech.webp")}
+                  alt="Mapa tecnológico do Brasil com pontos de conexão"
+                  fill
+                  sizes="660px"
+                  priority
+                  unoptimized
+                />
+              </div>
               <div className={styles.heroMapDepth}>
               {regionalReach.map((item) => {
                 const regionSlug = item.region.toLowerCase().replace(/[^a-z0-9]/g, "");
@@ -255,7 +271,6 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
                     key={item.region}
                     style={{ left: item.left, top: item.top }}
                   >
-                    <span className={styles.regionAnchorDot} aria-hidden="true" />
                     <span>{item.region}</span>
                     <strong>{item.total}</strong>
                     <small>empresas</small>
@@ -266,23 +281,31 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
             </div>
 
             <aside className={styles.heroRail} aria-hidden="true">
-              <strong>Brasil em oportunidades</strong>
-              <span>Dados que impulsionam o seu negócio.</span>
+              <div className={styles.heroRailInner}>
+                <strong>Brasil em<br />oportunidades</strong>
+                <span>Dados que<br />impulsionam<br />o seu negócio.</span>
+              </div>
             </aside>
           </div>
 
           <StaggerGroup className={styles.heroBenefits} aria-label="Benefícios da solução">
             {heroBenefits.map((benefit) => (
               <StaggerItem key={benefit.label}>
-                <span className={styles.benefitIcon}><PreviewIconView name={benefit.icon} size={27} /></span>
-                <strong>{benefit.label}</strong>
+                <span className={styles.benefitIcon}><PreviewIconView name={benefit.icon} size={25} /></span>
+                <span className={styles.benefitTextWrap}>
+                  <strong>{benefit.label}</strong>
+                  {benefit.line2 && <small>{benefit.line2}</small>}
+                </span>
               </StaggerItem>
             ))}
           </StaggerGroup>
 
           <div className={styles.numbersCard} data-testid="preview-numbers">
             <div className={styles.numbersContent}>
-              <p className={styles.eyebrow}>Números que impulsionam negócios</p>
+              <div className={styles.numbersEyebrowRow}>
+                <p className={styles.numbersEyebrow}>Números que impulsionam negócios</p>
+                <span className={styles.numbersEyebrowLine} aria-hidden="true" />
+              </div>
               <div className={styles.metricRow}>
                 {scaleMetrics.slice(0, 3).map((metric) => (
                   <div key={metric.label}>
@@ -290,25 +313,31 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
                     <span>{metric.label}</span>
                   </div>
                 ))}
+                <div className={styles.metricUpdated}>
+                  <BarChart3 size={32} className={styles.updatedChartIcon} aria-hidden="true" />
+                  <span>Dados atualizados<br />mensalmente</span>
+                </div>
               </div>
             </div>
-            <div className={styles.numbersGraphic}>
-              <BarChart3 aria-hidden="true" />
-              <span>Dados atualizados<br />mensalmente</span>
+
+            <div className={styles.numbersCommercialCard}>
+              <div className={styles.commercialCardContent}>
+                <span className={styles.commercialEyebrow}>Empresas reais.<br />Oportunidades reais.</span>
+                <p className={styles.commercialSubtitle}>Bases segmentadas<br />para o seu mercado.</p>
+                <a className={styles.commercialCircleBtn} href="/solicitar-planilha?source=home-v2-numbers" aria-label="Acessar bases segmentadas">
+                  <ArrowRight size={18} aria-hidden="true" />
+                </a>
+              </div>
+              <div className={styles.commercialCardImageWrap}>
+                <Image
+                  src={assetPath("/assets/brand/hero-office-card.webp")}
+                  alt="Escritório corporativo moderno iluminado à noite"
+                  fill
+                  sizes="320px"
+                  unoptimized
+                />
+              </div>
             </div>
-            <ClipReveal className={styles.numbersImage} data-testid="preview-numbers-image">
-              <Image
-                src={assetPath("/preview-v2/assets/office-intelligence.webp")}
-                alt="Profissionais em um escritório corporativo noturno"
-                fill
-                sizes="(max-width: 900px) 100vw, 46vw"
-                unoptimized
-              />
-              <span>
-                <strong>Empresas reais.<br />Oportunidades reais.</strong>
-                <small>Bases segmentadas<br />para o seu mercado.</small>
-              </span>
-            </ClipReveal>
           </div>
         </section>
 

@@ -1,12 +1,11 @@
 "use client";
 
 // cspell:ignore testid
-import Image from "next/image";
-import { ArrowRight, Menu, X } from "lucide-react";
+import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { assetPath } from "@/lib/asset-path";
 import { previewNavigation } from "@/lib/home-v2/mock-data";
+import { PnFinalLogo } from "@/components/shared-v2/PnFinalLogo";
 import { Magnetic, useHomeMotion } from "./motion/HomeMotion";
 import styles from "./home-v2.module.css";
 
@@ -44,6 +43,7 @@ export function HomeHeader({ menuOpen, onMenuToggle }: HomeHeaderProps) {
       { rootMargin: "-18% 0px -68% 0px", threshold: [0.05, 0.25, 0.5] },
     );
     previewNavigation.forEach(({ href }) => {
+      if (!href.startsWith("#")) return;
       const section = document.querySelector(href);
       if (section) observer.observe(section);
     });
@@ -65,27 +65,24 @@ export function HomeHeader({ menuOpen, onMenuToggle }: HomeHeaderProps) {
     >
       <div className={styles.headerInner}>
         <a className={styles.logoLink} href="#inicio" aria-label="ProspectaNicho, início da página">
-          <Image
-            src={assetPath("/assets/brand/logo-pn-final-light.png")}
-            alt="ProspectaNicho"
-            width={2172}
-            height={724}
-            priority
-            unoptimized
-          />
+          <PnFinalLogo priority />
         </a>
 
         <nav className={styles.desktopNav} aria-label="Navegação principal">
           {previewNavigation.map((item) => (
-            <a className={activeHref === item.href ? styles.navActive : ""} key={item.href} href={item.href}>{item.label}</a>
+            <a className={activeHref === item.href ? styles.navActive : ""} key={item.href} href={item.href}>
+              <span className={styles.navLabel}>
+                {item.label}
+                {item.dropdown ? <ChevronDown size={14} aria-hidden="true" /> : null}
+              </span>
+            </a>
           ))}
         </nav>
 
         <div className={styles.headerActions} data-testid="preview-header-actions">
-          <a className={styles.loginButton} href="/admin/login">Entrar</a>
           <Magnetic className={styles.magneticWrap}>
             <a className={styles.primaryButton} href="/solicitar-planilha?source=home-v2-header">
-              Solicitar planilha <ArrowRight size={18} aria-hidden="true" />
+              Falar com um especialista <ArrowRight size={18} aria-hidden="true" />
             </a>
           </Magnetic>
         </div>
@@ -110,10 +107,14 @@ export function HomeHeader({ menuOpen, onMenuToggle }: HomeHeaderProps) {
           exit={reducedMotion ? undefined : { opacity: 0, y: -8 }}
         >
           {previewNavigation.map((item) => (
-            <a key={item.href} href={item.href} onClick={onMenuToggle}>{item.label}</a>
+            <a key={item.href} href={item.href} onClick={onMenuToggle}>
+              <span className={styles.navLabel}>
+                {item.label}
+                {item.dropdown ? <ChevronDown size={14} aria-hidden="true" /> : null}
+              </span>
+            </a>
           ))}
-          <a href="/admin/login" onClick={onMenuToggle}>Entrar</a>
-          <a href="/solicitar-planilha?source=home-v2-header-mobile" onClick={onMenuToggle}>Solicitar planilha</a>
+          <a href="/solicitar-planilha?source=home-v2-header-mobile" onClick={onMenuToggle}>Falar com um especialista</a>
         </motion.div>
       ) : null}
       </AnimatePresence>

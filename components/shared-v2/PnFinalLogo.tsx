@@ -4,21 +4,24 @@ import { assetPath } from "@/lib/asset-path";
 type PnFinalLogoProps = {
   className?: string;
   priority?: boolean;
-  variant?: "dark" | "light";
+  variant?: "dark" | "light" | "goldenMaster";
 };
 
-export function PnFinalLogo({ className, priority = false, variant = "light" }: PnFinalLogoProps) {
-  const logoSrc = variant === "light" 
-    ? "/assets/brand/logo-pn-final-light.png" 
-    : "/assets/brand/logo-pn-final-dark.png";
+export function PnFinalLogo({ className, priority = false, variant = "goldenMaster" }: PnFinalLogoProps) {
+  let logoSrc = "/assets/brand/logo-hero-golden-master.png";
+  if (variant === "light") {
+    logoSrc = "/assets/brand/logo-pn-final-light.png";
+  } else if (variant === "dark") {
+    logoSrc = "/assets/brand/logo-pn-final-dark.png";
+  }
 
   return (
     <Image
       className={className}
       src={assetPath(logoSrc)}
       alt="ProspectaNicho"
-      width={2172}
-      height={724}
+      width={400}
+      height={58}
       priority={priority}
       unoptimized
     />
