@@ -42,11 +42,11 @@ export function SiteFooter() {
             crescimento da sua empresa.
           </p>
           <div className={styles.socials} aria-label="Canais de contato">
-            <Link href="/contato" aria-label="LinkedIn">
-              <Linkedin aria-hidden="true" />
-            </Link>
             <Link href="/contato" aria-label="Instagram">
               <Instagram aria-hidden="true" />
+            </Link>
+            <Link href="/contato" aria-label="LinkedIn">
+              <Linkedin aria-hidden="true" />
             </Link>
             <Link href="/contato" aria-label="YouTube">
               <Youtube aria-hidden="true" />
@@ -69,12 +69,12 @@ export function SiteFooter() {
           <Image
             src={assetPath("/assets/prospecta-web/footer-globe-hd.png")}
             alt="Globo digital da ProspectaNicho"
-            width={135}
-            height={135}
+            width={140}
+            height={140}
             unoptimized
           />
           <strong>
-            Mais negócios<br />para um Brasil<br />mais digital.
+            MAIS<br />NEGÓCIOS<br />PARA UM<br />BRASIL<br />MAIS<br />FORTE.
           </strong>
         </div>
       </Reveal>
@@ -95,7 +95,7 @@ export function SiteFooter() {
           required
           placeholder="Seu melhor e-mail"
         />
-        <button type="submit" disabled={newsletterState !== "idle"}>
+        <button className={styles.newsletterSubmit} type="submit" disabled={newsletterState !== "idle"}>
           {newsletterState === "sending"
             ? "Enviando..."
             : newsletterState === "success"
@@ -103,9 +103,6 @@ export function SiteFooter() {
             : "Quero receber"}
           {newsletterState === "idle" ? <ArrowRight aria-hidden="true" /> : null}
         </button>
-        <small>
-          Conteúdo relevante.<br />Sem spam.<br />Apenas oportunidades.
-        </small>
       </form>
 
       <AnimatePresence>
@@ -124,13 +121,8 @@ export function SiteFooter() {
 
       <div className={styles.footerBottom}>
         <span>© {new Date().getFullYear()} ProspectaNicho. Todos os direitos reservados.</span>
-        <div style={{ display: "flex", gap: "1rem" }}>
-          <Link href="/termos-de-uso">Termos de Uso</Link>
-          <span aria-hidden="true">|</span>
-          <Link href="/politica-de-privacidade">Política de Privacidade</Link>
-        </div>
+        <span>Dados. Negócios. Um Brasil com mais oportunidades.</span>
       </div>
-      <div className={styles.footerNetworkStrip} aria-hidden="true" />
     </footer>
   );
 }

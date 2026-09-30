@@ -130,7 +130,29 @@ export const plans: Array<{
   },
 ];
 
-export const testimonials: Array<{ quote: string; name: string; role: string; company: string; avatar: string }> = [];
+export const testimonials: Array<{ quote: string; name: string; role: string; company: string; avatar: string }> = [
+  {
+    quote: "A qualidade dos dados e a segmentação por região nos ajudaram a aumentar em 40% nossas oportunidades comerciais.",
+    name: "Ricardo Almeida",
+    role: "Diretor Comercial",
+    company: "Indústria de Equipamentos",
+    avatar: "/preview-v2/assets/avatar-rafael.webp",
+  },
+  {
+    quote: "Com a base da ProspectaNicho conseguimos expandir para novas regiões e dobrar o número de reuniões em 3 meses.",
+    name: "Mariana Costa",
+    role: "CEO",
+    company: "Agência de Marketing",
+    avatar: "/preview-v2/assets/avatar-patricia.webp",
+  },
+  {
+    quote: "Dados atualizados, suporte excelente e um processo simples para adquirir as bases. Recomendo!",
+    name: "Carlos Mendes",
+    role: "Sócio-diretor",
+    company: "Consultoria Empresarial",
+    avatar: "/preview-v2/assets/avatar-carlos.webp",
+  },
+];
 
 export const finalTrustPoints = [
   { icon: "shield" as const, label: "Sem cartão de crédito" },

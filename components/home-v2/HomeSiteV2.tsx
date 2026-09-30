@@ -480,9 +480,12 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
           <div className={styles.testimonialOverlay} />
           <Reveal className={styles.testimonialHeading}>
             <div>
-              <p className={styles.eyebrow}>Depoimentos</p>
+              <div className={styles.testimonialBadgeRow}>
+                <span className={styles.testimonialBadge}>DEPOIMENTOS</span>
+                <span className={styles.testimonialBadgeLine} aria-hidden="true" />
+              </div>
               <h2 id="testimonials-title">Quem usa, <span>recomenda.</span></h2>
-               <p>Empresas de diferentes segmentos já aceleraram seus resultados com nossas bases.</p>
+              <p>Empresas de diferentes segmentos já aceleraram seus resultados com nossas bases.</p>
             </div>
             <div className={styles.testimonialArrows} aria-label="Navegar pelos depoimentos">
               <button type="button" aria-label="Depoimento anterior" onClick={() => changeTestimonial(-1)} disabled={testimonials.length === 0}><ArrowLeft aria-hidden="true" /></button>
@@ -507,9 +510,12 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
             >
               {visibleTestimonials.map((testimonial) => (
                 <figure key={testimonial.name}>
-                  <blockquote><span>“</span>{testimonial.quote}”</blockquote>
+                  <div className={styles.testimonialCardTop}>
+                    <span className={styles.quoteIcon} aria-hidden="true">“</span>
+                    <p className={styles.quoteText}>{testimonial.quote}</p>
+                  </div>
                   <figcaption>
-                    <Image src={assetPath(testimonial.avatar)} alt="" width={86} height={86} unoptimized />
+                    <Image src={assetPath(testimonial.avatar)} alt="" width={68} height={68} unoptimized />
                     <span><strong>{testimonial.name}</strong><small>{testimonial.role}</small><small>{testimonial.company}</small></span>
                   </figcaption>
                 </figure>
@@ -558,7 +564,7 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
               </div>
               <div className={styles.trustRow} data-testid="preview-final-trust">
                 {finalTrustPoints.map((point) => (
-                  <span key={point.label}><PreviewIconView name={point.icon} size={22} />{point.label}</span>
+                  <span key={point.label}><CheckCircle2 size={18} aria-hidden="true" />{point.label}</span>
                 ))}
               </div>
             </div>
@@ -586,7 +592,7 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
               </div>
             ))}
             <div className={styles.footerMap}>
-              <Image src={assetPath("/preview-v2/assets/hero-national.webp")} alt="Mapa digital do Brasil" width={190} height={170} unoptimized />
+              <Image src={assetPath("/assets/prospecta-web/footer-globe-hd.png")} alt="Globo digital com foco no Brasil" width={140} height={140} unoptimized />
               <strong>Mais negócios<br />para um Brasil<br />mais forte.</strong>
             </div>
           </Reveal>
@@ -595,11 +601,10 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
             <div><Mail aria-hidden="true" /><span>Receba insights e conteúdos<br />sobre o mercado B2B no Brasil.</span></div>
             <label className="sr-only" htmlFor="preview-newsletter">Seu melhor e-mail</label>
             <input id="preview-newsletter" type="email" required placeholder="Seu melhor e-mail" />
-            <button type="submit" disabled={newsletterState !== "idle"}>
+            <button className={styles.newsletterSubmit} type="submit" disabled={newsletterState !== "idle"}>
               {newsletterState === "sending" ? "Enviando..." : newsletterState === "success" ? "Inscrição simulada ✓" : "Quero receber"}
               {newsletterState === "idle" ? <ArrowRight aria-hidden="true" /> : null}
             </button>
-            <small>Conteúdo relevante.<br />Sem spam.<br />Apenas oportunidades.</small>
           </form>
           <AnimatePresence>
             {showToast ? (
@@ -616,7 +621,7 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
           </AnimatePresence>
 
           <div className={styles.footerBottom}>
-            <span>© 2026 ProspectaNicho. Todos os direitos reservados.</span>
+            <span>© {new Date().getFullYear()} ProspectaNicho. Todos os direitos reservados.</span>
             <span>Dados. Negócios. Um Brasil com mais oportunidades.</span>
           </div>
         </footer>

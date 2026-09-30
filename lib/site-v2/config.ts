@@ -57,11 +57,10 @@ export const footerGroups = [
   {
     title: "Soluções",
     links: [
-      { label: "Prospecta Dados", href: "/" },
-      { label: "Prospecta Web", href: "/solucoes/sites-landing-pages" },
-      { label: "Prospecta Local", href: "/solucoes#local" },
-      { label: "Prospecta Brand", href: "/solucoes#brand" },
-      { label: "Prospecta Flow", href: "/solucoes#flow" },
+      { label: "Bases B2B", href: "/solicitar-planilha" },
+      { label: "Base personalizada", href: "/solicitar-planilha?tipo=personalizada" },
+      { label: "Segmentos", href: "/segmentos" },
+      { label: "Planos", href: "/planos" },
     ],
   },
   {
@@ -69,19 +68,17 @@ export const footerGroups = [
     links: [
       { label: "Blog", href: "/conteudo" },
       { label: "Cases", href: "/solucoes/sites-landing-pages#projetos" },
-      { label: "Materiais", href: "/conteudo#materiais" },
       { label: "Perguntas frequentes", href: "/planos#faq" },
-      { label: "Glossário", href: "/conteudo#glossario" },
+      { label: "Materiais gratuitos", href: "/conteudo" },
     ],
   },
   {
     title: "Sobre",
     links: [
-      { label: "Nossa História", href: "/sobre#historia" },
-      { label: "Nosso Time", href: "/sobre#time" },
+      { label: "Sobre nós", href: "/sobre" },
       { label: "Contato", href: "/contato" },
-      { label: "Trabalhe Conosco", href: "/sobre#carreiras" },
-      { label: "Seja um Parceiro", href: "/contato?assunto=parceria" },
+      { label: "Política de privacidade", href: "/politica-de-privacidade" },
+      { label: "Termos de uso", href: "/termos-de-uso" },
     ],
   },
 ];

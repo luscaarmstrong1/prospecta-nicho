@@ -8,7 +8,7 @@ type PnFinalLogoProps = {
 };
 
 export function PnFinalLogo({ className, priority = false, variant = "goldenMaster" }: PnFinalLogoProps) {
-  let logoSrc = "/assets/brand/logo-hero-golden-master.png";
+  let logoSrc = "/assets/brand/logo-prospectanicho-clean.png";
   if (variant === "light") {
     logoSrc = "/assets/brand/logo-pn-final-light.png";
   } else if (variant === "dark") {
