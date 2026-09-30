@@ -209,7 +209,7 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
           <div className={styles.heroBackgroundLayer}>
             <Image
               className={styles.heroBackground}
-              src={assetPath("/assets/brand/hero-golden-master.png")}
+              src={assetPath("/assets/brand/hero-clean-bg.webp")}
               alt=""
               fill
               sizes="100vw"
@@ -254,7 +254,7 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
             >
               <div className={styles.heroMapVisual}>
                 <Image
-                  src={assetPath("/assets/brand/hero-map-brazil-tech.webp")}
+                  src={assetPath("/assets/brand/hero-map-brazil-clean.webp")}
                   alt="Mapa tecnológico do Brasil com pontos de conexão"
                   fill
                   sizes="660px"

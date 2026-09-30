@@ -620,15 +620,15 @@
   position: absolute;
   z-index: 6;
   display: flex;
-  width: 172px;
-  min-height: 102px;
-  padding: 12px 16px;
+  width: 154px;
+  min-height: 92px;
+  padding: 10px 14px;
   border: 1.5px solid rgba(0, 229, 244, 0.85);
   border-radius: 10px;
   flex-direction: column;
   justify-content: center;
-  background: rgba(2, 22, 38, 0.92);
-  box-shadow: 0 10px 24px rgba(0, 4, 12, 0.6), 0 0 20px rgba(0, 229, 244, 0.22);
+  background: rgba(2, 22, 38, 0.94);
+  box-shadow: 0 10px 24px rgba(0, 4, 12, 0.6), 0 0 20px rgba(0, 229, 244, 0.25);
   transform: translate(-50%, -50%);
   backdrop-filter: blur(12px);
   transition: transform 220ms ease, box-shadow 220ms ease;
@@ -641,23 +641,23 @@
 
 .regionTag span {
   color: #00e5f4;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 800;
   letter-spacing: 0.02em;
 }
 
 .regionTag strong {
-  margin-top: 3px;
+  margin-top: 2px;
   color: #ffffff;
-  font-size: 1.42rem;
+  font-size: 1.28rem;
   font-weight: 800;
-  line-height: 1.05;
+  line-height: 1.1;
 }
 
 .regionTag small {
-  margin-top: 2px;
+  margin-top: 1px;
   color: #b8c9d7;
-  font-size: 0.8rem;
+  font-size: 0.74rem;
   font-weight: 600;
 }
 
