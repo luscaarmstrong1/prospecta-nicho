@@ -1,9 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { AppShell } from "@/components/AppShell";
 import { assetPath } from "@/lib/asset-path";
 import { site } from "@/lib/site";
 import { serializeJsonLd } from "@/lib/structured-data";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -38,7 +43,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     name: site.name,
     url: site.url,
     contactPoint: [{ "@type": "ContactPoint", contactType: "sales", email: site.email }],
-    logo: `${site.url}/assets/brand/logo-pn-final-light.png`,
+    logo: `${site.url}/assets/brand/logo-pn-final-dark.png`,
   };
 
   return (

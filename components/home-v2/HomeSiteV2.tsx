@@ -219,7 +219,8 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
           </div>
           <div className={styles.heroOverlay} />
 
-          <div className={styles.heroMain}>
+          <div className={styles.heroContent}>
+            <div className={styles.heroMain}>
             <motion.div
               className={styles.heroCopy}
               initial={reducedMotion ? false : "hidden"}
@@ -329,8 +330,9 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
                 </a>
               </div>
               <div className={styles.commercialCardImageWrap}>
+                <div className={styles.commercialCardShade} />
                 <Image
-                  src={assetPath("/assets/brand/hero-office-card.webp")}
+                  src={assetPath("/assets/brand/empresas-reais.webp")}
                   alt="Escritório corporativo moderno iluminado à noite"
                   fill
                   sizes="320px"
@@ -339,7 +341,8 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
         <section className={styles.sampleSection} id="amostra" aria-labelledby="sample-title" data-testid="preview-sample">
           <div className={styles.sampleGlow} />
