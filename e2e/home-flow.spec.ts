@@ -45,3 +45,4 @@ test("amostra apresenta tabela comercial e CTA funcional", async ({ page }) => {
     "/solicitar-planilha?source=home-v2-amostra",
   );
 });
+

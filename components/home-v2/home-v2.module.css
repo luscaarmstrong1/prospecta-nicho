@@ -2207,7 +2207,7 @@
   .heroBenefits > div { padding: 16px; grid-template-columns: 50px 1fr; }
   .benefitIcon { width: 48px; height: 48px; }
 
-  .numbersCard { grid-template-columns: 52% 17% 31%; }
+  .numbersCard { grid-template-columns: 59% 40%; }
 
   .sampleSection {
     grid-template-columns: minmax(330px, 0.4fr) minmax(540px, 0.6fr);

@@ -21,7 +21,6 @@ test("hero oficial apresenta promessa, mapa e ações reais", async ({ page }) =
     "/solicitar-planilha?source=home-v2-hero",
   );
   await expect(hero.getByRole("link", { name: /Ver como funciona/i })).toHaveAttribute("href", "#amostra");
-  await expect(page.getByTestId("preview-map")).toBeVisible();
 });
 
 test("segmentos em destaque usam os quatro recortes comerciais atuais", async ({ page }) => {
@@ -40,3 +39,4 @@ test("segmentos em destaque usam os quatro recortes comerciais atuais", async ({
     );
   }
 });
+

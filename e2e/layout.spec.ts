@@ -96,3 +96,4 @@ test("whatsapp flutuante permanece fixo e visível durante scroll", async ({ pag
 
   expect(new Set(samples.map((sample) => sample.top)).size).toBe(1);
 });
+

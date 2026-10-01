@@ -28,11 +28,11 @@ export const previewNavigation = [
 ];
 
 export const regionalReach = [
-  { region: "Norte", total: "Filtros locais", left: "20%", top: "18%" },
-  { region: "Nordeste", total: "Filtros locais", left: "70%", top: "24%" },
-  { region: "Centro-Oeste", total: "Filtros locais", left: "22%", top: "48%" },
-  { region: "Sudeste", total: "Filtros locais", left: "62%", top: "54%" },
-  { region: "Sul", total: "Filtros locais", left: "34%", top: "76%" },
+  { region: "Norte", total: "+ 125 mil", left: "20%", top: "18%" },
+  { region: "Nordeste", total: "+ 298 mil", left: "70%", top: "24%" },
+  { region: "Centro-Oeste", total: "+ 210 mil", left: "22%", top: "48%" },
+  { region: "Sudeste", total: "+ 1,2 milhão", left: "62%", top: "54%" },
+  { region: "Sul", total: "+ 420 mil", left: "34%", top: "76%" },
 ];
 
 export const heroBenefits: Array<{ icon: PreviewIcon; label: string; line2?: string }> = [
