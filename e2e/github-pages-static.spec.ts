@@ -20,6 +20,6 @@ test("home estatica carrega sem chamar API Route local", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: /Prospecta Nicho: encontre oportunidades B2B/i }),
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: /Solicita/i }).first()).toBeVisible();
+  await expect(page.getByRole("link", { name: /Falar com um especialista/i }).first()).toBeVisible();
   expect(apiRequests).toEqual([]);
 });
