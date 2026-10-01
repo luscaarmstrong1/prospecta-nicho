@@ -1,49 +1,42 @@
 import { expect, test } from "@playwright/test";
 
-const expectedCards = [
-  ["agencias", "Base para agências"],
-  ["contabilidades", "Base para contabilidades"],
-  ["energia-solar", "Base para energia solar"],
-  ["erp-e-sistemas", "Base para ERP e sistemas"],
-  ["maquininhas", "Base para maquininhas"],
-  ["comunicacao-visual", "Base para comunicação visual"],
+const expectedSegments = [
+  ["Indústrias", "industria"],
+  ["Comércios", "comercio"],
+  ["Serviços", "servicos"],
+  ["Tecnologia", "tecnologia"],
 ] as const;
 
-test("primeira dobra exibe showcase curado com busca, filtros e CTAs", async ({ page }) => {
+test("hero oficial apresenta promessa, mapa e ações reais", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.locator('[data-test-id="curated-showcase-hero"]')).toBeVisible();
-  await expect(page.getByText("INTELIGÊNCIA COMERCIAL B2B")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Escolha um nicho. Receba uma base pronta para prospecção." })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Solicitar uma base/i })).toHaveAttribute("href", "/solicitar-planilha");
-  await expect(page.getByRole("link", { name: /Receber amostra grátis/i })).toHaveAttribute(
+  const hero = page.getByTestId("preview-hero");
+  await expect(hero).toBeVisible();
+  await expect(hero.getByText("Bases B2B segmentadas")).toBeVisible();
+  await expect(
+    hero.getByRole("heading", { name: "Prospecta Nicho: encontre oportunidades B2B em todo o Brasil." }),
+  ).toBeVisible();
+  await expect(hero.getByRole("link", { name: /Ver planos e bases/i })).toHaveAttribute(
     "href",
-    "/solicitar-planilha?source=hero-amostra",
+    "/solicitar-planilha?source=home-v2-hero",
   );
+  await expect(hero.getByRole("link", { name: /Ver como funciona/i })).toHaveAttribute("href", "#amostra");
+  await expect(page.getByTestId("preview-map")).toBeVisible();
+});
 
-  await expect(page.locator(".showcase-card")).toHaveCount(6);
-  for (const [slug, title] of expectedCards) {
-    const card = page.locator(`.showcase-card[data-segment="${slug}"]`);
-    await expect(card).toContainText(title);
-    await expect(card.locator("img").first()).toHaveJSProperty("complete", true);
-    await expect(card).toHaveAttribute("href", `/solicitar-planilha?segment=${slug}&source=showcase-grid`);
+test("segmentos em destaque usam os quatro recortes comerciais atuais", async ({ page }) => {
+  await page.goto("/");
+
+  const cards = page.getByTestId("motion-segment-card");
+  await expect(cards).toHaveCount(expectedSegments.length);
+
+  for (const [title, segment] of expectedSegments) {
+    const card = cards.filter({ hasText: title });
+    await expect(card).toBeVisible();
+    await expect(card.locator("img")).toHaveJSProperty("complete", true);
+    await expect(card.getByRole("link", { name: /Acessar segmento/i })).toHaveAttribute(
+      "href",
+      `/solicitar-planilha?segment=${segment}&source=home-v2-segmento`,
+    );
   }
-
-  await page.getByRole("button", { name: "Agências" }).click();
-  await expect(page.locator(".showcase-card")).toHaveCount(1);
-  await expect(page.locator(".showcase-card")).toContainText("Base para agências");
-
-  await page.getByRole("button", { name: "Todos" }).click();
-  await page.getByPlaceholder("Buscar por segmento, cidade ou objetivo comercial...").fill("solar");
-  await expect(page.locator(".showcase-card")).toHaveCount(1);
-  await expect(page.locator(".showcase-card")).toContainText("Base para energia solar");
-
-  await page.getByPlaceholder("Buscar por segmento, cidade ou objetivo comercial...").fill("termo inexistente");
-  await expect(page.locator(".showcase-empty")).toContainText(
-    "Nenhuma base encontrada para esse termo. Você ainda pode solicitar uma base personalizada.",
-  );
-  await expect(page.getByRole("link", { name: "Montar base personalizada" })).toHaveAttribute(
-    "href",
-    "/solicitar-planilha?source=showcase-sem-resultado",
-  );
 });

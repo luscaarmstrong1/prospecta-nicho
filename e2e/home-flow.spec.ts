@@ -1,28 +1,28 @@
 import { expect, test } from "@playwright/test";
 
-test("home mantem ordem comercial final e remove FAQ da pagina inicial", async ({ page }) => {
+test("home mantém a sequência comercial atual e não exibe FAQ", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.locator('[data-test-id="curated-showcase-hero"]')).toBeVisible();
-  await expect(page.getByText(/INTELIG.NCIA COMERCIAL B2B/)).toBeVisible();
-  await expect(page.getByRole("heading", { name: /Escolha um nicho\. Receba uma base pronta para prospec..o\./ })).toBeVisible();
-  await expect(page.getByText("Antes de comecar, voce talvez queira saber.")).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "Ver todas as duvidas" })).toHaveCount(0);
+  await expect(page.getByTestId("preview-hero")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Prospecta Nicho: encontre oportunidades B2B em todo o Brasil." }),
+  ).toBeVisible();
+  await expect(page.getByText("Antes de começar, você talvez queira saber.")).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "Ver todas as dúvidas" })).toHaveCount(0);
 
   const sectionTops = await page.evaluate(() => {
-    const selectors = [
-      ".curated-hero",
-      "section:has(.delivery-preview)",
-      "section:has(.product-signal-grid)",
-      ".conversion-system-section",
-      ".segment-band",
-      ".sample-section",
-      ".final-cta",
+    const testIds = [
+      "preview-hero",
+      "preview-sample",
+      "preview-segments",
+      "preview-plans",
+      "preview-testimonials",
+      "preview-final-cta",
     ];
 
-    return selectors.map((selector) => {
-      const element = document.querySelector(selector);
-      if (!element) throw new Error(`Secao nao encontrada: ${selector}`);
+    return testIds.map((testId) => {
+      const element = document.querySelector(`[data-testid="${testId}"]`);
+      if (!element) throw new Error(`Seção não encontrada: ${testId}`);
       return element.getBoundingClientRect().top + window.scrollY;
     });
   });
@@ -30,17 +30,18 @@ test("home mantem ordem comercial final e remove FAQ da pagina inicial", async (
   expect(sectionTops).toEqual([...sectionTops].sort((a, b) => a - b));
 });
 
-test("demonstracao da entrega exibe planilha mascarada sem coluna de site", async ({ page }) => {
+test("amostra apresenta tabela comercial e CTA funcional", async ({ page }) => {
   await page.goto("/");
 
-  const preview = page.locator(".delivery-preview");
-  await expect(preview.getByText(/Pr.via da entrega/)).toBeVisible();
-  await expect(preview.getByText(/Dados fict.cios e mascarados/)).toBeVisible();
-  await expect(preview.locator(".delivery-row").nth(0)).not.toContainText("Site");
-  await expect(preview).toContainText("Empresa");
-  await expect(preview).toContainText("Status");
-  await expect(page.getByRole("link", { name: /Solicitar tabela gr.tis de teste/i })).toHaveAttribute(
+  const sample = page.getByTestId("preview-sample");
+  const table = sample.getByLabel("Demonstração de planilha comercial");
+  await expect(sample.getByRole("heading", { name: "Veja a qualidade dos nossos dados antes de decidir." })).toBeVisible();
+  await expect(table).toBeVisible();
+  await expect(table).toContainText("CNPJ");
+  await expect(table).toContainText("Razão Social");
+  await expect(table).toContainText("Telefone");
+  await expect(sample.getByRole("link", { name: /Receber amostra grátis/i })).toHaveAttribute(
     "href",
-    "/solicitar-planilha?source=home-demonstracao-amostra",
+    "/solicitar-planilha?source=home-v2-amostra",
   );
 });

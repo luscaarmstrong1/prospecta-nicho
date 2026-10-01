@@ -1,56 +1,41 @@
 import { expect, test } from "@playwright/test";
 
-test("home não cria scroll horizontal e mantém dez segmentos", async ({ page }) => {
+test("home não cria scroll horizontal e mantém quatro segmentos", async ({ page }) => {
   await page.goto("/");
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
-  await expect(page.locator(".segment-labels a")).toHaveCount(10);
+  await expect(page.getByTestId("motion-segment-card")).toHaveCount(4);
 });
 
-test("cards de segmento apontam para solicitação rápida", async ({ page }) => {
+test("cards de segmento apontam para a solicitação correta", async ({ page }) => {
   await page.goto("/");
-  const hrefs = await page.locator(".segment-labels a").evaluateAll((links) =>
-    links.map((link) => link.getAttribute("href") || ""),
+  const hrefs = await page.getByTestId("motion-segment-card").getByRole("link", { name: /Acessar segmento/i }).evaluateAll(
+    (links) => links.map((link) => link.getAttribute("href") || ""),
   );
+  expect(hrefs).toHaveLength(4);
   expect(hrefs.every((href) => href.startsWith("/solicitar-planilha?segment="))).toBe(true);
-});
-
-test("showcase da primeira dobra filtra cards por segmento e busca", async ({ page }) => {
-  await page.goto("/");
-
-  await expect(page.locator(".showcase-card")).toHaveCount(6);
-
-  await page.getByRole("button", { name: "Agências" }).click();
-  await expect(page.locator(".showcase-card")).toHaveCount(1);
-  await expect(page.locator(".showcase-card")).toContainText("Base para agências");
-
-  await page.getByPlaceholder("Buscar por segmento, cidade ou objetivo comercial...").fill("solar");
-  await page.getByRole("button", { name: "Todos" }).click();
-  await expect(page.locator(".showcase-card")).toHaveCount(1);
-  await expect(page.locator(".showcase-card")).toContainText("Base para energia solar");
 });
 
 test("home segue ordem final sem seção de FAQ", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.locator(".curated-hero .eyebrow").first()).toContainText("INTELIGÊNCIA COMERCIAL B2B");
+  await expect(page.getByTestId("preview-hero").getByText("Bases B2B segmentadas")).toBeVisible();
   await expect(page.getByText("Antes de começar, você talvez queira saber.")).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Ver todas as dúvidas" })).toHaveCount(0);
 
   const sectionTops = await page.evaluate(() => {
-    const selectors = [
-      ".curated-hero",
-      "section:has(.delivery-preview)",
-      "section:has(.product-signal-grid)",
-      ".conversion-system-section",
-      ".segment-band",
-      ".sample-section",
-      ".final-cta",
+    const testIds = [
+      "preview-hero",
+      "preview-sample",
+      "preview-segments",
+      "preview-plans",
+      "preview-testimonials",
+      "preview-final-cta",
     ];
 
-    return selectors.map((selector) => {
-      const element = document.querySelector(selector);
-      if (!element) throw new Error(`Seção não encontrada: ${selector}`);
+    return testIds.map((testId) => {
+      const element = document.querySelector(`[data-testid="${testId}"]`);
+      if (!element) throw new Error(`Seção não encontrada: ${testId}`);
       return element.getBoundingClientRect().top + window.scrollY;
     });
   });
@@ -58,17 +43,16 @@ test("home segue ordem final sem seção de FAQ", async ({ page }) => {
   expect(sectionTops).toEqual([...sectionTops].sort((a, b) => a - b));
 });
 
-test("filtros do showcase ficam em linha no desktop", async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== "desktop", "Alinhamento em linha única é exigido apenas no desktop.");
+test("cards de planos ficam alinhados no desktop", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop", "Alinhamento dos planos é validado no desktop.");
 
   await page.goto("/");
-  const filters = page.locator(".showcase-filter");
-  await expect(filters).toHaveCount(8);
+  const planHeadings = page.getByTestId("preview-plans").getByRole("heading", { level: 3 });
+  await expect(planHeadings).toHaveCount(4);
 
-  const tops = await filters.evaluateAll((elements) =>
-    elements.map((element) => Math.round(element.getBoundingClientRect().top)),
+  const tops = await planHeadings.evaluateAll((elements) =>
+    elements.map((element) => Math.round(element.closest("article")?.getBoundingClientRect().top ?? -1)),
   );
-
   expect(Math.max(...tops) - Math.min(...tops)).toBeLessThanOrEqual(1);
 });
 

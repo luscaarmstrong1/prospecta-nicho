@@ -12,16 +12,17 @@ const viewports = [
   { width: 1920, height: 1080 },
 ];
 
-test("home preserva responsividade visual nos principais tamanhos", async ({ page }) => {
+test("home preserva responsividade visual nos principais tamanhos", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop", "A matriz define todos os viewports explicitamente.");
   test.setTimeout(60_000);
 
   for (const viewport of viewports) {
     await page.setViewportSize(viewport);
     await page.goto("/");
 
-    await expect(page.locator(".curated-hero")).toBeVisible();
-    await expect(page.locator(".showcase-card").first()).toBeVisible();
-    await expect(page.locator(".delivery-preview")).toBeVisible();
+    await expect(page.getByTestId("preview-hero")).toBeVisible();
+    await expect(page.getByTestId("motion-segment-card").first()).toBeVisible();
+    await expect(page.getByLabel("Demonstração de planilha comercial")).toBeVisible();
     await expect(page.locator('[data-test-id="whatsapp-floating-button"]')).toBeVisible();
 
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
@@ -29,29 +30,12 @@ test("home preserva responsividade visual nos principais tamanhos", async ({ pag
   }
 });
 
-test("showcase adapta colunas e filtros sem quebrar largura", async ({ page }, testInfo) => {
+test("segmentos e planos se mantêm íntegros sem quebrar a largura", async ({ page }) => {
   await page.goto("/");
-  const cards = page.locator(".showcase-card");
-  await expect(cards).toHaveCount(6);
-  await expect(page.locator(".showcase-filter")).toHaveCount(8);
 
-  const metrics = await page.locator(".showcase-grid").evaluate((element) => {
-    const style = window.getComputedStyle(element);
-    return {
-      columns: style.gridTemplateColumns.split(" ").filter(Boolean).length,
-    };
-  });
+  await expect(page.getByTestId("motion-segment-card")).toHaveCount(4);
+  await expect(page.getByTestId("preview-plans").getByRole("heading", { level: 3 })).toHaveCount(4);
 
-  if (testInfo.project.name === "desktop") {
-    expect(metrics.columns).toBe(12);
-  } else {
-    expect(metrics.columns).toBeGreaterThanOrEqual(1);
-    expect(metrics.columns).toBeLessThanOrEqual(2);
-  }
-
-  const filterOverflow = await page.locator(".showcase-filters").evaluate((element) => {
-    const style = window.getComputedStyle(element);
-    return style.overflowX;
-  });
-  expect(["auto", "scroll"]).toContain(filterOverflow);
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
 });
