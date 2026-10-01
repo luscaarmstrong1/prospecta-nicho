@@ -1,18 +1,22 @@
 import type { Metadata } from "next";
 import { MessageCircle } from "lucide-react";
 import { ContactForm } from "@/components/ContactForm";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumbJsonLd, createMetadata } from "@/lib/seo";
 import { createWhatsAppLink, defaultWhatsAppMessage } from "@/lib/whatsapp";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createMetadata({
   title: "Contato",
-  description: "Fale com a ProspectaNicho sobre bases B2B, pedidos, pagamento, parcerias ou privacidade.",
-};
+  description: "Fale com a Prospecta Nicho sobre leads B2B, sites, landing pages, automação, pedidos, parcerias ou privacidade.",
+  path: "/contato",
+});
 
 export default function ContactPage() {
   const whatsappHref = createWhatsAppLink(defaultWhatsAppMessage);
 
   return (
     <>
+      <JsonLd data={breadcrumbJsonLd([{ name: "Início", path: "/" }, { name: "Contato", path: "/contato" }])} />
       <section className="hero">
         <div className="container-wide">
           <p className="eyebrow">Contato</p>

@@ -2,6 +2,7 @@ import { test, expect } from "@playwright/test";
 
 const marketingRoutes = [
   "/solucoes",
+  "/solucoes/sites-landing-pages",
   "/segmentos",
   "/planos",
   "/conteudo",

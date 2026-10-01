@@ -1,7 +1,7 @@
 "use client";
 
 // cspell:ignore construcao integracoes Linkedin saude servico testid Youtube
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
@@ -16,9 +16,7 @@ import {
   Database,
   Download,
   Globe2,
-  Instagram,
   Layers3,
-  Linkedin,
   Mail,
   MapPin,
   Megaphone,
@@ -31,7 +29,6 @@ import {
   TrendingUp,
   UserRound,
   Users,
-  Youtube,
   Zap,
 } from "lucide-react";
 import { assetPath } from "@/lib/asset-path";
@@ -150,37 +147,9 @@ export function HomeSiteV2({ includeHeaderFooter = true }: { includeHeaderFooter
 
 function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [newsletterState, setNewsletterState] = useState<"idle" | "sending" | "success">("idle");
-  const [showToast, setShowToast] = useState(false);
   const [testimonialIndex, setTestimonialIndex] = useState(0);
-  const newsletterSubmitTimer = useRef<number>(0);
-  const newsletterToastTimer = useRef<number>(0);
   const { motionOff, reducedMotion } = useHomeMotion();
   const whatsappHref = createWhatsAppLink(defaultWhatsAppMessage);
-
-  function submitNewsletter(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (newsletterState !== "idle") return;
-    setNewsletterState("sending");
-    window.clearTimeout(newsletterSubmitTimer.current);
-    window.clearTimeout(newsletterToastTimer.current);
-    newsletterSubmitTimer.current = window.setTimeout(() => {
-      setNewsletterState("success");
-      setShowToast(true);
-      newsletterToastTimer.current = window.setTimeout(() => setShowToast(false), 2600);
-    }, reducedMotion ? 20 : 620);
-  }
-
-  useEffect(() => () => {
-    window.clearTimeout(newsletterSubmitTimer.current);
-    window.clearTimeout(newsletterToastTimer.current);
-  }, []);
-
-  useEffect(() => {
-    if (newsletterState !== "success") return;
-    const timer = window.setTimeout(() => setNewsletterState("idle"), 3400);
-    return () => window.clearTimeout(timer);
-  }, [newsletterState]);
 
   const visibleTestimonials = testimonials.map((_, offset) =>
     testimonials[(testimonialIndex + offset) % testimonials.length],
@@ -229,7 +198,7 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
             >
               <motion.p className={styles.heroEyebrow} variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}>Bases B2B segmentadas</motion.p>
               <motion.h1 id="preview-hero-title" data-testid="preview-hero-title">
-                <motion.span className={styles.heroLine} variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}>Encontre novas</motion.span>
+                <motion.span className={styles.heroLine} variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}>Prospecta Nicho: encontre</motion.span>
                 <motion.span className={`${styles.heroLine} ${styles.heroHighlightLine}`} variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}>oportunidades B2B</motion.span>
                 <motion.span className={styles.heroLine} variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0 } }}>em todo o Brasil.</motion.span>
               </motion.h1>
@@ -274,7 +243,7 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
                   >
                     <span>{item.region}</span>
                     <strong>{item.total}</strong>
-                    <small>empresas</small>
+                    <small>por região</small>
                   </div>
                 );
               })}
@@ -304,19 +273,19 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
           <div className={styles.numbersCard} data-testid="preview-numbers">
             <div className={styles.numbersContent}>
               <div className={styles.numbersEyebrowRow}>
-                <p className={styles.numbersEyebrow}>Números que impulsionam negócios</p>
+                <p className={styles.numbersEyebrow}>Soluções que conectam dados e presença digital</p>
                 <span className={styles.numbersEyebrowLine} aria-hidden="true" />
               </div>
               <div className={styles.metricRow}>
-                {scaleMetrics.slice(0, 3).map((metric) => (
-                  <div key={metric.label}>
+                {scaleMetrics.map((metric) => (
+                  <Link href={metric.href} key={metric.label}>
                     <strong>{metric.value}</strong>
                     <span>{metric.label}</span>
-                  </div>
+                  </Link>
                 ))}
                 <div className={styles.metricUpdated}>
                   <BarChart3 size={32} className={styles.updatedChartIcon} aria-hidden="true" />
-                  <span>Dados atualizados<br />mensalmente</span>
+                  <Link href="/automacao">Automação<br />de processos</Link>
                 </div>
               </div>
             </div>
@@ -462,7 +431,7 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
               <h3>Precisa também fortalecer sua presença digital?</h3>
               <p>Desenvolvemos sites e landing pages profissionais, responsivos e pensados para conversão, ajudando sua empresa a atrair mais clientes e gerar mais resultados.</p>
             </div>
-            <Link className={styles.webBridgeBtn} href="/solucoes/sites-landing-pages">
+            <Link className={styles.webBridgeBtn} href="/sites">
               Conheça o Prospecta Web <ArrowRight size={18} aria-hidden="true" />
             </Link>
           </div>
@@ -484,8 +453,8 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
                 <span className={styles.testimonialBadge}>DEPOIMENTOS</span>
                 <span className={styles.testimonialBadgeLine} aria-hidden="true" />
               </div>
-              <h2 id="testimonials-title">Quem usa, <span>recomenda.</span></h2>
-              <p>Empresas de diferentes segmentos já aceleraram seus resultados com nossas bases.</p>
+              <h2 id="testimonials-title">Confiança com <span>transparência.</span></h2>
+              <p>Publicamos relatos somente depois da autorização e conferência de clientes reais.</p>
             </div>
             <div className={styles.testimonialArrows} aria-label="Navegar pelos depoimentos">
               <button type="button" aria-label="Depoimento anterior" onClick={() => changeTestimonial(-1)} disabled={testimonials.length === 0}><ArrowLeft aria-hidden="true" /></button>
@@ -579,11 +548,7 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
               <PnFinalLogo />
               <span>Dados que geram negócios.</span>
               <p>Dados, tecnologia e inteligência de mercado para impulsionar o crescimento da sua empresa.</p>
-              <div className={styles.socials} aria-label="Canais de contato">
-                <a href="/contato" aria-label="LinkedIn"><Linkedin aria-hidden="true" /></a>
-                <a href="/contato" aria-label="Instagram"><Instagram aria-hidden="true" /></a>
-                <a href="/contato" aria-label="YouTube"><Youtube aria-hidden="true" /></a>
-              </div>
+              <a href="mailto:prospectanicho@gmail.com">prospectanicho@gmail.com</a>
             </div>
             {footerGroups.map((group) => (
               <div className={styles.footerLinks} key={group.title}>
@@ -597,28 +562,13 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
             </div>
           </Reveal>
 
-          <form className={styles.newsletter} onSubmit={submitNewsletter}>
+          <div className={styles.newsletter}>
             <div><Mail aria-hidden="true" /><span>Receba insights e conteúdos<br />sobre o mercado B2B no Brasil.</span></div>
-            <label className="sr-only" htmlFor="preview-newsletter">Seu melhor e-mail</label>
-            <input id="preview-newsletter" type="email" required placeholder="Seu melhor e-mail" />
-            <button className={styles.newsletterSubmit} type="submit" disabled={newsletterState !== "idle"}>
-              {newsletterState === "sending" ? "Enviando..." : newsletterState === "success" ? "Inscrição simulada ✓" : "Quero receber"}
-              {newsletterState === "idle" ? <ArrowRight aria-hidden="true" /> : null}
-            </button>
-          </form>
-          <AnimatePresence>
-            {showToast ? (
-              <motion.span
-                className={styles.newsletterSuccess}
-                role="status"
-                initial={reducedMotion ? false : { opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={reducedMotion ? undefined : { opacity: 0, y: 8 }}
-              >
-                <CheckCircle2 size={16} aria-hidden="true" /> Inscrição registrada apenas nesta tela.
-              </motion.span>
-            ) : null}
-          </AnimatePresence>
+            <span>Conteúdos em preparação. Fale com a equipe para receber novidades.</span>
+            <Link className={styles.newsletterSubmit} href="/contato">
+              Entrar em contato <ArrowRight aria-hidden="true" />
+            </Link>
+          </div>
 
           <div className={styles.footerBottom}>
             <span>© {new Date().getFullYear()} ProspectaNicho. Todos os direitos reservados.</span>

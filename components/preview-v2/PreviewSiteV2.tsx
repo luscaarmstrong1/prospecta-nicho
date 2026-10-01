@@ -508,7 +508,7 @@ function PreviewSiteV2Content() {
       <footer className={styles.footer} id="sobre" data-testid="preview-footer">
         <Reveal className={styles.footerTop}>
           <div className={styles.footerBrand}>
-            <Image src={assetPath("/assets/brand/logo-pn-final-dark.png")} alt="ProspectaNicho" width={2172} height={724} unoptimized />
+            <Image src={assetPath("/preview-v2/assets/logo-official-transparent.png")} alt="ProspectaNicho" width={344} height={72} unoptimized />
             <span>Dados que criam negócios.</span>
             <p>Dados, tecnologia e inteligência de mercado para impulsionar o crescimento da sua empresa.</p>
             <div className={styles.socials} aria-label="Redes sociais demonstrativas">

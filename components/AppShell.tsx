@@ -11,10 +11,17 @@ import { SiteFooter } from "@/components/shared-v2/SiteFooter";
 
 const v2MarketingRoutes = new Set<string>([
   "/solucoes",
+  "/prospecta-web",
   "/segmentos",
   "/planos",
   "/conteudo",
   "/sobre",
+  "/contato",
+  "/leads-b2b",
+  "/sites",
+  "/landing-pages",
+  "/automacao",
+  "/projetos",
 ]);
 
 const legacyRoutes = new Set<string>([]);

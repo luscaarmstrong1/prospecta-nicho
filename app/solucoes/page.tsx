@@ -1,23 +1,20 @@
-// cspell:ignore Ltda
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ChevronRight, Database, Filter, Layers, Play, Send, ShieldCheck } from "lucide-react";
 import { SharedCTA } from "@/components/shared-v2/SharedCTA";
+import { createMetadata } from "@/lib/seo";
 import { createWhatsAppLink } from "@/lib/whatsapp";
 import styles from "@/components/shared-v2/site-pages.module.css";
 
-export const metadata: Metadata = {
-  title: "Soluções | ProspectaNicho",
-  description:
-    "Encontre, segmente e ative oportunidades B2B com mais resultado. Bases B2B, recorte personalizado e exportação para CRM.",
-};
+const description = "Conheça as soluções da Prospecta Nicho para inteligência comercial, presença digital e automação de processos B2B.";
+export const metadata: Metadata = createMetadata({ title: "Soluções para crescimento B2B", description, path: "/solucoes" });
 
 const solutionsList = [
   {
     id: "bases-b2b",
     icon: Database,
     title: "Bases B2B",
-    description: "Acesse milhões de empresas atualizadas em todo o Brasil, com dados completos e confiáveis.",
+    description: "Solicite recortes de empresas por segmento, região e perfil comercial para apoiar sua prospecção.",
     href: "/solicitar-planilha?source=solucoes-bases",
   },
   {
@@ -85,9 +82,7 @@ export default function SolucoesPage() {
                 </Link>
                 <a
                   className={styles.btnGhostOutline}
-                  href={createWhatsAppLink(
-                    "Olá, gostaria de entender como funciona a ProspectaNicho.",
-                  )}
+                  href={createWhatsAppLink("Olá, gostaria de entender como funcionam as soluções da Prospecta Nicho.")}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

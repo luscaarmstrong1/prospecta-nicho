@@ -17,14 +17,16 @@ import { productCatalog } from "@/lib/products";
 import { getSiteUrl } from "@/lib/site-url";
 
 export const site = {
-  name: "ProspectaNicho",
+  name: "Prospecta Nicho",
+  alternateName: "ProspectaNicho",
+  slogan: "Dados. Presença. Automação. Crescimento.",
   institutional: "Empresas no momento certo para a venda certa.",
   campaign: "Transforme seu público ideal em uma base pronta para prospecção.",
   tagline: "Menos tempo procurando. Mais tempo falando com empresas que fazem sentido para sua operação.",
-  description: "A ProspectaNicho transforma critérios comerciais em recortes de empresas prontos para prospecção.",
+  description: "A Prospecta Nicho conecta inteligência comercial, sites, landing pages e automação para ajudar empresas a encontrar oportunidades e crescer.",
   url: getSiteUrl(),
   whatsapp: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "",
-  email: process.env.CONTACT_EMAIL || "contato@prospectanicho.com.br",
+  email: process.env.CONTACT_EMAIL || "prospectanicho@gmail.com",
 };
 
 export type Product = {

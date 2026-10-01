@@ -6,6 +6,7 @@ import { ArrowRight, CheckCircle2, ShieldCheck, Zap } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { assetPath } from "@/lib/asset-path";
+import { createWhatsAppLink } from "@/lib/whatsapp";
 import { Magnetic, Reveal, useHomeMotion } from "@/components/home-v2/motion/HomeMotion";
 import styles from "@/components/shared-v2/site-pages.module.css";
 
@@ -29,7 +30,7 @@ export function SharedCTA({
   titleTertiary = "Mais resultados.",
   asideHeadline = "Pronto para acelerar sua prospecção?",
   primaryCtaLabel = "Falar com um especialista",
-  primaryCtaHref = "https://wa.me/5511999999999?text=Ol%C3%A1,%20gostaria%20de%20falar%20com%20um%20especialista%20da%20ProspectaNicho",
+  primaryCtaHref = createWhatsAppLink("Olá, gostaria de falar com um especialista da Prospecta Nicho."),
   secondaryCtaLabel = "Começar agora",
   secondaryCtaHref = "/solicitar-planilha?source=site-v2-cta",
   badgeText1 = "Sem cartão de crédito",

@@ -93,7 +93,7 @@ export const solucoesData = {
     },
     ctaSecondary: {
       label: "Falar com especialista",
-      href: "https://wa.me/5511999999999?text=Ol%C3%A1,%20gostaria%20de%20saber%20mais%20sobre%20as%20solu%C3%A7%C3%B5es%20da%20ProspectaNicho",
+      href: "/contato",
     },
   },
   solutions: [

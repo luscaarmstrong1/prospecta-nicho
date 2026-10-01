@@ -15,6 +15,7 @@
     "spellcheck": "node scripts/spellcheck.mjs && cspell \"app/**/*.{ts,tsx,md}\" \"components/**/*.{ts,tsx}\" \"lib/**/*.{ts,tsx}\"",
     "check:links": "node --experimental-strip-types scripts/check-links.mjs",
     "check:metadata": "node scripts/check-metadata.mjs",
+    "check:seo": "node scripts/check-seo.mjs",
     "check:content": "node scripts/check-content.mjs",
     "check:env": "node --experimental-strip-types scripts/check-env.ts",
     "check:rls": "node --experimental-strip-types scripts/check-rls.ts",
@@ -24,7 +25,7 @@
     "worker:sample": "python -m workers.rfb_cnpj run --sample",
     "worker:export-sample": "python -m workers.rfb_cnpj export --sample",
     "worker:validate": "python -m workers.rfb_cnpj validate",
-    "test:editor": "node --experimental-strip-types --test tests/*.test.mjs",
+    "test:editor": "node --experimental-strip-types --test --test-isolation=none tests/*.test.mjs",
     "test:e2e": "playwright test",
     "test:e2e:github-pages": "node scripts/test-github-pages-runtime.mjs",
     "test": "npm run test:editor"

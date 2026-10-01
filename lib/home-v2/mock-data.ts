@@ -28,11 +28,11 @@ export const previewNavigation = [
 ];
 
 export const regionalReach = [
-  { region: "Norte", total: "+ 125 mil", left: "20%", top: "18%" },
-  { region: "Nordeste", total: "+ 298 mil", left: "70%", top: "24%" },
-  { region: "Centro-Oeste", total: "+ 210 mil", left: "22%", top: "48%" },
-  { region: "Sudeste", total: "+ 1,2 milhão", left: "62%", top: "54%" },
-  { region: "Sul", total: "+ 420 mil", left: "34%", top: "76%" },
+  { region: "Norte", total: "Filtros locais", left: "20%", top: "18%" },
+  { region: "Nordeste", total: "Filtros locais", left: "70%", top: "24%" },
+  { region: "Centro-Oeste", total: "Filtros locais", left: "22%", top: "48%" },
+  { region: "Sudeste", total: "Filtros locais", left: "62%", top: "54%" },
+  { region: "Sul", total: "Filtros locais", left: "34%", top: "76%" },
 ];
 
 export const heroBenefits: Array<{ icon: PreviewIcon; label: string; line2?: string }> = [
@@ -43,10 +43,9 @@ export const heroBenefits: Array<{ icon: PreviewIcon; label: string; line2?: str
 ];
 
 export const scaleMetrics = [
-  { value: "5.8M", label: "empresas cadastradas" },
-  { value: "+600", label: "segmentos mapeados" },
-  { value: "5.570", label: "cidades cobertas" },
-  { value: "", label: "Dados atualizados mensalmente" },
+  { value: "Leads B2B", label: "segmentação comercial", href: "/leads-b2b" },
+  { value: "Sites", label: "presença digital", href: "/sites" },
+  { value: "Landing pages", label: "campanhas e conversão", href: "/landing-pages" },
 ];
 
 export const sampleColumns = ["CNPJ", "Razão Social", "Segmento", "Cidade", "Porte", "Telefone"];
@@ -130,29 +129,7 @@ export const plans: Array<{
   },
 ];
 
-export const testimonials: Array<{ quote: string; name: string; role: string; company: string; avatar: string }> = [
-  {
-    quote: "A qualidade dos dados e a segmentação por região nos ajudaram a aumentar em 40% nossas oportunidades comerciais.",
-    name: "Ricardo Almeida",
-    role: "Diretor Comercial",
-    company: "Indústria de Equipamentos",
-    avatar: "/preview-v2/assets/avatar-rafael.webp",
-  },
-  {
-    quote: "Com a base da ProspectaNicho conseguimos expandir para novas regiões e dobrar o número de reuniões em 3 meses.",
-    name: "Mariana Costa",
-    role: "CEO",
-    company: "Agência de Marketing",
-    avatar: "/preview-v2/assets/avatar-patricia.webp",
-  },
-  {
-    quote: "Dados atualizados, suporte excelente e um processo simples para adquirir as bases. Recomendo!",
-    name: "Carlos Mendes",
-    role: "Sócio-diretor",
-    company: "Consultoria Empresarial",
-    avatar: "/preview-v2/assets/avatar-carlos.webp",
-  },
-];
+export const testimonials: Array<{ quote: string; name: string; role: string; company: string; avatar: string }> = [];
 
 export const finalTrustPoints = [
   { icon: "shield" as const, label: "Sem cartão de crédito" },

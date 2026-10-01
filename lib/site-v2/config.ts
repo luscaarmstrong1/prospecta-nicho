@@ -1,12 +1,12 @@
 // cspell:ignore glossario
 
 export const siteConfig = {
-  name: "ProspectaNicho",
-  tagline: "Dados que geram negócios.",
+  name: "Prospecta Nicho",
+  tagline: "Dados. Presença. Automação. Crescimento.",
   description:
     "A ProspectaNicho transforma critérios comerciais em recortes de empresas prontos para prospecção no mercado B2B brasileiro.",
-  url: "https://prospectanicho.com.br",
-  email: "contato@prospectanicho.com.br",
+  url: "https://prospectanicho.app",
+  email: "prospectanicho@gmail.com",
 };
 
 export interface SolutionItem {
@@ -19,27 +19,17 @@ export const solutionsDropdown: SolutionItem[] = [
   {
     title: "Prospecta Dados",
     subtitle: "Bases B2B segmentadas",
-    href: "/",
+    href: "/leads-b2b",
   },
   {
     title: "Prospecta Web",
     subtitle: "Sites & Landing Pages",
-    href: "/solucoes/sites-landing-pages",
-  },
-  {
-    title: "Prospecta Local",
-    subtitle: "Google & Presença Local",
-    href: "/solucoes#local",
-  },
-  {
-    title: "Prospecta Brand",
-    subtitle: "Identidade Visual",
-    href: "/solucoes#brand",
+    href: "/sites",
   },
   {
     title: "Prospecta Flow",
-    subtitle: "CRM, Automação & IA",
-    href: "/solucoes#flow",
+    subtitle: "Automação comercial",
+    href: "/automacao",
   },
 ];
 
@@ -57,17 +47,17 @@ export const footerGroups = [
   {
     title: "Soluções",
     links: [
-      { label: "Bases B2B", href: "/solicitar-planilha" },
-      { label: "Base personalizada", href: "/solicitar-planilha?tipo=personalizada" },
-      { label: "Segmentos", href: "/segmentos" },
-      { label: "Planos", href: "/planos" },
+      { label: "Leads B2B", href: "/leads-b2b" },
+      { label: "Sites", href: "/sites" },
+      { label: "Landing pages", href: "/landing-pages" },
+      { label: "Automação", href: "/automacao" },
     ],
   },
   {
     title: "Conteúdo",
     links: [
       { label: "Blog", href: "/conteudo" },
-      { label: "Cases", href: "/solucoes/sites-landing-pages#projetos" },
+      { label: "Projetos", href: "/projetos" },
       { label: "Perguntas frequentes", href: "/planos#faq" },
       { label: "Materiais gratuitos", href: "/conteudo" },
     ],

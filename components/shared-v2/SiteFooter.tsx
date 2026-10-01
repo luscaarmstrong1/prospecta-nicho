@@ -2,35 +2,14 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, CheckCircle2, Instagram, Linkedin, Mail, Youtube } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
-import { type FormEvent, useState } from "react";
+import { ArrowRight, Mail } from "lucide-react";
 import { PnFinalLogo } from "@/components/shared-v2/PnFinalLogo";
 import { assetPath } from "@/lib/asset-path";
 import { footerGroups } from "@/lib/site-v2/config";
-import { Reveal, useHomeMotion } from "@/components/home-v2/motion/HomeMotion";
+import { Reveal } from "@/components/home-v2/motion/HomeMotion";
 import styles from "@/components/home-v2/home-v2.module.css";
 
 export function SiteFooter() {
-  const [newsletterState, setNewsletterState] = useState<"idle" | "sending" | "success">("idle");
-  const [showToast, setShowToast] = useState(false);
-  const { reducedMotion } = useHomeMotion();
-
-  const submitNewsletter = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (newsletterState !== "idle") return;
-    setNewsletterState("sending");
-
-    window.setTimeout(() => {
-      setNewsletterState("success");
-      setShowToast(true);
-      window.setTimeout(() => {
-        setShowToast(false);
-        setNewsletterState("idle");
-      }, 4200);
-    }, 450);
-  };
-
   return (
     <footer className={styles.footer} id="site-footer" data-testid="site-v2-footer">
       <Reveal className={styles.footerTop}>
@@ -41,17 +20,7 @@ export function SiteFooter() {
             Dados, tecnologia e inteligência de mercado para impulsionar o
             crescimento da sua empresa.
           </p>
-          <div className={styles.socials} aria-label="Canais de contato">
-            <Link href="/contato" aria-label="Instagram">
-              <Instagram aria-hidden="true" />
-            </Link>
-            <Link href="/contato" aria-label="LinkedIn">
-              <Linkedin aria-hidden="true" />
-            </Link>
-            <Link href="/contato" aria-label="YouTube">
-              <Youtube aria-hidden="true" />
-            </Link>
-          </div>
+          <a href="mailto:prospectanicho@gmail.com">prospectanicho@gmail.com</a>
         </div>
 
         {footerGroups.map((group) => (
@@ -67,7 +36,7 @@ export function SiteFooter() {
 
         <div className={styles.footerMap}>
           <Image
-            src={assetPath("/assets/prospecta-web/footer-globe-hd.png")}
+            src={assetPath("/assets/prospecta-web/footer-globe-clean.png")}
             alt="Globo digital da ProspectaNicho"
             width={140}
             height={140}
@@ -79,45 +48,18 @@ export function SiteFooter() {
         </div>
       </Reveal>
 
-      <form className={styles.newsletter} onSubmit={submitNewsletter}>
+      <div className={styles.newsletter}>
         <div>
           <Mail aria-hidden="true" />
           <span>
             Receba insights e conteúdos<br />sobre o mercado B2B no Brasil.
           </span>
         </div>
-        <label className="sr-only" htmlFor="site-newsletter">
-          Seu melhor e-mail
-        </label>
-        <input
-          id="site-newsletter"
-          type="email"
-          required
-          placeholder="Seu melhor e-mail"
-        />
-        <button className={styles.newsletterSubmit} type="submit" disabled={newsletterState !== "idle"}>
-          {newsletterState === "sending"
-            ? "Enviando..."
-            : newsletterState === "success"
-            ? "Inscrição registrada ✓"
-            : "Quero receber"}
-          {newsletterState === "idle" ? <ArrowRight aria-hidden="true" /> : null}
-        </button>
-      </form>
-
-      <AnimatePresence>
-        {showToast ? (
-          <motion.span
-            className={styles.newsletterSuccess}
-            role="status"
-            initial={reducedMotion ? false : { opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reducedMotion ? undefined : { opacity: 0, y: 8 }}
-          >
-            <CheckCircle2 size={16} aria-hidden="true" /> Inscrição realizada com sucesso.
-          </motion.span>
-        ) : null}
-      </AnimatePresence>
+        <span>Conteúdos em preparação. Fale com a equipe para receber novidades.</span>
+        <Link className={styles.newsletterSubmit} href="/contato">
+          Entrar em contato <ArrowRight aria-hidden="true" />
+        </Link>
+      </div>
 
       <div className={styles.footerBottom}>
         <span>© {new Date().getFullYear()} ProspectaNicho. Todos os direitos reservados.</span>

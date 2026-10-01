@@ -73,12 +73,9 @@ export function SiteHeader({ currentPath, variant }: SiteHeaderProps) {
   };
 
   return (
-    <motion.header
+    <header
       className={`${styles.header} ${scrolled ? styles.headerScrolled : ""}`}
       data-testid="site-v2-header"
-      initial={reducedMotion ? false : { opacity: 0, y: -12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.42 }}
     >
       <div
         className={`${styles.headerInner} ${
@@ -103,7 +100,7 @@ export function SiteHeader({ currentPath, variant }: SiteHeaderProps) {
               unoptimized
             />
           ) : (
-            <PnFinalLogo priority />
+            <PnFinalLogo priority variant="nav" />
           )}
         </Link>
 
@@ -315,6 +312,6 @@ export function SiteHeader({ currentPath, variant }: SiteHeaderProps) {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.header>
+    </header>
   );
 }

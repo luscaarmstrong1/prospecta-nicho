@@ -67,10 +67,10 @@ export function PreviewHeader({ menuOpen, onMenuToggle, onMockAction }: PreviewH
       <div className={styles.headerInner}>
         <a className={styles.logoLink} href="#inicio" aria-label="ProspectaNicho, início da prévia">
           <Image
-            src={assetPath("/assets/brand/logo-pn-final-light.png")}
+            src={assetPath("/preview-v2/assets/logo-official-transparent.png")}
             alt="ProspectaNicho"
-            width={2172}
-            height={724}
+            width={344}
+            height={72}
             priority
             unoptimized
           />

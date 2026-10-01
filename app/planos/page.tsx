@@ -5,9 +5,8 @@ import Link from "next/link";
 import { ArrowRight, Calculator, Check, ChevronDown, Layers, Megaphone, Play, Rocket, Settings, ShieldCheck, Zap } from "lucide-react";
 import { useState } from "react";
 import { assetPath } from "@/lib/asset-path";
-import { getCatalogProduct } from "@/lib/products";
-import { createWhatsAppLink } from "@/lib/whatsapp";
 import { SharedCTA } from "@/components/shared-v2/SharedCTA";
+import { createWhatsAppLink } from "@/lib/whatsapp";
 import styles from "@/components/shared-v2/site-pages.module.css";
 
 const plansList = [
@@ -17,7 +16,7 @@ const plansList = [
     title: "Empresas recém-abertas",
     description: "Seja o primeiro a chegar. Empresas recentes e com alto potencial para o seu negócio.",
     startingFrom: "A partir de",
-    price: getCatalogProduct("empresas-recem-abertas")?.price ?? "R$ 147,00",
+    price: "R$ 147,00",
     period: "por lista",
     ctaText: "Ver detalhes",
     ctaHref: "/solicitar-planilha?plano=recem-abertas",
@@ -29,7 +28,7 @@ const plansList = [
     title: "Base para agências",
     description: "Agências, estúdios, produtoras e empresas de marketing digital.",
     startingFrom: "A partir de",
-    price: getCatalogProduct("agencias-marketing")?.price ?? "R$ 197,00",
+    price: "R$ 197,00",
     period: "por lista",
     ctaText: "Ver detalhes",
     ctaHref: "/solicitar-planilha?plano=agencias",
@@ -41,7 +40,7 @@ const plansList = [
     title: "Contabilidades",
     description: "Escritórios contábeis e empresas de serviços financeiros.",
     startingFrom: "A partir de",
-    price: getCatalogProduct("contabilidades")?.price ?? "R$ 197,00",
+    price: "R$ 197,00",
     period: "por lista",
     ctaText: "Ver detalhes",
     ctaHref: "/solicitar-planilha?plano=contabilidades",
@@ -53,12 +52,10 @@ const plansList = [
     title: "Base personalizada",
     description: "Fale com nosso time e monte uma base sob medida para o seu nicho.",
     startingFrom: "A partir de",
-    price: getCatalogProduct("base-personalizada")?.price ?? "A partir de R$ 497,00",
-    period: "De acordo com o seu segmento.",
+    price: "R$ 497,00",
+    period: "por lista",
     ctaText: "Falar com um especialista",
-    ctaHref: createWhatsAppLink(
-      "Olá, gostaria de montar uma base personalizada na ProspectaNicho.",
-    ),
+    ctaHref: createWhatsAppLink("Olá, gostaria de conversar sobre uma base personalizada da Prospecta Nicho.") || "/contato",
     popular: false,
     custom: true,
   },
@@ -78,7 +75,7 @@ const faqsList = [
   },
   {
     question: "Os dados são realmente atualizados?",
-    answer: "Sim. Nossas bases passam por processos contínuos de enriquecimento cadastral, eliminando CNPJs inativos e garantindo alta acurácia nos telefones comerciais.",
+    answer: "Os critérios e os campos disponíveis são confirmados antes do pedido. A entrega usa dados empresariais e fontes compatíveis com o recorte contratado.",
   },
   {
     question: "Em quais formatos recebo a base?",
@@ -86,12 +83,13 @@ const faqsList = [
   },
   {
     question: "Posso solicitar um plano personalizado?",
-    answer: "Com certeza. Montamos recortes sob medida para operações de qualquer porte com filtros avançados por CNAE, região, capital social e faturamento.",
+    answer: "Sim. O recorte pode combinar atividade econômica, região e outros critérios disponíveis, confirmados antes da contratação.",
   },
 ];
 
 export default function PlanosPage() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const plansWhatsAppHref = createWhatsAppLink("Olá, gostaria de saber como funcionam os planos da Prospecta Nicho.");
 
   const toggleFaq = (idx: number) => {
     setOpenFaqIndex(openFaqIndex === idx ? null : idx);
@@ -117,9 +115,7 @@ export default function PlanosPage() {
                 </Link>
                 <a
                   className={styles.btnGhostOutline}
-                  href={createWhatsAppLink(
-                    "Olá, gostaria de saber como funcionam os planos da ProspectaNicho.",
-                  )}
+                  href={plansWhatsAppHref || "/contato"}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

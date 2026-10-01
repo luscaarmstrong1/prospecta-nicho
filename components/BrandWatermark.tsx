@@ -9,7 +9,7 @@ export function BrandWatermark({ tone = "dark" }: Props) {
   return (
     <Image
       className={`brand-watermark brand-watermark--${tone}`}
-      src={assetPath("/assets/brand/logo-pn-final-symbol.png")}
+      src={assetPath("/assets/brand/logo-symbol.png")}
       alt=""
       width={295}
       height={305}

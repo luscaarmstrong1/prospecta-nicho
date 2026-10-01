@@ -9,9 +9,9 @@ type BrandLogoProps = {
 };
 
 const logoByVariant = {
-  header: "/assets/brand/logo-pn-final-light.png",
-  footer: "/assets/brand/logo-pn-final-dark.png",
-  compact: "/assets/brand/logo-pn-final-light.png",
+  header: "/assets/brand/logo-pn-final-dark.png",
+  footer: "/assets/brand/logo-pn-final-light.png",
+  compact: "/assets/brand/logo-pn-final-dark.png",
   symbol: "/assets/brand/logo-pn-final-symbol.png",
 };
 

@@ -1,24 +1,22 @@
-// cspell:ignore carlos rafael patricia
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Compass, Eye, Play, Shield, Target, TrendingUp } from "lucide-react";
+import { ArrowRight, Eye, Target, TrendingUp } from "lucide-react";
 import { assetPath } from "@/lib/asset-path";
-import { createWhatsAppLink } from "@/lib/whatsapp";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { SharedCTA } from "@/components/shared-v2/SharedCTA";
+import { breadcrumbJsonLd, createMetadata } from "@/lib/seo";
+import { createWhatsAppLink } from "@/lib/whatsapp";
 import styles from "@/components/shared-v2/site-pages.module.css";
 
-export const metadata: Metadata = {
-  title: "Sobre | ProspectaNicho",
-  description:
-    "Dados que geram oportunidades reais para o seu negócio. A ProspectaNicho nasceu para tornar o mercado brasileiro mais acessível, conectado e cheio de oportunidades.",
-};
+const description = "Conheça a Prospecta Nicho e sua proposta de unir inteligência comercial, presença digital e automação para apoiar empresas B2B.";
+export const metadata: Metadata = createMetadata({ title: "Sobre a Prospecta Nicho", description, path: "/sobre" });
 
 const aboutMetrics = [
-  { value: "5,8M", label: "registros no universo ilustrativo" },
-  { value: "+ 600", label: "segmentos potencialmente mapeáveis" },
-  { value: "5.570", label: "cidades cobertas" },
-  { value: "Sob medida", label: "recortes definidos para cada operação" },
+  { value: "Dados", label: "recortes comerciais com contexto" },
+  { value: "Presença", label: "sites e páginas para comunicar valor" },
+  { value: "Automação", label: "processos conectados à operação" },
+  { value: "Crescimento", label: "decisões apoiadas por informação" },
 ];
 
 const valuesList = [
@@ -42,30 +40,10 @@ const valuesList = [
   },
 ];
 
-const operationalProfiles = [
-  {
-    name: "Operação comercial",
-    role: "Perfil ilustrativo",
-    quote: "Acreditamos em dados como ponte para grandes negócios.",
-    avatar: "/preview-v2/assets/avatar-carlos.webp",
-  },
-  {
-    name: "Inteligência de dados",
-    role: "Perfil ilustrativo",
-    quote: "Nosso foco é transformar informação em oportunidades reais.",
-    avatar: "/preview-v2/assets/avatar-rafael.webp",
-  },
-  {
-    name: "Sucesso do cliente",
-    role: "Perfil ilustrativo",
-    quote: "Mais empresas conectadas para um Brasil mais forte.",
-    avatar: "/preview-v2/assets/avatar-patricia.webp",
-  },
-];
-
 export default function SobrePage() {
   return (
     <div className={styles.pageWrapper}>
+      <JsonLd data={breadcrumbJsonLd([{ name: "Início", path: "/" }, { name: "Sobre", path: "/sobre" }])} />
       <main className={styles.mainContent}>
         {/* HERO (1:1 COM MOCKUP 05) */}
         <section className={styles.heroSplitSection} data-testid="sobre-hero">
@@ -84,13 +62,11 @@ export default function SobrePage() {
                 </Link>
                 <a
                   className={styles.btnGhostOutline}
-                  href={createWhatsAppLink(
-                    "Olá, gostaria de conhecer melhor a ProspectaNicho.",
-                  )}
+                  href={createWhatsAppLink("Olá, gostaria de conhecer melhor a Prospecta Nicho.")}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <Play size={15} fill="#20edf0" color="#20edf0" /> Ver nosso vídeo
+                  Falar com um especialista
                 </a>
               </div>
             </div>
@@ -162,43 +138,6 @@ export default function SobrePage() {
                   </article>
                 );
               })}
-            </div>
-          </div>
-        </section>
-
-        {/* NOSSO TIME (1:1 COM O MOCKUP - 3 CARDS) */}
-        <section className={styles.sectionBlock} data-testid="sobre-team">
-          <div className={styles.containerWrap}>
-            <div style={{ marginBottom: "2.5rem" }}>
-              <span className={styles.eyebrowTag}>NOSSO TIME</span>
-              <h2 className={styles.sectionHeadingH2}>
-                Pessoas que acreditam em um mercado com mais oportunidades.
-              </h2>
-              <p style={{ color: "#94a3b8", fontSize: "0.95rem" }}>
-                Representação visual das frentes que sustentam a operação. Os perfis e as imagens são ilustrativos.
-              </p>
-            </div>
-
-            <div className={styles.teamCardsGrid3}>
-              {operationalProfiles.map((member) => (
-                <div key={member.name} className={styles.teamMemberCard}>
-                  <div className={styles.teamMemberAvatar}>
-                    <Image
-                      src={assetPath(member.avatar)}
-                      alt=""
-                      fill
-                      sizes="72px"
-                      style={{ objectFit: "cover" }}
-                      unoptimized
-                    />
-                  </div>
-                  <div className={styles.teamMemberInfo}>
-                    <h4>{member.name}</h4>
-                    <small>{member.role}</small>
-                    <p>“{member.quote}”</p>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </section>

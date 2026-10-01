@@ -60,3 +60,13 @@ rfb-data/
 secrets/
 credentials/
 private/
+handoff/
+.ai/
+AGENTS.md
+scripts/capture*
+scripts/audit*
+scripts/compare*
+scripts/generate*
+scripts/inspect*
+scripts/scrape*
+

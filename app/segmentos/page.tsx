@@ -1,56 +1,110 @@
-// cspell:ignore datacenter timeframe
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Calculator, Cpu, Factory, Heart, Megaphone, Play, Sun } from "lucide-react";
+import { ArrowRight, Calculator, ChevronDown, Cpu, Factory, Heart, Megaphone, Play, Search, Sun, Zap } from "lucide-react";
 import { assetPath } from "@/lib/asset-path";
-import { createWhatsAppLink } from "@/lib/whatsapp";
-import { SegmentosExplorer } from "@/components/shared-v2/SegmentosExplorer";
 import { SharedCTA } from "@/components/shared-v2/SharedCTA";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { breadcrumbJsonLd, createMetadata } from "@/lib/seo";
+import { createWhatsAppLink } from "@/lib/whatsapp";
 import styles from "@/components/shared-v2/site-pages.module.css";
 
-export const metadata: Metadata = {
-  title: "Segmentos | ProspectaNicho",
-  description:
-    "Encontre oportunidades nos setores que mais movem o Brasil. Explore dados atualizados por segmento e descubra empresas prontas para prospecção.",
-};
+export const metadata: Metadata = createMetadata({
+  title: "Segmentos para prospecção B2B",
+  description: "Explore segmentos atendidos pela Prospecta Nicho e solicite uma base de empresas com filtros por atividade e região.",
+  path: "/segmentos",
+});
 
 const segmentHeroPills = [
-  { icon: Megaphone, title: "Agências", count: "+ 320 mil empresas" },
-  { icon: Sun, title: "Energia Solar", count: "+ 28 mil empresas" },
-  { icon: Calculator, title: "Contabilidades", count: "+ 518 mil empresas" },
-  { icon: Factory, title: "Indústria", count: "+ 376 mil empresas" },
-  { icon: Cpu, title: "Tecnologia", count: "+ 267 mil empresas" },
-  { icon: Heart, title: "Saúde", count: "+ 315 mil empresas" },
+  { icon: Megaphone, title: "Agências", count: "Recorte por atividade e região" },
+  { icon: Sun, title: "Energia Solar", count: "Recorte por atividade e região" },
+  { icon: Calculator, title: "Contabilidades", count: "Recorte por atividade e região" },
+  { icon: Factory, title: "Indústria", count: "Recorte por atividade e região" },
+  { icon: Cpu, title: "Tecnologia", count: "Recorte por atividade e região" },
+  { icon: Heart, title: "Saúde", count: "Recorte por atividade e região" },
+];
+
+const segmentCardsList = [
+  {
+    id: "agencias",
+    icon: Megaphone,
+    title: "Agências",
+    description: "Marketing, publicidade e comunicação digital.",
+    image: "/preview-v2/assets/segment-agencias.webp",
+    href: "/solicitar-planilha?segmento=agencias",
+  },
+  {
+    id: "contabilidades",
+    icon: Calculator,
+    title: "Contabilidades",
+    description: "Escritórios contábeis e serviços financeiros.",
+    image: "/preview-v2/assets/finance-accounting.png",
+    href: "/solicitar-planilha?segmento=contabilidades",
+  },
+  {
+    id: "energia-solar",
+    icon: Sun,
+    title: "Energia Solar",
+    description: "Empresas de energia solar e soluções sustentáveis.",
+    image: "/preview-v2/assets/solar-energy.png",
+    href: "/solicitar-planilha?segmento=energia-solar",
+  },
+  {
+    id: "industria",
+    icon: Factory,
+    title: "Indústria",
+    description: "Indústrias, equipamentos e setor manufatureiro.",
+    image: "/preview-v2/assets/industry-factory.png",
+    href: "/solicitar-planilha?segmento=industria",
+  },
+  {
+    id: "tecnologia",
+    icon: Cpu,
+    title: "Tecnologia",
+    description: "Software, TI e soluções tecnológicas.",
+    image: "/preview-v2/assets/server-datacenter.png",
+    href: "/solicitar-planilha?segmento=tecnologia",
+  },
+  {
+    id: "saude",
+    icon: Heart,
+    title: "Saúde",
+    description: "Clínicas, hospitais e serviços de saúde.",
+    image: "/preview-v2/assets/healthcare-hospital.png",
+    href: "/solicitar-planilha?segmento=saude",
+  },
 ];
 
 const growthMarkets = [
   {
     icon: Sun,
     title: "Energia Solar",
-    percentage: "+ 42%",
-    timeframe: "no último ano",
+    highlight: "Atividade e região",
+    detail: "Filtros definidos conforme o objetivo comercial",
     image: "/preview-v2/assets/solar-energy.png",
   },
   {
     icon: Cpu,
     title: "Tecnologia",
-    percentage: "+ 37%",
-    timeframe: "no último ano",
+    highlight: "Atividade e região",
+    detail: "Filtros definidos conforme o objetivo comercial",
     image: "/preview-v2/assets/server-datacenter.png",
   },
   {
     icon: Heart,
     title: "Saúde",
-    percentage: "+ 28%",
-    timeframe: "no último ano",
+    highlight: "Atividade e região",
+    detail: "Filtros definidos conforme o objetivo comercial",
     image: "/preview-v2/assets/healthcare-hospital.png",
   },
 ];
 
 export default function SegmentosPage() {
+  const whatsappHref = createWhatsAppLink("Olá, gostaria de saber mais sobre os segmentos atendidos pela Prospecta Nicho.");
+
   return (
     <div className={styles.pageWrapper}>
+      <JsonLd data={breadcrumbJsonLd([{ name: "Início", path: "/" }, { name: "Segmentos", path: "/segmentos" }])} />
       <main className={styles.mainContent}>
         {/* HERO (1:1 COM MOCKUP 02) */}
         <section className={styles.heroSplitSection} data-testid="segmentos-hero">
@@ -69,9 +123,7 @@ export default function SegmentosPage() {
                 </Link>
                 <a
                   className={styles.btnGhostOutline}
-                  href={createWhatsAppLink(
-                    "Olá, gostaria de saber mais sobre os segmentos da ProspectaNicho.",
-                  )}
+                  href={whatsappHref || "/contato"}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -116,7 +168,58 @@ export default function SegmentosPage() {
               </p>
             </div>
 
-            <SegmentosExplorer />
+            {/* SEARCH & FILTER CLUSTER */}
+            <div className={styles.segmentSearchFilterCluster}>
+              <div className={styles.searchBoxWide}>
+                <Search size={18} color="#20edf0" />
+                <input
+                  type="text"
+                  placeholder="Buscar segmento (ex.: contabilidade, saúde, indústria...)"
+                  aria-label="Buscar segmento"
+                />
+              </div>
+
+              <div className={styles.filterSelectBtn}>
+                <span>Todas as regiões</span>
+                <ChevronDown size={16} />
+              </div>
+
+              <div className={styles.filterSelectBtn}>
+                <span>Ordenar por relevância</span>
+                <ChevronDown size={16} />
+              </div>
+            </div>
+
+            {/* 6 SEGMENT PHOTO CARDS (2 LINHAS X 3 COLUNAS) */}
+            <div className={styles.segmentPhotosGrid}>
+              {segmentCardsList.map((card) => {
+                const IconComp = card.icon;
+                return (
+                  <article key={card.id} className={styles.segmentPhotoCard}>
+                    <div className={styles.segmentPhotoThumb}>
+                      <Image
+                        src={assetPath(card.image)}
+                        alt={card.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 400px"
+                        style={{ objectFit: "cover" }}
+                        unoptimized
+                      />
+                    </div>
+                    <div className={styles.segmentPhotoContent}>
+                      <div className={styles.segmentCardIconRow}>
+                        <IconComp size={18} />
+                        <h3 className={styles.segmentCardHeading}>{card.title}</h3>
+                      </div>
+                      <p className={styles.segmentCardParagraph}>{card.description}</p>
+                      <Link className={styles.linkCardDetails} href={card.href}>
+                        Ver empresas <ArrowRight size={14} aria-hidden="true" />
+                      </Link>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
           </div>
         </section>
 
@@ -126,9 +229,9 @@ export default function SegmentosPage() {
             <div className={styles.sectionHeaderRow}>
               <div>
                 <span className={styles.eyebrowTag}>SEGMENTOS EM DESTAQUE</span>
-                <h2 className={styles.sectionHeadingH2}>Mercados em crescimento</h2>
+                <h2 className={styles.sectionHeadingH2}>Segmentos para explorar</h2>
                 <p style={{ color: "#94a3b8", fontSize: "0.95rem" }}>
-                  Setores com maior potencial de oportunidades no momento.
+                  Exemplos de recortes que podem ser combinados com localização e atividade econômica.
                 </p>
               </div>
               <Link className={styles.linkViewAll} href="/segmentos">
@@ -156,9 +259,9 @@ export default function SegmentosPage() {
                         <IconComp size={16} />
                         <h3 className={styles.growthMarketTitle}>{m.title}</h3>
                       </div>
-                      <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>Crescimento de</span>
-                      <div className={styles.growthPercentage}>{m.percentage}</div>
-                      <span style={{ fontSize: "0.8rem", color: "#64748b" }}>{m.timeframe}</span>
+                      <span style={{ fontSize: "0.8rem", color: "#94a3b8" }}>Possibilidade de recorte</span>
+                      <div className={styles.growthPercentage}>{m.highlight}</div>
+                      <span style={{ fontSize: "0.8rem", color: "#64748b" }}>{m.detail}</span>
                     </div>
                   </div>
                 );

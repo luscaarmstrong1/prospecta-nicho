@@ -70,7 +70,7 @@ test("basePath de assets só vale para preview ou export estático", () => {
 
 test("URL canônica bloqueia GitHub Pages fora de preview estático", () => {
   const source = readFileSync("lib/site-url.ts", "utf8");
-  assert.match(source, /productionUrl = "https:\/\/prospectanicho\.com\.br"/);
+  assert.match(source, /productionUrl = "https:\/\/prospectanicho\.app"/);
   assert.match(source, /github\\.io/);
   assert.match(source, /allowStaticPreviewUrl/);
   assert.match(source, /NEXT_PUBLIC_STATIC_EXPORT/);

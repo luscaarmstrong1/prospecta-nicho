@@ -1,11 +1,6 @@
-"use client";
-
-// cspell:ignore datacenter
-
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BookOpen, Compass, FileCheck, Layers, Mail, Play, Search, TrendingUp } from "lucide-react";
-import { type FormEvent, useState } from "react";
 import { assetPath } from "@/lib/asset-path";
 import { SharedCTA } from "@/components/shared-v2/SharedCTA";
 import styles from "@/components/shared-v2/site-pages.module.css";
@@ -15,52 +10,45 @@ const contentCards = [
     id: "guia-prospeccao",
     tag: "GUIA",
     icon: Compass,
-    title: "Guia completo de prospecção B2B",
-    description: "Do planejamento ao contato: passo a passo para construir um processo de prospecção eficiente.",
-    linkText: "Baixar guia",
-    href: "/amostra",
+    title: "Como definir um recorte de leads B2B",
+    description: "Entenda como segmento, CNAE, região e porte ajudam a organizar uma prospecção mais objetiva.",
+    linkText: "Conhecer Leads B2B",
+    href: "/leads-b2b",
     image: "/preview-v2/assets/office-meeting-team.png",
   },
   {
-    id: "case-industria",
-    tag: "CASE",
+    id: "sites-empresariais",
+    tag: "PRESENÇA DIGITAL",
     icon: TrendingUp,
-    title: "Como uma indústria aumentou 40% dos leads com o ProspectaNicho",
-    description: "Veja como uma empresa do setor industrial estruturou sua prospecção e conquistou resultados reais em 3 meses.",
-    linkText: "Ler case",
-    href: "/conteudo",
+    title: "O papel de um site institucional na jornada comercial",
+    description: "Veja os elementos que ajudam uma empresa a comunicar seus serviços, diferenciais e canais de contato.",
+    linkText: "Conhecer Sites",
+    href: "/sites",
     image: "/preview-v2/assets/industry-factory.png",
   },
   {
     id: "segmentacao-mercado",
-    tag: "BLOG",
+    tag: "LANDING PAGES",
     icon: BookOpen,
-    title: "Segmentação de mercado: o segredo para vendas mais assertivas",
-    description: "Entenda como uma segmentação bem feita pode aumentar suas taxas de conversão e reduzir o ciclo de vendas.",
-    linkText: "Ler artigo",
-    href: "/conteudo",
+    title: "Como estruturar uma página para uma campanha específica",
+    description: "Oferta, contexto, prova, formulário e chamada para ação precisam trabalhar em uma única direção.",
+    linkText: "Conhecer Landing Pages",
+    href: "/landing-pages",
     image: "/preview-v2/assets/finance-accounting.png",
   },
   {
-    id: "checklist-prospeccao",
-    tag: "MATERIAL GRATUITO",
+    id: "automacao-comercial",
+    tag: "AUTOMAÇÃO",
     icon: FileCheck,
-    title: "Checklist de prospecção B2B para sua equipe",
-    description: "Um checklist prático e pronto para uso, com as principais etapas para uma prospecção mais organizada e eficiente.",
-    linkText: "Baixar material",
-    href: "/amostra",
+    title: "Onde a automação ajuda o processo comercial",
+    description: "Entradas, distribuição, alertas e acompanhamento podem reduzir tarefas repetitivas sem perder o contexto.",
+    linkText: "Conhecer Automação",
+    href: "/automacao",
     image: "/preview-v2/assets/server-datacenter.png",
   },
 ];
 
 export default function ConteudoPage() {
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleNewsletter = (e: FormEvent) => {
-    e.preventDefault();
-    setSubscribed(true);
-  };
-
   return (
     <div className={styles.pageWrapper}>
       <main className={styles.mainContent}>
@@ -127,7 +115,7 @@ export default function ConteudoPage() {
         <section className={styles.sectionBlock} data-testid="conteudo-featured">
           <div className={styles.containerWrap}>
             <div style={{ marginBottom: "2rem" }}>
-              <span className={styles.eyebrowTag}>ARTIGO EM DESTAQUE</span>
+              <span className={styles.eyebrowTag}>GUIA EM DESTAQUE</span>
             </div>
 
             <article className={styles.featuredArticleEditorial}>
@@ -136,13 +124,13 @@ export default function ConteudoPage() {
                   <BookOpen size={13} /> BLOG
                 </span>
                 <h2 className={styles.editorialHeadline}>
-                  Tendências do mercado B2B para 2026: o que sua empresa precisa saber agora
+                  Como conectar dados, presença digital e automação na operação B2B
                 </h2>
                 <p className={styles.editorialExcerpt}>
-                  Um panorama completo sobre as principais tendências que estão moldando o mercado B2B no Brasil e como aproveitá-las na sua estratégia de prospecção.
+                  Conheça as frentes da Prospecta Nicho e veja como elas se complementam da identificação do público até o acompanhamento comercial.
                 </p>
-                <Link className={styles.btnPrimarySolid} href="/conteudo">
-                  Ler artigo completo <ArrowRight size={16} />
+                <Link className={styles.btnPrimarySolid} href="/solucoes">
+                  Explorar soluções <ArrowRight size={16} />
                 </Link>
               </div>
 
@@ -170,8 +158,8 @@ export default function ConteudoPage() {
               <div>
                 <span className={styles.eyebrowTag}>MAIS CONTEÚDOS PARA VOCÊ</span>
               </div>
-              <Link className={styles.linkViewAll} href="/conteudo">
-                Ver todos os conteúdos <ArrowRight size={14} />
+              <Link className={styles.linkViewAll} href="/projetos">
+                Ver projetos publicados <ArrowRight size={14} />
               </Link>
             </div>
 
@@ -216,35 +204,14 @@ export default function ConteudoPage() {
                   Fique por dentro das novidades do <span className={styles.cyanHighlight}>ProspectaNicho.</span>
                 </h2>
                 <p style={{ color: "#94a3b8", fontSize: "0.9rem", marginTop: "0.5rem" }}>
-                  Assine nossa newsletter e receba artigos, guias, cases e insights diretamente no seu e-mail.
+                  Novos artigos e guias serão publicados nesta área. Entre em contato para conversar sobre um tema específico.
                 </p>
               </div>
 
               <div>
-                {subscribed ? (
-                  <div style={{ color: "#20edf0", fontWeight: 700, padding: "1rem", background: "rgba(32, 237, 240, 0.1)", borderRadius: "0.75rem" }}>
-                    Inscrição registrada com sucesso! ✓
-                  </div>
-                ) : (
-                  <form onSubmit={handleNewsletter}>
-                    <div className={styles.newsletterInputCluster}>
-                      <input
-                        type="email"
-                        required
-                        placeholder="Seu melhor e-mail"
-                        aria-label="Seu melhor e-mail"
-                      />
-                      <button type="submit" className={styles.btnPrimarySolid} style={{ cursor: "pointer", border: "none" }}>
-                        Quero receber <ArrowRight size={16} />
-                      </button>
-                    </div>
-                    <div style={{ display: "flex", gap: "1.5rem", marginTop: "0.85rem", fontSize: "0.78rem", color: "#94a3b8" }}>
-                      <span>✓ Conteúdo exclusivo</span>
-                      <span>✓ Sem spam</span>
-                      <span>✓ Cancele quando quiser</span>
-                    </div>
-                  </form>
-                )}
+                <Link className={styles.btnPrimarySolid} href="/contato">
+                  Sugerir um tema <ArrowRight size={16} />
+                </Link>
               </div>
             </div>
           </div>
