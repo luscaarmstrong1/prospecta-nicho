@@ -35,11 +35,8 @@ export function SiteHeader({ currentPath, variant }: SiteHeaderProps) {
   const dropdownTimeout = useRef<NodeJS.Timeout | null>(null);
   const { reducedMotion } = useHomeMotion();
 
-  const isProspectaWeb =
-    variant === "prospectaWeb" ||
-    currentPath === "/solucoes/sites-landing-pages" ||
-    currentPath === "/prospecta-web";
-  const navItems = isProspectaWeb ? prospectaWebNavigation : mainNavigation;
+  const isProspectaWeb = false;
+  const navItems = mainNavigation;
 
   const specialistWhatsAppUrl = createWhatsAppLink(
     "Olá! Gostaria de falar com um especialista da ProspectaNicho sobre soluções para minha empresa."

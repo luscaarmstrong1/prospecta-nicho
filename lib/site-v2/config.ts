@@ -17,14 +17,14 @@ export interface SolutionItem {
 
 export const solutionsDropdown: SolutionItem[] = [
   {
-    title: "Prospecta Dados",
-    subtitle: "Bases B2B segmentadas",
-    href: "/leads-b2b",
+    title: "Sites & Landing Pages",
+    subtitle: "Sites profissionais e conversão",
+    href: "/",
   },
   {
-    title: "Prospecta Web",
-    subtitle: "Sites & Landing Pages",
-    href: "/sites",
+    title: "Leads B2B",
+    subtitle: "Bases B2B segmentadas",
+    href: "/leads",
   },
   {
     title: "Prospecta Flow",
@@ -47,9 +47,8 @@ export const footerGroups = [
   {
     title: "Soluções",
     links: [
-      { label: "Leads B2B", href: "/leads-b2b" },
-      { label: "Sites", href: "/sites" },
-      { label: "Landing pages", href: "/landing-pages" },
+      { label: "Sites & Landing Pages", href: "/" },
+      { label: "Leads B2B", href: "/leads" },
       { label: "Automação", href: "/automacao" },
     ],
   },

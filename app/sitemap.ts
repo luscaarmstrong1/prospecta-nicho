@@ -5,6 +5,7 @@ export const dynamic = "force-static";
 
 const indexableRoutes = [
   ["/", "weekly", 1],
+  ["/leads", "monthly", 0.9],
   ["/leads-b2b", "monthly", 0.9],
   ["/sites", "monthly", 0.9],
   ["/landing-pages", "monthly", 0.9],

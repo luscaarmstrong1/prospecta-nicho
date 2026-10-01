@@ -17,6 +17,7 @@ const v2MarketingRoutes = new Set<string>([
   "/conteudo",
   "/sobre",
   "/contato",
+  "/leads",
   "/leads-b2b",
   "/sites",
   "/landing-pages",
