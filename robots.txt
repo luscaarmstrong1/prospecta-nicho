@@ -1,4 +1,10 @@
 User-Agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /compra/
+Disallow: /pedido/
+Disallow: /preview/
 
+Host: https://prospectanicho.app
 Sitemap: https://prospectanicho.app/sitemap.xml
