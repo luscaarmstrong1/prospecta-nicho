@@ -1,4 +1,4 @@
-﻿export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 import { z } from "zod";
@@ -19,13 +19,20 @@ const schema = z.object({
   email: z.string().email().max(180),
   whatsapp: z.string().min(8).max(32),
   subject: z.enum([
+    "Leads B2B",
+    "Sites",
+    "Sites e Landing Pages",
+    "Landing Pages",
+    "Automação",
+    "Suporte",
+    "Parcerias",
+    "Outro",
     "Duvida sobre uma base",
     "Solicitar base personalizada",
     "Suporte sobre pedido",
     "Pagamento",
     "Parceria",
     "Privacidade",
-    "Outro",
   ]),
   message: z.string().min(10).max(3000),
   consent: z.union([z.literal(true), z.literal("true")]),
