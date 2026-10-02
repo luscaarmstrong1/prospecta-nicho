@@ -1,9 +1,24 @@
 import type { Metadata, Viewport } from "next";
+import { Sora, Manrope } from "next/font/google";
 import { AppShell } from "@/components/AppShell";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { assetPath } from "@/lib/asset-path";
 import { site } from "@/lib/site";
 import "./globals.css";
+
+const sora = Sora({
+  subsets: ["latin"],
+  weight: ["600", "700", "800"],
+  display: "swap",
+  variable: "--font-sora",
+});
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+  variable: "--font-manrope",
+});
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -64,8 +79,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   };
 
   return (
-    <html lang="pt-BR">
-      <body>
+    <html lang="pt-BR" className={`${sora.variable} ${manrope.variable}`}>
+      <body className={manrope.className}>
         <JsonLd data={organization} />
         <AppShell>{children}</AppShell>
       </body>

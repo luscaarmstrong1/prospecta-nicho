@@ -1,15 +1,14 @@
 import { NextResponse } from "next/server";
 import { type AdminPermission, normalizeAdminRole, roleHasPermission } from "@/lib/admin-permissions";
-
-const adminCookieName = "prospecta_admin_session";
+import { verifyAdminSession, ADMIN_COOKIE_NAME } from "@/lib/server/admin-session";
 
 function readCookieToken(request: Request) {
   const cookie = request.headers.get("cookie") || "";
   const match = cookie
     .split(";")
     .map((item) => item.trim())
-    .find((item) => item.startsWith(`${adminCookieName}=`));
-  return match ? decodeURIComponent(match.slice(adminCookieName.length + 1)) : "";
+    .find((item) => item.startsWith(`${ADMIN_COOKIE_NAME}=`));
+  return match ? decodeURIComponent(match.slice(ADMIN_COOKIE_NAME.length + 1)) : "";
 }
 
 async function readJson(url: string, init: RequestInit) {
@@ -55,10 +54,25 @@ export async function requireAdmin(request: Request, permission: AdminPermission
   const cookieToken = readCookieToken(request);
   const breakGlassEnabled = process.env.ENABLE_BREAK_GLASS_ADMIN === "true";
 
+  // 1. Break-glass direct token support
   if (breakGlassEnabled && expected && (token === expected || cookieToken === expected)) return null;
 
+  // 2. Signed Admin Session Cookie verification (HMAC)
+  if (cookieToken) {
+    const session = await verifyAdminSession(cookieToken);
+    if (session && session.role) {
+      if (!roleHasPermission(session.role, permission)) {
+        return NextResponse.json({ ok: false, message: "Usuário sem permissão para esta ação." }, { status: 403 });
+      }
+      return null;
+    }
+  }
+
+  // 3. Bearer Supabase Token verification (API clients)
   const tokenResult = token ? await validateSupabaseAdminToken(token, permission) : null;
   if (tokenResult?.ok) return null;
+
+  // 4. Legacy Supabase token in cookie fallback
   const cookieResult = cookieToken ? await validateSupabaseAdminToken(cookieToken, permission) : null;
   if (cookieResult?.ok) return null;
 

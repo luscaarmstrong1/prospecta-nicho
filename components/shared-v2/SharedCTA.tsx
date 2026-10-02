@@ -57,7 +57,7 @@ export function SharedCTA({
         style={{ y: reducedMotion ? 0 : imageY }}
       >
         <Image
-          src={assetPath("/preview-v2/assets/earth-brazil-space.png")}
+          src={assetPath("/preview-v2/assets/earth-brazil-space.webp")}
           alt="Brasil iluminado visto do espaço com conexões"
           fill
           sizes="100vw"

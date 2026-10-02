@@ -859,104 +859,277 @@
 }
 
 /* --------------------------------------------------------------------------
-   SOBRE - 4 METRICS + 3 VALUE CARDS + 3 TEAM CARDS (1:1)
+   SOBRE - 1:1 FIDELIDADE AO DESIGN SYSTEM E REFERÊNCIA OFICIAL
    -------------------------------------------------------------------------- */
-.aboutMetricsBar4 {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.5rem;
-  background: rgba(6, 22, 38, 0.8);
-  border: 1px solid rgba(32, 237, 240, 0.2);
-  border-radius: 1.25rem;
-  padding: 2.5rem 2rem;
-  margin: 0 auto;
-}
 
-.aboutMetricItem {
-  text-align: center;
-  border-right: 1px solid rgba(32, 237, 240, 0.12);
-}
-
-.aboutMetricItem:last-child {
-  border-right: none;
-}
-
-.aboutMetricNumber {
-  font-family: var(--font-sora, 'Sora', sans-serif);
-  font-size: clamp(2.2rem, 3.5vw, 3rem);
-  font-weight: 800;
-  color: #20edf0;
-  line-height: 1.1;
-  margin-bottom: 0.35rem;
-}
-
-.aboutMetricLabel {
-  font-size: 0.85rem;
-  color: #94a3b8;
-  font-weight: 500;
-}
-
-.valuesGrid3 {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.75rem;
-}
-
-.valueCardItem {
-  background: rgba(6, 22, 38, 0.85);
-  border: 1px solid rgba(32, 237, 240, 0.2);
-  border-radius: 1.25rem;
-  padding: 2.2rem 1.8rem;
+/* HERO SOBRE PANORÂMICO COM TRATAMENTO DE IMAGEM */
+.aboutHeroSection {
+  position: relative;
+  min-height: 720px;
+  padding: 4.5rem 2rem 5rem;
+  background-color: #020f1c;
+  border-bottom: 1px solid rgba(32, 237, 240, 0.15);
+  overflow: hidden;
   display: flex;
-  flex-direction: column;
-}
-
-.teamCardsGrid3 {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.75rem;
-}
-
-.teamMemberCard {
-  background: rgba(6, 22, 38, 0.85);
-  border: 1px solid rgba(32, 237, 240, 0.2);
-  border-radius: 1.25rem;
-  padding: 1.5rem;
-  display: flex;
-  gap: 1.25rem;
   align-items: center;
 }
 
-.teamMemberAvatar {
-  width: 72px;
-  height: 72px;
-  border-radius: 1rem;
-  overflow: hidden;
-  position: relative;
-  flex-shrink: 0;
-  border: 1px solid rgba(32, 237, 240, 0.3);
+.aboutHeroBg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
 }
 
-.teamMemberInfo h4 {
+.aboutHeroBg img {
+  object-fit: cover;
+  object-position: center right;
+  opacity: 0.85;
+}
+
+/* Overlays recomendados na diretriz */
+.aboutHeroOverlayH {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    90deg,
+    rgba(2, 15, 28, 0.98) 0%,
+    rgba(3, 19, 34, 0.94) 30%,
+    rgba(4, 25, 43, 0.78) 52%,
+    rgba(4, 24, 41, 0.35) 75%,
+    rgba(4, 20, 35, 0.15) 100%
+  );
+  pointer-events: none;
+}
+
+.aboutHeroOverlayV {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(2, 15, 28, 0.6) 0%,
+    rgba(2, 15, 28, 0) 35%,
+    rgba(2, 15, 28, 0) 70%,
+    rgba(2, 15, 28, 0.95) 100%
+  );
+  pointer-events: none;
+}
+
+.aboutHeroGlow {
+  position: absolute;
+  top: 20%;
+  left: 35%;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(32, 237, 240, 0.08) 0%, rgba(32, 237, 240, 0) 70%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.aboutHeroInner {
+  position: relative;
+  z-index: 2;
+  max-width: 1240px;
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.1fr 0.95fr;
+  gap: 3.5rem;
+  align-items: center;
+}
+
+.aboutHeroTextCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Faixa de 4 benefícios abaixo do CTA no Hero */
+.heroBenefitsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  margin-top: 2.75rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(32, 237, 240, 0.12);
+  width: 100%;
+}
+
+.heroBenefitItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.heroBenefitItem svg {
+  color: #20edf0;
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+.heroBenefitText {
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #cbd5e1;
+}
+
+/* Mockup de Dashboard SaaS B2B Realista */
+.aboutDashboardMockupWrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.aboutDashboardCleanImage {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  aspect-ratio: 340 / 236;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75), 0 0 35px rgba(32, 237, 240, 0.18);
+  border: 1px solid rgba(32, 237, 240, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.aboutDashboardCleanImage:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.85), 0 0 45px rgba(32, 237, 240, 0.3);
+  border-color: rgba(32, 237, 240, 0.45);
+}
+
+/* CARDS DE PILARES (4 CARDS) */
+.pillarsGrid4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.pillarCard {
+  background: #071d2e;
+  border: 1px solid rgba(31, 216, 235, 0.2);
+  border-radius: 16px;
+  padding: 2.2rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  min-height: 280px;
+}
+
+.pillarCard:hover {
+  transform: translateY(-4px);
+  border-color: #20edf0;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 26px rgba(32, 237, 240, 0.22);
+}
+
+.pillarCard:hover .cardTopIcon {
+  box-shadow: 0 0 16px rgba(32, 237, 240, 0.35);
+  border-color: #20edf0;
+}
+
+/* CARDS DE VALORES (3 CARDS GRANDES) */
+.valuesGrid3Custom {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.75rem;
+}
+
+.valueCardCustom {
+  background: #071d2e;
+  border: 1px solid rgba(31, 216, 235, 0.2);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  min-height: 320px;
+}
+
+.valueCardCustom:hover {
+  transform: translateY(-4px);
+  border-color: #20edf0;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 26px rgba(32, 237, 240, 0.22);
+}
+
+.valueCardCustom:hover .cardTopIcon {
+  box-shadow: 0 0 16px rgba(32, 237, 240, 0.35);
+  border-color: #20edf0;
+}
+
+/* SEÇÃO POR QUE EXISTIMOS - COMPOSIÇÃO SOFISTICADA BRASIL */
+.purposeGrid3Cols {
+  display: grid;
+  grid-template-columns: 1.15fr 0.9fr 1.15fr;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.purposeLeftCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.purposeCenterVisual {
+  position: relative;
+  width: 100%;
+  height: 340px;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  border: 1px solid rgba(32, 237, 240, 0.25);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(32, 237, 240, 0.15);
+}
+
+.purposeRightBenefits {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+}
+
+.purposeBenefitBlock {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.1rem;
+}
+
+.purposeBenefitIconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(32, 237, 240, 0.1);
+  border: 1px solid rgba(32, 237, 240, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #20edf0;
+  flex-shrink: 0;
+}
+
+.purposeBenefitTitle {
   font-family: var(--font-sora, 'Sora', sans-serif);
   font-size: 1.05rem;
   font-weight: 700;
   color: #ffffff;
+  margin-bottom: 0.25rem;
 }
 
-.teamMemberInfo small {
-  display: block;
-  color: #20edf0;
-  font-size: 0.78rem;
-  font-weight: 600;
-  margin-bottom: 0.4rem;
-}
-
-.teamMemberInfo p {
+.purposeBenefitDesc {
   color: #94a3b8;
-  font-size: 0.8rem;
-  line-height: 1.4;
-  font-style: italic;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.purposeDivider {
+  height: 1px;
+  background: rgba(32, 237, 240, 0.12);
+  width: 100%;
 }
 
 /* --------------------------------------------------------------------------
@@ -1105,16 +1278,38 @@
    RESPONSIVE BREAKPOINTS (DESKTOP -> TABLET -> MOBILE)
    -------------------------------------------------------------------------- */
 @media (max-width: 1024px) {
-  .heroSplitInner {
+  .heroSplitInner,
+  .aboutHeroInner {
     grid-template-columns: 1fr;
     gap: 2.5rem;
+  }
+  .sectionHeaderRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+  .sectionHeaderRow p {
+    text-align: left !important;
+    max-width: 100% !important;
   }
   .solutionsGrid4,
   .planCardsGrid4,
   .contentCardsGrid4,
   .aboutMetricsBar4,
-  .includedBenefitsRow4 {
+  .includedBenefitsRow4,
+  .pillarsGrid4 {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .heroBenefitsRow {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  .purposeGrid3Cols {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  .purposeCenterVisual {
+    display: none;
   }
   .stepsConnectedRow {
     grid-template-columns: 1fr;
@@ -1139,9 +1334,15 @@
   .contentCardsGrid4,
   .aboutMetricsBar4,
   .valuesGrid3,
+  .valuesGrid3Custom,
+  .pillarsGrid4,
   .teamCardsGrid3,
   .includedBenefitsRow4 {
     grid-template-columns: 1fr;
+  }
+  .heroBenefitsRow {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
   }
   .featuredArticleEditorial {
     grid-template-columns: 1fr;

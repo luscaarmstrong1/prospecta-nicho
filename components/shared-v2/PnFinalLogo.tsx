@@ -12,9 +12,9 @@ export function PnFinalLogo({ className, priority = false, variant = "goldenMast
   if (variant === "nav") {
     logoSrc = "/assets/brand/logo-prospectanicho-nav-transparent.png";
   } else if (variant === "light") {
-    logoSrc = "/assets/brand/logo-pn-final-light.png";
+    logoSrc = "/assets/brand/logo-pn-final-light.webp";
   } else if (variant === "dark") {
-    logoSrc = "/assets/brand/logo-pn-final-dark.png";
+    logoSrc = "/assets/brand/logo-pn-final-dark.webp";
   }
 
   return (

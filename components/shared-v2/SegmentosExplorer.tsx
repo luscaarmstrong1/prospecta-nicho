@@ -23,7 +23,7 @@ const segmentCards = [
     icon: Calculator,
     title: "Contabilidades",
     description: "Escritórios contábeis e serviços financeiros.",
-    image: "/preview-v2/assets/finance-accounting.png",
+    image: "/preview-v2/assets/finance-accounting.webp",
     href: "/solicitar-planilha?segmento=contabilidades",
   },
   {
@@ -31,7 +31,7 @@ const segmentCards = [
     icon: Sun,
     title: "Energia Solar",
     description: "Empresas de energia solar e soluções sustentáveis.",
-    image: "/preview-v2/assets/solar-energy.png",
+    image: "/preview-v2/assets/solar-energy.webp",
     href: "/solicitar-planilha?segmento=energia-solar",
   },
   {
@@ -39,7 +39,7 @@ const segmentCards = [
     icon: Factory,
     title: "Indústria",
     description: "Indústrias, equipamentos e setor manufatureiro.",
-    image: "/preview-v2/assets/industry-factory.png",
+    image: "/preview-v2/assets/industry-factory.webp",
     href: "/solicitar-planilha?segmento=industria",
   },
   {
@@ -47,7 +47,7 @@ const segmentCards = [
     icon: Cpu,
     title: "Tecnologia",
     description: "Software, TI e soluções tecnológicas.",
-    image: "/preview-v2/assets/server-datacenter.png",
+    image: "/preview-v2/assets/server-datacenter.webp",
     href: "/solicitar-planilha?segmento=tecnologia",
   },
   {
@@ -55,7 +55,7 @@ const segmentCards = [
     icon: Heart,
     title: "Saúde",
     description: "Clínicas, hospitais e serviços de saúde.",
-    image: "/preview-v2/assets/healthcare-hospital.png",
+    image: "/preview-v2/assets/healthcare-hospital.webp",
     href: "/solicitar-planilha?segmento=saude",
   },
 ];

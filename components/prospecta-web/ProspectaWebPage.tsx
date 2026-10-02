@@ -189,7 +189,7 @@ export function ProspectaWebPage() {
         <section className={styles.heroSection} aria-labelledby="hero-heading">
           <div className={styles.heroBackground}>
             <Image
-              src={assetPath("/assets/prospecta-web/hero-fold-final.png")}
+              src={assetPath("/assets/prospecta-web/hero-fold-final.webp")}
               alt="Ambiente corporativo com notebook e smartphone demonstrando site profissional ProspectaNicho"
               fill
               priority
@@ -300,10 +300,10 @@ export function ProspectaWebPage() {
         <section className={styles.serviceSection} id="servicos" aria-labelledby="services-heading">
           <div className={styles.serviceBackgroundWrapper}>
             <Image
-              src={assetPath("/assets/prospecta-web/service-section-bg-final.png")}
+              src={assetPath("/assets/prospecta-web/service-section-bg-final.webp")}
               alt=""
               fill
-              priority
+              loading="lazy"
               className={styles.serviceBackgroundImage}
               unoptimized
             />
@@ -471,10 +471,10 @@ export function ProspectaWebPage() {
         >
           <div className={styles.ctaBackground}>
             <Image
-              src={assetPath("/assets/prospecta-web/final-cta-bg.png")}
+              src={assetPath("/assets/prospecta-web/final-cta-bg.webp")}
               alt="Ambiente corporativo de alta tecnologia com notebook apresentando a ProspectaNicho"
               fill
-              priority
+              loading="lazy"
               className={styles.ctaBgImg}
               unoptimized
             />

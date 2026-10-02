@@ -273,7 +273,7 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
           <div className={styles.numbersCard} data-testid="preview-numbers">
             <div className={styles.numbersContent}>
               <div className={styles.numbersEyebrowRow}>
-                <p className={styles.numbersEyebrow}>Soluções que conectam dados e presença digital</p>
+                <p className={styles.numbersEyebrow}>Números que impulsionam negócios</p>
                 <span className={styles.numbersEyebrowLine} aria-hidden="true" />
               </div>
               <div className={styles.metricRow}>
@@ -285,7 +285,7 @@ function HomeSiteV2Content({ includeHeaderFooter = true }: { includeHeaderFooter
                 ))}
                 <div className={styles.metricUpdated}>
                   <BarChart3 size={32} className={styles.updatedChartIcon} aria-hidden="true" />
-                  <Link href="/automacao">Automação<br />de processos</Link>
+                  <span>Dados atualizados<br />mensalmente</span>
                 </div>
               </div>
             </div>

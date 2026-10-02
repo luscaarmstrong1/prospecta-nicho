@@ -43,9 +43,9 @@ export const heroBenefits: Array<{ icon: PreviewIcon; label: string; line2?: str
 ];
 
 export const scaleMetrics = [
-  { value: "Leads B2B", label: "segmentação comercial", href: "/leads-b2b" },
-  { value: "Sites", label: "presença digital", href: "/sites" },
-  { value: "Landing pages", label: "campanhas e conversão", href: "/landing-pages" },
+  { value: "5.8M", label: "empresas cadastradas", href: "/leads-b2b" },
+  { value: "+600", label: "segmentos mapeados", href: "/segmentos" },
+  { value: "5.570", label: "cidades cobertas", href: "/leads-b2b" },
 ];
 
 export const sampleColumns = ["CNPJ", "Razão Social", "Segmento", "Cidade", "Porte", "Telefone"];
@@ -73,13 +73,13 @@ export const featuredSegments: Array<{
   {
     title: "Comércios",
     description: "Lojas, redes e comércios segmentados por região.",
-    image: "/preview-v2/assets/segment-comercios-v2.png",
+    image: "/preview-v2/assets/segment-comercios-v2.webp",
     icon: "search",
   },
   {
     title: "Serviços",
     description: "Empresas de serviços B2B e serviços especializados.",
-    image: "/preview-v2/assets/office-meeting-team.png",
+    image: "/preview-v2/assets/office-meeting-team.webp",
     icon: "settings",
   },
   {
