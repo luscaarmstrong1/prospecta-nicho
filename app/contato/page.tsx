@@ -1,56 +1,46 @@
 import type { Metadata } from "next";
-import { MessageCircle } from "lucide-react";
-import { ContactForm } from "@/components/ContactForm";
+import { ContactView } from "@/components/contact/ContactView";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { breadcrumbJsonLd, createMetadata } from "@/lib/seo";
-import { createWhatsAppLink, defaultWhatsAppMessage } from "@/lib/whatsapp";
+import { site } from "@/lib/site";
+import { serializeJsonLd } from "@/lib/structured-data";
 
 export const metadata: Metadata = createMetadata({
   title: "Contato",
-  description: "Fale com a Prospecta Nicho sobre leads B2B, sites, landing pages, automação, pedidos, parcerias ou privacidade.",
+  description:
+    "Fale com a Prospecta Nicho sobre Leads B2B, sites, landing pages, automação, suporte e novas oportunidades para o seu negócio.",
   path: "/contato",
 });
 
-export default function ContactPage() {
-  const whatsappHref = createWhatsAppLink(defaultWhatsAppMessage);
+export default function ContatoPage() {
+  const contactPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    name: "Contato | Prospecta Nicho",
+    url: "https://prospectanicho.app/contato/",
+    description:
+      "Fale com a Prospecta Nicho sobre Leads B2B, sites, landing pages, automação, suporte e novas oportunidades para o seu negócio.",
+    mainEntity: {
+      "@type": "Organization",
+      name: site.name,
+      url: site.url,
+      email: site.email,
+    },
+  };
 
   return (
     <>
-      <JsonLd data={breadcrumbJsonLd([{ name: "Início", path: "/" }, { name: "Contato", path: "/contato" }])} />
-      <section className="hero">
-        <div className="container-wide">
-          <p className="eyebrow">Contato</p>
-          <h1 className="h1">Fale sobre o público que você quer alcançar.</h1>
-          <p className="lead">
-            Conte qual é sua operação comercial e a ProspectaNicho orienta o melhor formato de base para seu objetivo.
-          </p>
-        </div>
-      </section>
-      <section className="section section--light">
-        <div className="container-wide split-section">
-          <div className="card">
-            <p className="eyebrow">Quando usar este canal</p>
-            <h2 className="h2">Suporte, pedidos e privacidade.</h2>
-            <p className="lead">
-              Use o contato para dúvidas comerciais, suporte de pedido, pagamento, parcerias, solicitações fora do editor
-              ou temas de privacidade e supressão.
-            </p>
-            <div className="value-list">
-              <span>Critérios definidos antes da entrega</span>
-              <span>Campos confirmados conforme disponibilidade</span>
-              <span>Formato preparado para rotina comercial</span>
-              <span>Suporte humano para validar o recorte</span>
-            </div>
-            {whatsappHref ? (
-              <a className="button button--teal" href={whatsappHref} target="_blank" rel="noopener noreferrer" style={{ marginTop: 22 }}>
-                <MessageCircle size={18} />
-                Falar sobre meu público no WhatsApp
-              </a>
-            ) : null}
-          </div>
-          <ContactForm />
-        </div>
-      </section>
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Início", path: "/" },
+          { name: "Contato", path: "/contato" },
+        ])}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(contactPageSchema) }}
+      />
+      <ContactView email={site.email} />
     </>
   );
 }

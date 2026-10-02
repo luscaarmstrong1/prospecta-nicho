@@ -1,0 +1,829 @@
+/* ==========================================================================
+   PROSPECTANICHO V2 - CONTACT PAGE MODULE CSS (1:1 PIXEL-PERFECT MOCKUP)
+   ========================================================================== */
+
+.pageWrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #031420;
+  color: #f7fbff;
+  font-family: var(--font-manrope, "Manrope", sans-serif);
+  overflow-x: clip;
+}
+
+.mainContent {
+  flex: 1;
+  padding-top: 5rem;
+}
+
+/* --------------------------------------------------------------------------
+   1. HERO SECTION (FULL EXECUTIVE NIGHT OFFICE BACKGROUND + OVERLAY)
+   -------------------------------------------------------------------------- */
+.heroSection {
+  position: relative;
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(19, 219, 236, 0.12);
+  background-color: #020e1c;
+}
+
+.heroBgImage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-size: cover;
+  background-position: center right;
+  background-repeat: no-repeat;
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+      90deg,
+      rgba(2, 14, 28, 0.98) 0%,
+      rgba(3, 18, 34, 0.94) 34%,
+      rgba(4, 24, 42, 0.76) 54%,
+      rgba(4, 24, 42, 0.28) 78%,
+      rgba(4, 24, 42, 0.12) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(2, 14, 28, 0.4) 0%,
+      transparent 40%,
+      rgba(2, 14, 28, 0.85) 100%
+    );
+  pointer-events: none;
+}
+
+.heroContainer {
+  position: relative;
+  z-index: 3;
+  max-width: 1240px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 4.5rem 2rem 5.5rem;
+}
+
+.heroContent {
+  max-width: 580px;
+}
+
+.eyebrowTag {
+  display: inline-block;
+  color: #13dbec;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 1.1rem;
+}
+
+.heroTitle {
+  font-family: var(--font-sora, "Sora", sans-serif);
+  font-size: clamp(2.3rem, 4vw, 3.4rem);
+  font-weight: 800;
+  line-height: 1.14;
+  color: #ffffff;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.25rem;
+}
+
+.cyanHighlight {
+  color: #13dbec;
+}
+
+.heroLead {
+  font-size: 1.05rem;
+  line-height: 1.65;
+  color: #9aafc1;
+  margin-bottom: 2rem;
+  max-width: 520px;
+}
+
+.heroBtnGroup {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 3.5rem;
+}
+
+.btnPrimarySolid {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.6rem;
+  border-radius: 0.6rem;
+  background: #13dbec;
+  color: #031420;
+  font-family: var(--font-sora, "Sora", sans-serif);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border: 1px solid #13dbec;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  box-shadow: 0 0 20px rgba(19, 219, 236, 0.4);
+}
+
+.btnPrimarySolid:hover {
+  background: #25e5f5;
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(19, 219, 236, 0.65);
+}
+
+.btnPrimarySolid svg {
+  transition: transform 0.2s ease;
+}
+
+.btnPrimarySolid:hover svg {
+  transform: translateX(3px);
+}
+
+.btnGhostOutline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.4rem;
+  border-radius: 0.6rem;
+  background: rgba(3, 20, 32, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-family: var(--font-sora, "Sora", sans-serif);
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  backdrop-filter: blur(8px);
+}
+
+.btnGhostOutline:hover {
+  background: rgba(19, 219, 236, 0.12);
+  border-color: #13dbec;
+  color: #13dbec;
+}
+
+/* 4 Horizontal Hero Benefits */
+.heroBenefitsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.heroBenefitItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #f7fbff;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.heroBenefitIcon {
+  color: #13dbec;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 6px rgba(19, 219, 236, 0.4));
+}
+
+/* --------------------------------------------------------------------------
+   2. MAIN CONTACT SECTION (SPLIT: CHANNELS LEFT + FORM RIGHT)
+   -------------------------------------------------------------------------- */
+.contactMainSection {
+  padding: 5.5rem 2rem;
+  background-color: #031420;
+  position: relative;
+}
+
+.containerWrap {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.contactSplitGrid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 3.5rem;
+  align-items: start;
+}
+
+.sectionHeadingH2 {
+  font-family: var(--font-sora, "Sora", sans-serif);
+  font-size: clamp(2rem, 3.2vw, 2.75rem);
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-top: 0.5rem;
+  margin-bottom: 1.2rem;
+}
+
+.sectionDesc {
+  color: #9aafc1;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  max-width: 480px;
+  margin-bottom: 2.2rem;
+}
+
+/* Contact Channels Cards */
+.channelsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.channelCard {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem 1.5rem;
+  background: #071d2e;
+  border: 1px solid rgba(19, 219, 236, 0.16);
+  border-radius: 1rem;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.25s ease;
+}
+
+.channelCard:hover {
+  transform: translateY(-4px);
+  border-color: rgba(19, 219, 236, 0.5);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), 0 0 20px rgba(19, 219, 236, 0.15);
+}
+
+.channelIconWrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(19, 219, 236, 0.12);
+  border: 1px solid rgba(19, 219, 236, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #13dbec;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.channelCard:hover .channelIconWrap {
+  background: rgba(19, 219, 236, 0.2);
+  box-shadow: 0 0 14px rgba(19, 219, 236, 0.4);
+}
+
+.channelInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.channelTitle {
+  font-family: var(--font-sora, "Sora", sans-serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.2rem;
+}
+
+.channelDetail {
+  font-size: 0.85rem;
+  color: #9aafc1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.channelChevron {
+  color: #9aafc1;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.channelCard:hover .channelChevron {
+  color: #13dbec;
+  transform: translateX(4px);
+}
+
+/* Contact Form Card */
+.formCard {
+  background: #071d2e;
+  border: 1px solid rgba(19, 219, 236, 0.22);
+  border-radius: 1.25rem;
+  padding: 2.5rem 2.2rem;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.6), 0 0 30px rgba(19, 219, 236, 0.08);
+  position: relative;
+}
+
+.formHeader {
+  margin-bottom: 1.8rem;
+}
+
+.formSubtitle {
+  color: #9aafc1;
+  font-size: 0.9rem;
+  margin-top: 0.35rem;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.15rem;
+}
+
+.fieldFull {
+  grid-column: 1 / -1;
+}
+
+.fieldLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #f7fbff;
+}
+
+.fieldRequired {
+  color: #13dbec;
+}
+
+.formInput,
+.formSelect,
+.formTextarea {
+  width: 100%;
+  background: #041a29;
+  border: 1px solid rgba(19, 219, 236, 0.2);
+  border-radius: 0.65rem;
+  padding: 0.75rem 1rem;
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.formInput::placeholder,
+.formTextarea::placeholder {
+  color: #556c80;
+}
+
+.formInput:focus,
+.formSelect:focus,
+.formTextarea:focus {
+  border-color: #13dbec;
+  box-shadow: 0 0 0 2px rgba(19, 219, 236, 0.25);
+  background: #052236;
+}
+
+.formSelect {
+  cursor: pointer;
+}
+
+.formSelect option {
+  background: #041a29;
+  color: #ffffff;
+}
+
+.formTextarea {
+  resize: vertical;
+  min-height: 105px;
+}
+
+.fieldError {
+  font-size: 0.75rem;
+  color: #f87171;
+  margin-top: 0.15rem;
+}
+
+/* Consent Checkbox */
+.consentWrap {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #9aafc1;
+  cursor: pointer;
+}
+
+.consentCheckbox {
+  margin-top: 0.15rem;
+  width: 17px;
+  height: 17px;
+  accent-color: #13dbec;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.consentWrap a {
+  color: #13dbec;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.consentWrap a:hover {
+  color: #62fbf7;
+}
+
+/* Form Action Button */
+.btnSubmit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.95rem 1.6rem;
+  border-radius: 0.65rem;
+  background: #13dbec;
+  border: 1px solid #13dbec;
+  color: #031420;
+  font-family: var(--font-sora, "Sora", sans-serif);
+  font-weight: 700;
+  font-size: 0.98rem;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  box-shadow: 0 0 24px rgba(19, 219, 236, 0.35);
+  margin-top: 0.6rem;
+}
+
+.btnSubmit:hover:not(:disabled) {
+  background: #25e5f5;
+  transform: translateY(-2px);
+  box-shadow: 0 0 32px rgba(19, 219, 236, 0.6);
+}
+
+.btnSubmit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btnSubmit svg {
+  transition: transform 0.2s ease;
+}
+
+.btnSubmit:hover:not(:disabled) svg {
+  transform: translateX(3px);
+}
+
+/* Form Status Messages */
+.formAlertSuccess {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 0.6rem;
+  color: #34d399;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.formAlertError {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 0.6rem;
+  color: #f87171;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+/* Success Card View */
+.successCard {
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.successIconWrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(19, 219, 236, 0.12);
+  border: 1px solid rgba(19, 219, 236, 0.4);
+  color: #13dbec;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+}
+
+.successTitle {
+  font-family: var(--font-sora, "Sora", sans-serif);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.75rem;
+}
+
+.successDesc {
+  color: #9aafc1;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 440px;
+  margin: 0 auto 2rem;
+}
+
+/* --------------------------------------------------------------------------
+   3. NATIONAL COVERAGE SECTION (BRAZIL MAP CONNECTED)
+   -------------------------------------------------------------------------- */
+.coverageSection {
+  padding: 5.5rem 2rem;
+  background-color: #020e1a;
+  border-top: 1px solid rgba(19, 219, 236, 0.1);
+  border-bottom: 1px solid rgba(19, 219, 236, 0.1);
+  position: relative;
+}
+
+.coverageGrid3 {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr 1fr;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.coverageTextCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.coverageVisualCol {
+  position: relative;
+  width: 100%;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  border: 1px solid rgba(19, 219, 236, 0.25);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7), 0 0 30px rgba(19, 219, 236, 0.15);
+  background: #020b14;
+}
+
+.coverageVisualImage {
+  position: relative;
+  width: 100%;
+  height: 380px;
+}
+
+.coverageVisualOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(2, 11, 20, 0.3) 0%,
+    transparent 50%,
+    rgba(2, 11, 20, 0.6) 100%
+  );
+  pointer-events: none;
+}
+
+.coverageBenefitsCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.coverageBenefitItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.coverageBenefitIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(19, 219, 236, 0.12);
+  border: 1px solid rgba(19, 219, 236, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #13dbec;
+  flex-shrink: 0;
+}
+
+.coverageBenefitTitle {
+  font-family: var(--font-sora, "Sora", sans-serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.35rem;
+}
+
+.coverageBenefitDesc {
+  color: #9aafc1;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+/* --------------------------------------------------------------------------
+   4. REASONS FOR CONTACT SECTION (4 CARDS INTERACTIVE)
+   -------------------------------------------------------------------------- */
+.reasonsSection {
+  padding: 5.5rem 2rem;
+  background-color: #031420;
+  position: relative;
+}
+
+.reasonsHeader {
+  margin-bottom: 3.5rem;
+}
+
+.reasonsGrid4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.reasonCard {
+  background: #071d2e;
+  border: 1px solid rgba(19, 219, 236, 0.18);
+  border-radius: 1.15rem;
+  padding: 2.2rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.reasonCard:hover {
+  transform: translateY(-4px);
+  border-color: rgba(19, 219, 236, 0.55);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 24px rgba(19, 219, 236, 0.2);
+}
+
+.reasonCardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.reasonIconWrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(19, 219, 236, 0.12);
+  border: 1px solid rgba(19, 219, 236, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #13dbec;
+  transition: all 0.2s ease;
+}
+
+.reasonCard:hover .reasonIconWrap {
+  background: rgba(19, 219, 236, 0.22);
+  box-shadow: 0 0 16px rgba(19, 219, 236, 0.45);
+}
+
+.reasonArrow {
+  color: #9aafc1;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.reasonCard:hover .reasonArrow {
+  color: #13dbec;
+  transform: translateX(4px);
+}
+
+.reasonTitle {
+  font-family: var(--font-sora, "Sora", sans-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.6rem;
+}
+
+.reasonDesc {
+  color: #9aafc1;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVENESS (1024px, 768px, 430px, 390px, 375px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+  .heroBenefitsRow {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  .contactSplitGrid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  .coverageGrid3 {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .coverageVisualImage {
+    height: 320px;
+  }
+
+  .reasonsGrid4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .heroSection {
+    min-height: auto;
+  }
+
+  .heroContainer {
+    padding: 3rem 1.25rem 4rem;
+  }
+
+  .heroTitle {
+    font-size: 2.2rem;
+  }
+
+  .heroLead {
+    font-size: 0.98rem;
+  }
+
+  .heroBtnGroup {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .btnPrimarySolid,
+  .btnGhostOutline {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .heroBenefitsRow {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .contactMainSection,
+  .coverageSection,
+  .reasonsSection {
+    padding: 3.5rem 1.25rem;
+  }
+
+  .formCard {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .reasonsGrid4 {
+    grid-template-columns: 1fr;
+  }
+
+  .coverageVisualImage {
+    height: 260px;
+  }
+}
+
+@media (max-width: 430px) {
+  .heroBenefitsRow {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .heroTitle {
+    font-size: 1.95rem;
+  }
+
+  .sectionHeadingH2 {
+    font-size: 1.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btnPrimarySolid,
+  .btnGhostOutline,
+  .channelCard,
+  .reasonCard,
+  .btnSubmit,
+  .channelChevron,
+  .reasonArrow {
+    transition: none !important;
+    transform: none !important;
+  }
+}
