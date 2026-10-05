@@ -31,8 +31,11 @@ test("segmentos em destaque usam os quatro recortes comerciais atuais", async ({
 
   for (const [title, segment] of expectedSegments) {
     const card = cards.filter({ hasText: title });
+    await card.scrollIntoViewIfNeeded();
     await expect(card).toBeVisible();
-    await expect(card.locator("img")).toHaveJSProperty("complete", true);
+    const image = card.locator("img");
+    await expect(image).toHaveJSProperty("complete", true, { timeout: 15_000 });
+    expect(await image.evaluate((element: HTMLImageElement) => element.naturalWidth)).toBeGreaterThan(0);
     await expect(card.getByRole("link", { name: /Acessar segmento/i })).toHaveAttribute(
       "href",
       `/solicitar-planilha?segment=${segment}&source=home-v2-segmento`,

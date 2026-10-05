@@ -12,7 +12,7 @@ test("official home uses the approved v2 visual with real navigation", async ({ 
   await expect(page.getByTestId("preview-final-cta")).toBeVisible();
 
   await expect(page.getByText("Versão visual de teste", { exact: false })).toHaveCount(0);
-  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByRole("dialog", { name: "Preferências de cookies" })).toBeVisible();
   await expect(page.getByRole("link", { name: /Receber amostra/ }).first()).toHaveAttribute(
     "href",
     /\/solicitar-planilha\?source=header-mobile-amostra/,
@@ -31,7 +31,10 @@ test("official home remains usable on mobile without horizontal overflow", async
 
   await expect(page.getByTestId("preview-hero-title")).toBeVisible();
   await page.getByRole("button", { name: "Abrir menu" }).click();
-  await expect(page.getByRole("link", { name: "Montar minha base" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Falar com um especialista" }).last()).toHaveAttribute(
+    "href",
+    "/solicitar-planilha?source=home-v2-header-mobile",
+  );
 
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
   expect(overflow).toBe(false);
