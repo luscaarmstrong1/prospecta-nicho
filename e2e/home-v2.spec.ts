@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("official home uses the approved v2 visual with real navigation", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/leads");
 
   await expect(
     page.getByRole("heading", { name: "Prospecta Nicho: encontre oportunidades B2B em todo o Brasil." }),
@@ -27,7 +27,7 @@ test("official home uses the approved v2 visual with real navigation", async ({ 
 test("official home remains usable on mobile without horizontal overflow", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop", "O cenário define seu próprio viewport móvel.");
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("/");
+  await page.goto("/leads");
 
   await expect(page.getByTestId("preview-hero-title")).toBeVisible();
   await page.getByRole("button", { name: "Abrir menu" }).click();

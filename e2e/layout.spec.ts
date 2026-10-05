@@ -1,14 +1,14 @@
 import { expect, test } from "@playwright/test";
 
 test("home não cria scroll horizontal e mantém quatro segmentos", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/leads");
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
   await expect(page.getByTestId("motion-segment-card")).toHaveCount(4);
 });
 
 test("cards de segmento apontam para a solicitação correta", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/leads");
   const hrefs = await page.getByTestId("motion-segment-card").getByRole("link", { name: /Acessar segmento/i }).evaluateAll(
     (links) => links.map((link) => link.getAttribute("href") || ""),
   );
@@ -17,7 +17,7 @@ test("cards de segmento apontam para a solicitação correta", async ({ page }) 
 });
 
 test("home segue ordem final sem seção de FAQ", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/leads");
 
   await expect(page.getByTestId("preview-hero").getByText("Bases B2B segmentadas")).toBeVisible();
   await expect(page.getByText("Antes de começar, você talvez queira saber.")).toHaveCount(0);
@@ -46,7 +46,7 @@ test("home segue ordem final sem seção de FAQ", async ({ page }) => {
 test("cards de planos ficam alinhados no desktop", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop", "Alinhamento dos planos é validado no desktop.");
 
-  await page.goto("/");
+  await page.goto("/leads");
   const planHeadings = page.getByTestId("preview-plans").getByRole("heading", { level: 3 });
   await expect(planHeadings).toHaveCount(4);
 
@@ -57,7 +57,7 @@ test("cards de planos ficam alinhados no desktop", async ({ page }, testInfo) =>
 });
 
 test("whatsapp flutuante permanece fixo e visível durante scroll", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/leads");
   const whatsapp = page.locator('[data-test-id="whatsapp-floating-button"]');
   await expect(whatsapp).toBeVisible();
   await expect(whatsapp).toHaveAttribute("href", /^https:\/\/wa\.me\/5535998905896\?text=/);

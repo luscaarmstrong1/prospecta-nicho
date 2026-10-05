@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("home mantém a sequência comercial atual e não exibe FAQ", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/leads");
 
   await expect(page.getByTestId("preview-hero")).toBeVisible();
   await expect(
@@ -31,7 +31,7 @@ test("home mantém a sequência comercial atual e não exibe FAQ", async ({ page
 });
 
 test("amostra apresenta tabela comercial e CTA funcional", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/leads");
 
   const sample = page.getByTestId("preview-sample");
   const table = sample.getByLabel("Demonstração de planilha comercial");

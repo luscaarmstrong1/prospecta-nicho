@@ -8,7 +8,7 @@ const expectedSegments = [
 ] as const;
 
 test("hero oficial apresenta promessa, mapa e ações reais", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/leads");
 
   const hero = page.getByTestId("preview-hero");
   await expect(hero).toBeVisible();
@@ -24,7 +24,7 @@ test("hero oficial apresenta promessa, mapa e ações reais", async ({ page }) =
 });
 
 test("segmentos em destaque usam os quatro recortes comerciais atuais", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/leads");
 
   const cards = page.getByTestId("motion-segment-card");
   await expect(cards).toHaveCount(expectedSegments.length);

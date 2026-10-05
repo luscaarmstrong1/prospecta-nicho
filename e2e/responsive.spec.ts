@@ -18,7 +18,7 @@ test("home preserva responsividade visual nos principais tamanhos", async ({ pag
 
   for (const viewport of viewports) {
     await page.setViewportSize(viewport);
-    await page.goto("/");
+    await page.goto("/leads");
 
     await expect(page.getByTestId("preview-hero")).toBeVisible();
     await expect(page.getByTestId("motion-segment-card").first()).toBeVisible();
@@ -31,7 +31,7 @@ test("home preserva responsividade visual nos principais tamanhos", async ({ pag
 });
 
 test("segmentos e planos se mantêm íntegros sem quebrar a largura", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/leads");
 
   await expect(page.getByTestId("motion-segment-card")).toHaveCount(4);
   await expect(page.getByTestId("preview-plans").getByRole("heading", { level: 3 })).toHaveCount(4);

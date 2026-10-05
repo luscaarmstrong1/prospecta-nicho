@@ -53,8 +53,8 @@ test.describe("ProspectaNicho V2 Marketing Pages - Visual & Quality QA", () => {
 
   test("Planos FAQ accordion and pricing cards render cleanly", async ({ page }) => {
     await page.goto("/planos", { waitUntil: "networkidle" });
-    await expect(page.getByText("R$ 149")).toBeVisible();
-    await expect(page.getByText("Sob consulta")).toBeVisible();
+    await expect(page.getByText("R$ 147,00")).toBeVisible();
+    await expect(page.getByText("R$ 497,00")).toBeVisible();
     await expect(page.getByText(/Perguntas frequentes/i)).toBeVisible();
   });
 });
