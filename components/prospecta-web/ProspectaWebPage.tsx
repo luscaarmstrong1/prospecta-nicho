@@ -206,8 +206,8 @@ export function ProspectaWebPage() {
             <div className={styles.heroContent}>
               <SectionBadge>SITES &amp; LANDING PAGES</SectionBadge>
               <h1 id="hero-heading" className={styles.heroTitle}>
-                Sites &amp; Landing Pages<br />
-                que <span className={styles.cyanHighlight}>transformam</span><br />
+                Sites &amp; Landing Pages<br className={styles.desktopBreak} />
+                que <span className={styles.cyanHighlight}>transformam</span><br className={styles.desktopBreak} />
                 presença em <span className={styles.cyanHighlight}>negócios.</span>
               </h1>
               <p className={styles.heroSubtitle}>
@@ -339,13 +339,13 @@ export function ProspectaWebPage() {
                 <div className={styles.servicesTextCol}>
                   <SectionBadge>SERVIÇO COMPLETO</SectionBadge>
                   <h2 id="services-heading" className={styles.servicesTitle}>
-                    O que está incluso<br />
+                    O que está incluso<br className={styles.desktopBreak} />
                     no seu projeto
                   </h2>
                   <p className={styles.servicesSubtitle}>
-                    Entregamos muito mais que um site bonito.<br />
-                    Criamos páginas estratégicas, otimizadas<br />
-                    e prontas para gerar resultados para<br />
+                    Entregamos muito mais que um site bonito.<br className={styles.desktopBreak} />
+                    Criamos páginas estratégicas, otimizadas<br className={styles.desktopBreak} />
+                    e prontas para gerar resultados para<br className={styles.desktopBreak} />
                     o seu negócio.
                   </p>
                 </div>

@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { PnFinalLogo } from "@/components/shared-v2/PnFinalLogo";
 import { assetPath } from "@/lib/asset-path";
-import { mainNavigation, solutionsDropdown } from "@/lib/site-v2/config";
+import { getMainNavigation, mainNavigation, solutionsDropdown } from "@/lib/site-v2/config";
 import { Magnetic, useHomeMotion } from "@/components/home-v2/motion/HomeMotion";
 import { createWhatsAppLink } from "@/lib/whatsapp";
 import styles from "@/components/home-v2/home-v2.module.css";
@@ -36,7 +36,26 @@ export function SiteHeader({ currentPath, variant }: SiteHeaderProps) {
   const { reducedMotion } = useHomeMotion();
 
   const isProspectaWeb = false;
-  const navItems = mainNavigation;
+  const navItems = getMainNavigation(currentPath);
+
+  const isItemActive = (href: string) => {
+    if (href === "/") {
+      return (
+        currentPath === "/" ||
+        currentPath === "/sites" ||
+        currentPath === "/landing-pages" ||
+        currentPath === "/prospecta-web"
+      );
+    }
+    if (href === "/leads") {
+      return (
+        currentPath === "/leads" ||
+        currentPath === "/leads-b2b" ||
+        Boolean(currentPath?.startsWith("/leads/"))
+      );
+    }
+    return currentPath === href || (href !== "/" && Boolean(currentPath?.startsWith(href)));
+  };
 
   const specialistWhatsAppUrl = createWhatsAppLink(
     "Olá! Gostaria de falar com um especialista da ProspectaNicho sobre soluções para minha empresa."
@@ -57,6 +76,26 @@ export function SiteHeader({ currentPath, variant }: SiteHeaderProps) {
       window.cancelAnimationFrame(scrollFrame.current);
     };
   }, []);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [currentPath]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [menuOpen]);
 
   const handleMouseEnter = () => {
     if (dropdownTimeout.current) clearTimeout(dropdownTimeout.current);
@@ -170,10 +209,7 @@ export function SiteHeader({ currentPath, variant }: SiteHeaderProps) {
               );
             }
 
-            const isActive =
-              item.href === "/"
-                ? currentPath === "/"
-                : currentPath === item.href || (item.href !== "/" && currentPath?.startsWith(item.href));
+            const isActive = isItemActive(item.href);
 
             return (
               <Link
@@ -222,23 +258,12 @@ export function SiteHeader({ currentPath, variant }: SiteHeaderProps) {
             {navItems.map((item) => {
               if (item.hasDropdown) {
                 return (
-                  <div key={item.href} style={{ width: "100%" }}>
+                  <div key={item.href} className={styles.mobileDropdownWrap}>
                     <button
                       type="button"
                       onClick={() => setMobileSolucoesOpen((prev) => !prev)}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        width: "100%",
-                        background: "transparent",
-                        border: 0,
-                        color: "#ffffff",
-                        padding: "10px 0",
-                        fontSize: "1rem",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                      }}
+                      className={styles.mobileDropdownButton}
+                      aria-expanded={mobileSolucoesOpen}
                     >
                       <span>{item.label}</span>
                       <ChevronDown
@@ -250,31 +275,18 @@ export function SiteHeader({ currentPath, variant }: SiteHeaderProps) {
                       />
                     </button>
                     {mobileSolucoesOpen && (
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          gap: "8px",
-                          paddingLeft: "12px",
-                          marginBottom: "12px",
-                          borderLeft: "2px solid rgba(9, 226, 232, 0.3)",
-                        }}
-                      >
+                      <div className={styles.mobileDropdownList}>
                         {solutionsDropdown.map((sub) => (
                           <Link
                             key={sub.href}
                             href={sub.href}
                             onClick={() => setMenuOpen(false)}
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              padding: "6px 0",
-                            }}
+                            className={styles.mobileDropdownItem}
                           >
-                            <span style={{ fontSize: "0.92rem", fontWeight: 700, color: "#fff" }}>
+                            <span className={styles.mobileDropdownItemTitle}>
                               {sub.title}
                             </span>
-                            <span style={{ fontSize: "0.78rem", color: "#a8d2e1" }}>
+                            <span className={styles.mobileDropdownItemSubtitle}>
                               {sub.subtitle}
                             </span>
                           </Link>
@@ -285,11 +297,14 @@ export function SiteHeader({ currentPath, variant }: SiteHeaderProps) {
                 );
               }
 
+              const isActive = isItemActive(item.href);
+
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setMenuOpen(false)}
+                  className={isActive ? styles.navActive : ""}
                 >
                   {item.label}
                 </Link>

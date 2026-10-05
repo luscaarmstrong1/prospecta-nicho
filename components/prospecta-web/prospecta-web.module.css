@@ -34,6 +34,35 @@
   max-width: 1440px;
   padding: 0 40px 0 80px;
   margin: 0 auto;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1180px) {
+  .container,
+  .webContainer {
+    padding: 0 32px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .container,
+  .webContainer {
+    padding: 0 28px;
+  }
+}
+
+@media (max-width: 767px) {
+  .container,
+  .webContainer {
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 390px) {
+  .container,
+  .webContainer {
+    padding: 0 16px;
+  }
 }
 
 .sectionBadge {
@@ -312,9 +341,33 @@
 .serviceContainer {
   width: 100%;
   max-width: 1320px;
-  padding: 0;
+  padding: 0 40px 0 80px;
   margin: 0 auto;
   box-sizing: border-box;
+}
+
+@media (max-width: 1180px) {
+  .serviceContainer {
+    padding: 0 32px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .serviceContainer {
+    padding: 0 28px;
+  }
+}
+
+@media (max-width: 767px) {
+  .serviceContainer {
+    padding: 0 20px;
+  }
+}
+
+@media (max-width: 390px) {
+  .serviceContainer {
+    padding: 0 16px;
+  }
 }
 
 /* FAIXA A — 4 BENEFÍCIOS */
@@ -1021,12 +1074,48 @@
 }
 
 /* --------------------------------------------------------------------------
-   RESPONSIVIDADE (1024px, 768px, 430px, 390px)
+   RESPONSIVIDADE (1180px, 1024px, 768px, 430px, 390px)
    -------------------------------------------------------------------------- */
-@media (max-width: 1100px) {
+@media (max-width: 1023px) {
+  .desktopBreak {
+    display: none;
+  }
+
+  .heroSection {
+    min-height: auto;
+    padding-top: 100px;
+    padding-bottom: 50px;
+  }
+
+  .heroContent {
+    max-width: 100%;
+    padding: 20px 0 30px;
+  }
+
+  .heroTitle {
+    font-size: clamp(2.1rem, 5.5vw, 2.75rem);
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  .heroSubtitle {
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 100%;
+    margin-bottom: 2rem;
+  }
+
+  .heroActions {
+    margin-bottom: 2.2rem;
+  }
+
+  .heroTrustRow {
+    gap: 1.5rem;
+  }
+
   .servicesMainGrid {
     grid-template-columns: 1fr;
-    gap: 2.2rem;
+    gap: 2rem;
   }
 
   .servicesTextCol {
@@ -1036,28 +1125,126 @@
     padding-bottom: 1.5rem;
   }
 
+  .servicesListCol {
+    padding-left: 0;
+    max-width: none;
+  }
+
+  .servicesVisualCol {
+    display: none;
+    min-height: 0;
+  }
+
   .benefitsGrid {
     grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 860px) {
-  .heroGrid {
-    grid-template-columns: 1fr;
-    gap: 2.5rem;
+    gap: 16px;
   }
 
-  .heroVisual {
-    justify-content: center;
+  .casesHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .casesHeaderRight {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    width: 100%;
   }
 
   .casesGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .heroSection {
+    padding-top: 86px;
+    padding-bottom: 36px;
+  }
+
+  .heroBgImg {
+    object-position: 70% center;
+  }
+
+  .heroOverlay {
+    background: linear-gradient(
+      180deg,
+      rgba(0, 10, 23, 0.75) 0%,
+      rgba(0, 10, 23, 0.90) 50%,
+      rgba(0, 10, 23, 0.98) 100%
+    );
+  }
+
+  .heroTitle {
+    font-size: clamp(1.9rem, 7.5vw, 2.35rem);
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+  }
+
+  .heroSubtitle {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    margin-bottom: 1.8rem;
+  }
+
+  .heroActions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 360px;
+    gap: 0.85rem;
+    margin-bottom: 2rem;
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+    min-height: 48px;
+    box-sizing: border-box;
+  }
+
+  .heroTrustRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    width: 100%;
+  }
+
+  .benefitsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .benefitCard {
+    padding: 16px 14px;
+    min-height: 150px;
+  }
+
+  .benefitIconCircle {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 12px;
+  }
+
+  .benefitTitle {
+    font-size: 1rem;
+  }
+
+  .benefitDescription {
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+
+  .servicesTitle {
+    font-size: clamp(1.75rem, 6vw, 2.1rem);
   }
 
   .processStepsRow {
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.25rem;
   }
 
   .processStepDivider {
@@ -1065,14 +1252,22 @@
     padding: 0.2rem 0;
   }
 
-  .bridgeCard {
-    flex-direction: column;
-    align-items: flex-start;
+  .processCardContainer {
+    padding: 1.25rem 1.25rem;
+  }
+
+  .casesGrid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
   }
 
   .ctaFinalSection {
     min-height: auto;
-    padding: 40px 0;
+    padding: 36px 0;
+  }
+
+  .ctaBgImg {
+    object-position: 80% center;
   }
 
   .ctaFinalTextCol {
@@ -1080,47 +1275,51 @@
   }
 
   .ctaFinalTitle {
-    font-size: 34px;
-  }
-
-  .ctaOverlay {
-    background: linear-gradient(
-      90deg,
-      rgba(0, 10, 23, 0.96) 0%,
-      rgba(0, 10, 23, 0.88) 60%,
-      rgba(0, 10, 23, 0.75) 100%
-    );
-  }
-}
-
-@media (max-width: 540px) {
-  .benefitsGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .heroActions,
-  .ctaFinalActions {
-    flex-direction: column;
-    width: 100%;
-  }
-
-  .primaryButton,
-  .secondaryButton,
-  .ctaFinalSecondaryBtn {
-    width: 100%;
-  }
-
-  .ctaFinalTitle {
-    font-size: 28px;
+    font-size: clamp(1.8rem, 6.5vw, 2.2rem);
+    line-height: 1.15;
   }
 
   .ctaLeadBreak {
     display: none;
   }
 
+  .ctaOverlay {
+    background: linear-gradient(
+      180deg,
+      rgba(0, 10, 23, 0.92) 0%,
+      rgba(0, 10, 23, 0.96) 60%,
+      rgba(0, 10, 23, 0.99) 100%
+    );
+  }
+
+  .ctaFinalActions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    max-width: 360px;
+    gap: 0.85rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .ctaFinalSecondaryBtn {
+    width: 100%;
+    min-height: 48px;
+    box-sizing: border-box;
+  }
+
   .ctaFinalTrustRow {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .benefitsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heroTitle {
+    font-size: clamp(1.75rem, 8vw, 2.1rem);
   }
 }

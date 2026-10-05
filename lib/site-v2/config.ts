@@ -33,15 +33,42 @@ export const solutionsDropdown: SolutionItem[] = [
   },
 ];
 
-export const mainNavigation = [
+export interface NavItem {
+  label: string;
+  href: string;
+  hasDropdown?: boolean;
+}
+
+export const mainNavigation: NavItem[] = [
   { label: "Início", href: "/" },
-  { label: "Soluções", href: "/solucoes", hasDropdown: true },
-  { label: "Segmentos", href: "/segmentos" },
-  { label: "Planos", href: "/planos" },
-  { label: "Conteúdo", href: "/conteudo" },
+  { label: "Leads B2B", href: "/leads" },
   { label: "Sobre", href: "/sobre" },
   { label: "Contato", href: "/contato" },
 ];
+
+export function getMainNavigation(currentPath?: string): NavItem[] {
+  const normalizedPath = (currentPath || "/").replace(/\/+$/, "") || "/";
+  const isLeads =
+    normalizedPath === "/leads" ||
+    normalizedPath.startsWith("/leads/") ||
+    normalizedPath === "/leads-b2b";
+
+  if (isLeads) {
+    return [
+      { label: "Início", href: "/leads" },
+      { label: "Sites & Landing Pages", href: "/" },
+      { label: "Sobre", href: "/sobre" },
+      { label: "Contato", href: "/contato" },
+    ];
+  }
+
+  return [
+    { label: "Início", href: "/" },
+    { label: "Leads B2B", href: "/leads" },
+    { label: "Sobre", href: "/sobre" },
+    { label: "Contato", href: "/contato" },
+  ];
+}
 
 export const footerGroups = [
   {

@@ -23,6 +23,14 @@ const v2MarketingRoutes = new Set<string>([
   "/landing-pages",
   "/automacao",
   "/projetos",
+  "/politica-de-privacidade",
+  "/termos-de-uso",
+  "/politica-de-cookies",
+  "/termos-de-entrega",
+  "/politica-de-supressao",
+  "/aviso-de-dados-empresariais",
+  "/faq",
+  "/blog",
 ]);
 
 const legacyRoutes = new Set<string>([]);

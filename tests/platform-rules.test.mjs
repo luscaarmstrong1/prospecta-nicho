@@ -116,3 +116,24 @@ test("pagamentos não aprovam fluxo sem webhook validado", () => {
   assert.match(preference, /Base personalizada/);
   assert.match(preference, /status: 409/);
 });
+
+test("navegação principal oculta segmentos, planos e conteudo e chaveia soluções", async () => {
+  const { getMainNavigation, mainNavigation } = await import("../lib/site-v2/config.ts");
+  
+  // Confirma que abas desnecessárias estão ocultas
+  const hiddenLabels = ["Segmentos", "Planos", "Conteúdo"];
+  for (const label of hiddenLabels) {
+    assert.equal(mainNavigation.some((item) => item.label === label), false);
+  }
+
+  // Na rota / (Sites & Landing Pages), exibe link para Leads B2B
+  const homeNav = getMainNavigation("/");
+  assert.deepEqual(homeNav.map((i) => i.label), ["Início", "Leads B2B", "Sobre", "Contato"]);
+  assert.equal(homeNav.find((i) => i.label === "Leads B2B")?.href, "/leads");
+
+  // Na rota /leads (Leads B2B), exibe link para Sites & Landing Pages
+  const leadsNav = getMainNavigation("/leads");
+  assert.deepEqual(leadsNav.map((i) => i.label), ["Início", "Sites & Landing Pages", "Sobre", "Contato"]);
+  assert.equal(leadsNav.find((i) => i.label === "Sites & Landing Pages")?.href, "/");
+  assert.equal(leadsNav.find((i) => i.label === "Início")?.href, "/leads");
+});
