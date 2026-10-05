@@ -694,7 +694,7 @@
 .caseImageFrame {
   position: relative;
   width: 100%;
-  aspect-ratio: 247 / 144;
+  aspect-ratio: 16 / 10;
   border-radius: 13px 13px 0 0;
   overflow: hidden;
   background-color: #001326;
@@ -704,6 +704,7 @@
   width: 100% !important;
   height: 100% !important;
   object-fit: cover;
+  object-position: top center;
   transition: transform 0.35s ease;
 }
 

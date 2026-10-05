@@ -138,10 +138,14 @@ const processSteps = [
 
 const projectCases = [
   {
-    id: "odonto",
-    title: "Clínica Odontológica",
-    image: "/assets/prospecta-web/case-odonto-hd.png",
-    tags: ["Site Institucional", "Geração de Leads"],
+    id: "conexium",
+    title: "Conexium Engenharia",
+    category: "Engenharia & Soluções Industriais",
+    tags: ["Site Institucional", "Engenharia"],
+    image: "/assets/prospecta-web/case-conexium.png",
+    href: "https://conexium-engenharia.vercel.app/",
+    external: true,
+    alt: "Homepage do projeto Conexium Engenharia",
   },
   {
     id: "omega-imports",
@@ -156,7 +160,7 @@ const projectCases = [
   {
     id: "imobiliaria",
     title: "Imobiliária",
-    image: "/assets/prospecta-web/case-imobiliaria-hd.png",
+    image: "/assets/prospecta-web/case-imobiliaria.png",
     tags: ["Site Institucional", "Apresentação de Imóveis"],
   },
 ];
