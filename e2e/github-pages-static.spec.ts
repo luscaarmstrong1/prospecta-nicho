@@ -18,7 +18,9 @@ test("home estatica carrega sem chamar API Route local", async ({ page }) => {
   await page.goto("/prospecta-nicho/");
 
   await expect(
-    page.getByRole("heading", { name: /Prospecta Nicho: encontre oportunidades B2B/i }),
+    page.getByRole("heading", {
+      name: /Sites & Landing Pages que transformam presença em negócios/i,
+    }),
   ).toBeVisible();
   await expect(page.getByRole("link", { name: /Falar com um especialista/i }).first()).toBeVisible();
   expect(apiRequests).toEqual([]);
