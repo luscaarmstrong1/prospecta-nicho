@@ -127,7 +127,7 @@ export default function SobrePage() {
       />
       <main className={styles.mainContent}>
         {/* ==================================================================
-            1. HERO DOBRA 1 - PANORÂMICO COM MOCKUP REALISTA DO DASHBOARD SAAS
+            1. HERO DOBRA 1 - PANORÂMICO COM MOCKUP REALISTA DO DASHBOARD SaaS
             ================================================================== */}
         <section className={styles.aboutHeroSection} data-testid="sobre-hero">
           {/* Background do escritório corporativo noturno fornecido */}
