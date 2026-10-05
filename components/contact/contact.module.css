@@ -35,7 +35,7 @@
   inset: 0;
   z-index: 1;
   background-size: cover;
-  background-position: center right;
+  background-position: center right 15%;
   background-repeat: no-repeat;
 }
 
@@ -46,16 +46,16 @@
   background: linear-gradient(
       90deg,
       rgba(2, 14, 28, 0.98) 0%,
-      rgba(3, 18, 34, 0.94) 34%,
-      rgba(4, 24, 42, 0.76) 54%,
-      rgba(4, 24, 42, 0.28) 78%,
+      rgba(3, 18, 34, 0.95) 38%,
+      rgba(4, 24, 42, 0.82) 55%,
+      rgba(4, 24, 42, 0.35) 76%,
       rgba(4, 24, 42, 0.12) 100%
     ),
     linear-gradient(
       180deg,
-      rgba(2, 14, 28, 0.4) 0%,
-      transparent 40%,
-      rgba(2, 14, 28, 0.85) 100%
+      rgba(2, 14, 28, 0.5) 0%,
+      transparent 35%,
+      rgba(2, 14, 28, 0.9) 100%
     );
   pointer-events: none;
 }

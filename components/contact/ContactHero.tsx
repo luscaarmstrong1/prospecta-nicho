@@ -13,7 +13,7 @@ export function ContactHero({ onScrollToForm }: ContactHeroProps) {
     "Olá! Gostaria de falar com um especialista da ProspectaNicho sobre soluções para minha empresa."
   );
 
-  const heroBg = assetPath("/images/contact/contact-hero.webp");
+  const heroBg = assetPath("/assets/contato/hero-contato-consultant.webp");
 
   return (
     <section className={styles.heroSection} data-testid="contact-hero">

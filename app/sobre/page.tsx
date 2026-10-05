@@ -133,12 +133,11 @@ export default function SobrePage() {
           {/* Background do escritório corporativo noturno fornecido */}
           <div className={styles.aboutHeroBg} aria-hidden="true">
             <Image
-              src={assetPath("/preview-v2/assets/about-hero-office.png")}
+              src={assetPath("/assets/sobre/hero-sobre-office.webp")}
               alt="Escritório corporativo premium noturno com vista urbana"
               fill
               priority
               sizes="100vw"
-              unoptimized
             />
           </div>
 
@@ -278,10 +277,12 @@ export default function SobrePage() {
             </div>
 
             <div className={styles.valuesGrid3Custom}>
-              {valuesList.map((val) => {
+              {valuesList.map((val, idx) => {
                 const IconComp = val.icon;
+                const formattedNum = String(idx + 1).padStart(2, "0");
                 return (
                   <article key={val.id} className={styles.valueCardCustom}>
+                    <span className={styles.valueCardNumber} aria-hidden="true">{formattedNum}</span>
                     <div className={styles.cardTopIcon}>
                       <IconComp size={24} aria-hidden="true" />
                     </div>
@@ -338,19 +339,18 @@ export default function SobrePage() {
               {/* Centro: Composição Visual com Cidade e Janela Corporativa */}
               <div className={styles.purposeCenterVisual}>
                 <Image
-                  src={assetPath("/preview-v2/assets/about-purpose-city-hd.png")}
+                  src={assetPath("/assets/sobre/brasil-empresarial.webp")}
                   alt="Visualização corporativa com skyline urbano e janelas executivas"
                   fill
                   sizes="(max-width: 1024px) 100vw, 400px"
                   style={{ objectFit: "cover" }}
-                  unoptimized
                 />
                 <div
                   style={{
                     position: "absolute",
                     inset: 0,
                     background:
-                      "linear-gradient(180deg, rgba(2, 15, 28, 0.2) 0%, rgba(2, 15, 28, 0.8) 100%)",
+                      "linear-gradient(180deg, rgba(2, 15, 28, 0.15) 0%, rgba(2, 15, 28, 0.75) 100%)",
                   }}
                 />
               </div>

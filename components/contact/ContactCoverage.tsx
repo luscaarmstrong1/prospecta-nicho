@@ -6,7 +6,7 @@ import { assetPath } from "@/lib/asset-path";
 import styles from "./contact.module.css";
 
 export function ContactCoverage() {
-  const brazilMapImg = assetPath("/images/contact/contact-brazil.webp");
+  const brazilMapImg = assetPath("/assets/contato/brazil-map-network.webp");
 
   return (
     <section className={styles.coverageSection} data-testid="contact-coverage">

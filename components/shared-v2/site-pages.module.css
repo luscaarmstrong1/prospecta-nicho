@@ -1011,21 +1011,38 @@
 }
 
 .pillarCard {
-  background: #071d2e;
-  border: 1px solid rgba(31, 216, 235, 0.2);
+  background: linear-gradient(180deg, #061c2d 0%, #031320 100%);
+  border: 1px solid rgba(31, 216, 235, 0.18);
   border-radius: 16px;
   padding: 2.2rem 1.6rem;
   display: flex;
   flex-direction: column;
   position: relative;
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease;
   min-height: 280px;
+}
+
+.pillarCard::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(32, 237, 240, 0.4), transparent);
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
 .pillarCard:hover {
   transform: translateY(-4px);
-  border-color: #20edf0;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 26px rgba(32, 237, 240, 0.22);
+  border-color: rgba(32, 237, 240, 0.55);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65), 0 0 24px rgba(32, 237, 240, 0.18);
+}
+
+.pillarCard:hover::before {
+  opacity: 1;
 }
 
 .pillarCard:hover .cardTopIcon {
@@ -1033,7 +1050,7 @@
   border-color: #20edf0;
 }
 
-/* CARDS DE VALORES (3 CARDS GRANDES) */
+/* CARDS DE VALORES (3 CARDS GRANDES COM NUMERAÇÃO EDITORIAL) */
 .valuesGrid3Custom {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1041,26 +1058,62 @@
 }
 
 .valueCardCustom {
-  background: #071d2e;
-  border: 1px solid rgba(31, 216, 235, 0.2);
+  background: linear-gradient(180deg, #072033 0%, #031422 100%);
+  border: 1px solid rgba(31, 216, 235, 0.18);
   border-radius: 16px;
   padding: 2.5rem 2rem;
   display: flex;
   flex-direction: column;
   position: relative;
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  overflow: hidden;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease;
   min-height: 320px;
+}
+
+.valueCardCustom::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(32, 237, 240, 0.5), transparent);
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
 .valueCardCustom:hover {
   transform: translateY(-4px);
-  border-color: #20edf0;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 26px rgba(32, 237, 240, 0.22);
+  border-color: rgba(32, 237, 240, 0.55);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.65), 0 0 24px rgba(32, 237, 240, 0.2);
+}
+
+.valueCardCustom:hover::before {
+  opacity: 1;
 }
 
 .valueCardCustom:hover .cardTopIcon {
   box-shadow: 0 0 16px rgba(32, 237, 240, 0.35);
   border-color: #20edf0;
+}
+
+.valueCardNumber {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.75rem;
+  font-family: var(--font-sora, 'Sora', sans-serif);
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1;
+  color: rgba(32, 237, 240, 0.14);
+  letter-spacing: -0.04em;
+  pointer-events: none;
+  transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.valueCardCustom:hover .valueCardNumber {
+  color: rgba(32, 237, 240, 0.32);
+  transform: translateY(-2px);
 }
 
 /* SEÇÃO POR QUE EXISTIMOS - COMPOSIÇÃO SOFISTICADA BRASIL */
