@@ -13,9 +13,9 @@ test("official home uses the approved v2 visual with real navigation", async ({ 
 
   await expect(page.getByText("Versão visual de teste", { exact: false })).toHaveCount(0);
   await expect(page.getByRole("dialog", { name: "Preferências de cookies" })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Receber amostra/ }).first()).toHaveAttribute(
+  await expect(page.getByTestId("preview-header-actions").getByRole("link", { name: /Falar com um especialista/ })).toHaveAttribute(
     "href",
-    /\/solicitar-planilha\?source=header-mobile-amostra/,
+    /\/solicitar-planilha\?source=home-v2-header/,
   );
   await expect(page.getByTestId("preview-hero").getByRole("link", { name: /Ver planos e bases/ })).toHaveAttribute(
     "href",
@@ -31,7 +31,7 @@ test("official home remains usable on mobile without horizontal overflow", async
 
   await expect(page.getByTestId("preview-hero-title")).toBeVisible();
   await page.getByRole("button", { name: "Abrir menu" }).click();
-  await expect(page.getByRole("link", { name: "Falar com um especialista" }).last()).toHaveAttribute(
+  await expect(page.getByTestId("preview-header").locator('a[href="/solicitar-planilha?source=home-v2-header-mobile"]')).toHaveAttribute(
     "href",
     "/solicitar-planilha?source=home-v2-header-mobile",
   );
