@@ -13,9 +13,9 @@ test("official home uses the approved v2 visual with real navigation", async ({ 
 
   await expect(page.getByText("Versão visual de teste", { exact: false })).toHaveCount(0);
   await expect(page.getByRole("dialog", { name: "Preferências de cookies" })).toBeVisible();
-  await expect(page.getByTestId("preview-header-actions").getByRole("link", { name: /Falar com um especialista/ })).toHaveAttribute(
+  await expect(page.getByTestId("site-v2-header-actions").getByRole("link", { name: /Falar com um especialista/ })).toHaveAttribute(
     "href",
-    /\/solicitar-planilha\?source=home-v2-header/,
+    /^https:\/\/wa\.me\//,
   );
   await expect(page.getByTestId("preview-hero").getByRole("link", { name: /Ver planos e bases/ })).toHaveAttribute(
     "href",
@@ -31,10 +31,9 @@ test("official home remains usable on mobile without horizontal overflow", async
 
   await expect(page.getByTestId("preview-hero-title")).toBeVisible();
   await page.getByRole("button", { name: "Abrir menu" }).click();
-  await expect(page.getByTestId("preview-header").locator('a[href="/solicitar-planilha?source=home-v2-header-mobile"]')).toHaveAttribute(
-    "href",
-    "/solicitar-planilha?source=home-v2-header-mobile",
-  );
+  await expect(
+    page.getByTestId("site-v2-header").getByRole("link", { name: "Falar com um especialista" }).last(),
+  ).toHaveAttribute("href", /^https:\/\/wa\.me\//);
 
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
   expect(overflow).toBe(false);
