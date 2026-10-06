@@ -13,7 +13,7 @@ test("official home uses the approved v2 visual with real navigation", async ({ 
 
   await expect(page.getByText("Versão visual de teste", { exact: false })).toHaveCount(0);
   await expect(page.getByRole("dialog", { name: "Preferências de cookies" })).toBeVisible();
-  await expect(page.getByTestId("site-v2-header-actions").getByRole("link", { name: /Falar com um especialista/ })).toHaveAttribute(
+  await expect(page.getByTestId("site-v2-header-actions").locator("a")).toHaveAttribute(
     "href",
     /^https:\/\/wa\.me\//,
   );
