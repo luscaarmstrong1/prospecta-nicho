@@ -122,7 +122,7 @@ const termsSections: LegalSectionItem[] = [
     content: (
       <>
         <p className={styles.legalParagraph}>
-          Todo o conteúdo exibido na plataforma — incluindo a marca Prospecta Nicho, logotipos, código-fonte, arquitetura de software, layouts originais, textos institucionais, ícones e design gráfico — é de propriedade exclusiva da Prospecta Nicho ou de seus licenciantes, estando protegido pela legislação de direitos autorais e propriedade industrial (Lei nº 9.610/1998 e Lei nº 9.279/1996).
+          Todo o conteúdo exibido na plataforma, incluindo a marca Prospecta Nicho, logotipos, código-fonte, arquitetura de software, layouts originais, textos institucionais, ícones e design gráfico, é de propriedade exclusiva da Prospecta Nicho ou de seus licenciantes, estando protegido pela legislação de direitos autorais e propriedade industrial (Lei nº 9.610/1998 e Lei nº 9.279/1996).
         </p>
         <p className={styles.legalParagraph}>
           É expressamente vedada a reprodução, cópia, distribuição, engenharia reversa ou comercialização não autorizada de qualquer elemento exclusivo da plataforma sem prévia anuência por escrito da Prospecta Nicho. Nos projetos de desenvolvimento de sites, a titularidade dos conteúdos, logos e materiais fornecidos pelo cliente permanece com o próprio cliente.

@@ -28,7 +28,7 @@ const privacySections: LegalSectionItem[] = [
     content: (
       <>
         <p className={styles.legalParagraph}>
-          A <strong>Prospecta Nicho</strong> respeita a sua privacidade e está comprometida em proteger os seus dados pessoais. Esta Política de Privacidade explica, de forma clara, transparente e acessível, como tratamos, coletamos, utilizamos, armazenamos e salvaguardamos as informações dos usuários e clientes em nossas plataformas digitais e serviços comerciais, em estrita conformidade com a <strong>Lei Geral de Proteção de Dados Pessoais (LGPD – Lei nº 13.709/2018)</strong> e demais legislações aplicáveis no território brasileiro.
+          A <strong>Prospecta Nicho</strong> respeita a sua privacidade e está comprometida em proteger os seus dados pessoais. Esta Política de Privacidade explica, de forma clara, transparente e acessível, como tratamos, coletamos, utilizamos, armazenamos e salvaguardamos as informações dos usuários e clientes em nossas plataformas digitais e serviços comerciais, em estrita conformidade com a <strong>Lei Geral de Proteção de Dados Pessoais (LGPD - Lei nº 13.709/2018)</strong> e demais legislações aplicáveis no território brasileiro.
         </p>
         <p className={styles.legalParagraph}>
           Ao acessar nosso site, interagir com nossas soluções, solicitar orçamentos, amostras ou contratar serviços de inteligência comercial B2B, sites profissionais ou automações, você declara ter ciência das diretrizes descritas neste documento.

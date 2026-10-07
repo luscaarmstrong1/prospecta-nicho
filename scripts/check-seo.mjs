@@ -16,6 +16,7 @@ const home = read("app/page.tsx");
 const homeView = read("components/home-v2/HomeSiteV2.tsx");
 const sitemap = read("app/sitemap.ts");
 const robots = read("app/robots.ts");
+const manifest = read("app/manifest.ts");
 
 if (!siteUrl.includes(canonicalDomain)) failures.push("lib/site-url.ts não define o domínio canônico de produção.");
 if (!layout.includes("GOOGLE_SITE_VERIFICATION")) failures.push("app/layout.tsx não aceita GOOGLE_SITE_VERIFICATION.");
@@ -24,6 +25,13 @@ if (!home.includes("WebSite")) failures.push("app/page.tsx não publica WebSite 
 if (!home.includes("Prospecta Nicho | Leads B2B, Sites, Landing Pages e Automação")) failures.push("A home não tem o título SEO aprovado.");
 if (!homeView.includes("Prospecta Nicho: encontre")) failures.push("O H1 da home não contém a marca Prospecta Nicho.");
 if (!robots.includes("/sitemap.xml")) failures.push("robots.ts não referencia o sitemap.");
+if (!existsSync(join(root, "public", "favicon-96x96.png"))) failures.push("Favicon 96x96 público ausente.");
+if (!layout.includes('sizes: "96x96"') || !layout.includes('type: "image/png"')) {
+  failures.push("app/layout.tsx não declara tamanho e tipo do favicon principal.");
+}
+if (!manifest.includes('assetPath("/favicon-96x96.png")') || !manifest.includes('sizes: "96x96"')) {
+  failures.push("app/manifest.ts não publica o favicon 96x96 com base path seguro.");
+}
 
 for (const route of requiredRoutes) {
   if (!existsSync(join(root, "app", route, "page.tsx"))) failures.push(`Rota obrigatória ausente: /${route}`);

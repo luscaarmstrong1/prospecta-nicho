@@ -20,6 +20,6 @@ test("preview v2 is navigable and keeps actions demonstrative", async ({ page })
   await page.getByLabel("Seu melhor e-mail").fill("teste@exemplo.com");
   await page.getByRole("button", { name: /Quero receber/ }).click();
   await expect(page.getByRole("button", { name: "Enviando..." })).toBeVisible();
-  await expect(page.getByText("Demonstração — nenhum dado foi enviado.")).toBeVisible();
+  await expect(page.getByText("Demonstração: nenhum dado foi enviado.")).toBeVisible();
   expect(integrationRequests).toEqual([]);
 });

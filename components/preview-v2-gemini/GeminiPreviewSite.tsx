@@ -764,7 +764,7 @@ function GeminiPreviewSiteContent() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={reducedMotion ? undefined : { opacity: 0, y: 8 }}
               >
-                <CheckCircle2 size={16} aria-hidden="true" /> Demonstração — nenhum dado foi enviado.
+                <CheckCircle2 size={16} aria-hidden="true" /> Demonstração: nenhum dado foi enviado.
               </motion.span>
             )}
           </AnimatePresence>

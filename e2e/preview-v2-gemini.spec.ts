@@ -54,7 +54,7 @@ test.describe("ProspectaNicho Preview V2 - Gemini Candidate", () => {
 
     const subscribeBtn = page.getByRole("button", { name: /Quero receber/i });
     await subscribeBtn.click();
-    await expect(page.getByText("Demonstração — nenhum dado foi enviado.")).toBeVisible();
+    await expect(page.getByText("Demonstração: nenhum dado foi enviado.")).toBeVisible();
 
     // 6. Assert complete isolation from backend/supabase
     expect(integrationRequests).toEqual([]);

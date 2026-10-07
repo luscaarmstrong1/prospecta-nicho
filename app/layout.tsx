@@ -38,8 +38,19 @@ export const metadata: Metadata = {
   publisher: site.name,
   alternates: { canonical: "/" },
   icons: {
-    icon: assetPath("/assets/brand/favicon.png"),
-    apple: assetPath("/assets/brand/apple-touch-icon.png"),
+    icon: [
+      {
+        url: assetPath("/favicon-96x96.png"),
+        sizes: "96x96",
+        type: "image/png",
+      },
+    ],
+    shortcut: assetPath("/favicon.ico"),
+    apple: {
+      url: assetPath("/apple-touch-icon.png"),
+      sizes: "180x180",
+      type: "image/png",
+    },
   },
   openGraph: {
     title: "Prospecta Nicho | Leads B2B, Sites, Landing Pages e Automação",

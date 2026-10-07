@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { assetPath } from "@/lib/asset-path";
 import { site } from "@/lib/site";
 
 export const dynamic = "force-static";
@@ -14,8 +15,8 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#0fa3a6",
     lang: "pt-BR",
     icons: [
-      { src: "/assets/brand/favicon.png", sizes: "64x64", type: "image/png" },
-      { src: "/assets/brand/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+      { src: assetPath("/favicon-96x96.png"), sizes: "96x96", type: "image/png" },
+      { src: assetPath("/apple-touch-icon.png"), sizes: "180x180", type: "image/png" },
     ],
   };
 }

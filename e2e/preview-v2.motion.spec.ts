@@ -53,7 +53,7 @@ test.describe("preview v2 motion system", () => {
     await page.getByTestId("preview-footer").scrollIntoViewIfNeeded();
     await page.getByLabel("Seu melhor e-mail").fill("motion@exemplo.com");
     await page.getByRole("button", { name: "Quero receber" }).click();
-    await expect(page.getByText("Demonstração — nenhum dado foi enviado.")).toBeVisible();
+    await expect(page.getByText("Demonstração: nenhum dado foi enviado.")).toBeVisible();
 
     if (["desktop", "mobile-390"].includes(testInfo.project.name)) {
       await page.goto("/preview/site-v2/?motion=off", { waitUntil: "networkidle" });
